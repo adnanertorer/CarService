@@ -26,5 +26,15 @@ public class SubServiceConfiguration : IEntityTypeConfiguration<SubService>
         builder.Property(c => c.DeletedBy).HasMaxLength(64);
 
         builder.HasQueryFilter(c => c.IsDeleted == false || c.DeletedDate == null);
+
+        builder.HasOne(b => b.MainService)
+            .WithMany(c => c.SubServices)
+            .HasForeignKey(b => b.MainServiceId)
+            .OnDelete(DeleteBehavior.NoAction);
+
+        builder.HasOne(b => b.Employee)
+           .WithMany(c => c.SubServices)
+           .HasForeignKey(b => b.EmployeeId)
+           .OnDelete(DeleteBehavior.NoAction);
     }
 }

@@ -24,5 +24,15 @@ public class AccountingTransactionConfiguration : IEntityTypeConfiguration<Accou
         builder.Property(c => c.DeletedBy).HasMaxLength(64);
 
         builder.HasQueryFilter(c => c.IsDeleted == false || c.DeletedDate == null);
+
+        builder.HasOne(b => b.Company)
+         .WithMany(c => c.AccountingTransactions)
+         .HasForeignKey(b => b.CompanyId)
+         .OnDelete(DeleteBehavior.NoAction);
+
+        builder.HasOne(b => b.Customer)
+        .WithMany(c => c.AccountingTransactions)
+        .HasForeignKey(b => b.CustomerId)
+        .OnDelete(DeleteBehavior.NoAction);
     }
 }

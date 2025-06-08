@@ -25,5 +25,10 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
         builder.Property(c => c.DeletedBy).HasMaxLength(64);
 
         builder.HasQueryFilter(c => c.IsDeleted == false || c.DeletedDate == null);
+
+        builder.HasOne(b => b.Company)
+            .WithMany(c => c.Users)
+            .HasForeignKey(b => b.CompanyId)
+            .OnDelete(DeleteBehavior.NoAction);
     }
 }
