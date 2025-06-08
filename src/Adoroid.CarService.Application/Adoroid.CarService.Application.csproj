@@ -7,7 +7,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.3.0" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\Adoroid.CarService.Persistence\Adoroid.CarService.Persistence.csproj" />
+    <ProjectReference Include="..\Adoroid.CarService.Shared\Adoroid.CarService.Shared.csproj" />
   </ItemGroup>
 
 </Project>
