@@ -21,5 +21,10 @@ public class MainServiceConfiguration : IEntityTypeConfiguration<MainService>
         builder.Property(c => c.DeletedBy).HasMaxLength(64);
 
         builder.HasQueryFilter(c => c.IsDeleted == false || c.DeletedDate == null);
+
+        builder.HasOne(b => b.Vehicle)
+        .WithMany(c => c.MainServices)
+        .HasForeignKey(b => b.VehicleId)
+        .OnDelete(DeleteBehavior.NoAction);
     }
 }

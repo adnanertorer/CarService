@@ -25,5 +25,10 @@ public class VehicleConfiguration : IEntityTypeConfiguration<Vehicle>
         builder.Property(c => c.DeletedBy).HasMaxLength(64);
 
         builder.HasQueryFilter(c => c.IsDeleted == false || c.DeletedDate == null);
+
+        builder.HasOne(b => b.Customer)
+           .WithMany(c => c.Vehicles)
+           .HasForeignKey(b => b.CustomerId)
+           .OnDelete(DeleteBehavior.NoAction);
     }
 }

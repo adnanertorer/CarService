@@ -26,5 +26,10 @@ public class CustomerConfiguration : IEntityTypeConfiguration<Customer>
         builder.Property(c => c.DeletedBy).HasMaxLength(64);
 
         builder.HasQueryFilter(c => c.IsDeleted == false || c.DeletedDate == null);
+
+        builder.HasOne(b => b.Company)
+            .WithMany(c => c.Customers)
+            .HasForeignKey(b => b.CompanyId)
+            .OnDelete(DeleteBehavior.NoAction);
     }
 }

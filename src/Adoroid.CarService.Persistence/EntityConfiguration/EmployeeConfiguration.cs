@@ -24,5 +24,10 @@ public class EmployeeConfiguration : IEntityTypeConfiguration<Employee>
         builder.Property(c => c.DeletedBy).HasMaxLength(64);
 
         builder.HasQueryFilter(c => c.IsDeleted == false || c.DeletedDate == null);
+
+        builder.HasOne(b => b.Company)
+           .WithMany(c => c.Employees)
+           .HasForeignKey(b => b.CompanyId)
+           .OnDelete(DeleteBehavior.NoAction);
     }
 }

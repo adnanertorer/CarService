@@ -14,4 +14,5 @@ public class AccountingTransaction : Entity<Guid>
 
     public Customer? Customer { get; set; }
     public Company? Company { get; set; } 
+
 }
