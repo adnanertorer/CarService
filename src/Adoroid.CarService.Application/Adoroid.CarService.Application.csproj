@@ -19,8 +19,7 @@
 
   <ItemGroup>
     <Folder Include="ExeptionMessages\" />
-    <Folder Include="Features\" />
-    <Folder Include="Dtos\" />
+    <Folder Include="Features\Users\" />
   </ItemGroup>
 
 </Project>
