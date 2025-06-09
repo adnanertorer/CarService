@@ -1,4 +1,4 @@
-﻿using Adoroid.CarService.Shared.Auth;
+﻿using Adoroid.CarService.Application.Common.Abstractions.Auth;
 using Microsoft.AspNetCore.Http;
 using System.Security.Claims;
 

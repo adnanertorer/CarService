@@ -18,8 +18,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="ExeptionMessages\" />
-    <Folder Include="Features\Users\" />
+    <Folder Include="Features\Users\Commands\" />
   </ItemGroup>
 
 </Project>
