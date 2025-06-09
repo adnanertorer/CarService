@@ -18,7 +18,7 @@ namespace Adoroid.CarService.Application.Features.Companies.Commands.Update
         {
             var company = await dbContext.Companies.FirstOrDefaultAsync(i => i.Id == request.Id, cancellationToken);
             if (company == null)
-                return Response<CompanyDto>.Fail(BusinessExceptionMessages.CompanyAlreadyExists);
+                return Response<CompanyDto>.Fail(BusinessExceptionMessages.CompanyNotFound);
 
             company.UpdatedDate = DateTime.Now;
             company.UpdatedBy = Guid.Parse(currentUser.Id!);
