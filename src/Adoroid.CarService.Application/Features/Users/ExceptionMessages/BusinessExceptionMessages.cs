@@ -11,4 +11,10 @@ public static class BusinessExceptionMessages
     public const string LoginFailed = "Giriş başarısız oldu. Lütfen tekrar deneyin.";
     public const string InvalidRefreshToken = "Geçersiz yenileme jetonu.";
     public const string RefreshTokenExpired = "Yenileme jetonu süresi dolmuş.";
+    public const string OtpRequired = "OTP doğrulaması gereklidir.";
+    public const string OtpInvalid = "Geçersiz OTP kodu.";
+    public const string OtpExpired = "OTP kodu süresi dolmuş.";
+    public const string OtpAlreadySent = "OTP kodu zaten gönderildi. Lütfen bekleyin ve tekrar deneyin.";
+    public const string OtpNotSent = "OTP kodu gönderilemedi. Lütfen tekrar deneyin.";
+    public const string OtpLimitExceeded = "OTP gönderim limiti aşıldı. Lütfen daha sonra tekrar deneyin.";
 }
