@@ -1,5 +1,5 @@
 ﻿using Adoroid.CarService.Application.Dtos.Auth;
-using Adoroid.CarService.Application.Dtos.Users;
+using Adoroid.CarService.Application.Features.Users.Dtos;
 using Adoroid.Core.Application.Wrappers;
 
 namespace Adoroid.CarService.Application.Common.Abstractions.Auth;

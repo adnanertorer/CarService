@@ -1,5 +1,5 @@
 ﻿using Adoroid.CarService.Application.Common.Abstractions.Auth;
-using Adoroid.CarService.Application.Dtos.Users;
+using Adoroid.CarService.Application.Features.Users.Dtos;
 using Adoroid.CarService.Application.Features.Users.ExceptionMessages;
 using Adoroid.CarService.Domain.Entities;
 using Adoroid.CarService.Persistence;
@@ -9,7 +9,8 @@ using MinimalMediatR.Core;
 
 namespace Adoroid.CarService.Application.Features.Users.Commands.Create;
 
-public record CreateUserCommand(string Name, string Surname, string Email, string Password, Guid CompanyId, string PhoneNumber) : IRequest<Response<UserDto>>;
+public record CreateUserCommand(string Name, string Surname, string Email, string Password, Guid CompanyId, string PhoneNumber) :
+    IRequest<Response<UserDto>>;
 
 public class CreateUserCommandHandler(CarServiceDbContext dbContext, IAesEncryptionHelper aesEncryptionHelper) : IRequestHandler<CreateUserCommand, Response<UserDto>>
 {
