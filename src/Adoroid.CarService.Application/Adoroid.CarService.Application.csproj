@@ -17,10 +17,4 @@
     <ProjectReference Include="..\Adoroid.CarService.Shared\Adoroid.CarService.Shared.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="ExeptionMessages\" />
-    <Folder Include="Features\" />
-    <Folder Include="Dtos\" />
-  </ItemGroup>
-
 </Project>

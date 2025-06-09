@@ -1,4 +1,4 @@
-﻿namespace Adoroid.CarService.Shared;
+﻿namespace Adoroid.CarService.Application.Common.Abstractions.Auth;
 
 public interface ICurrentUser
 {
