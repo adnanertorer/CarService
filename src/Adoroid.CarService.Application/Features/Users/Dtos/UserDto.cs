@@ -1,4 +1,4 @@
-﻿namespace Adoroid.CarService.Application.Dtos.Users;
+﻿namespace Adoroid.CarService.Application.Features.Users.Dtos;
 
 public class UserDto
 {
