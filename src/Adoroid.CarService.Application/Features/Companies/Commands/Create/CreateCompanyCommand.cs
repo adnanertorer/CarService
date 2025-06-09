@@ -6,7 +6,7 @@ using Adoroid.Core.Application.Wrappers;
 using Microsoft.EntityFrameworkCore;
 using MinimalMediatR.Core;
 
-namespace Adoroid.CarService.Application.Features.Companies.Commands;
+namespace Adoroid.CarService.Application.Features.Companies.Commands.Create;
 
 public record CreateCompanyCommand(string CompanyName, string AuthorizedName, string AuthorizedSurname,
     string TaxNumber, string TaxOffice, int CityId, int DistrictId, string CompanyAddress,
