@@ -17,6 +17,7 @@ public class SupplierGetByIdRequestHandler(CarServiceDbContext dbContext) : IReq
         var supplier = await dbContext.Suppliers
             .AsNoTracking()
             .FirstOrDefaultAsync(i => i.Id == request.Id, cancellationToken);
+
         if (supplier is null)
             return Response<SupplierDto>.Fail(BusinessExceptionMessages.SupplierNotFound);
 
