@@ -1,11 +1,11 @@
 ﻿using Adoroid.CarService.Application.Common.ValidationMessages;
 using FluentValidation;
 
-namespace Adoroid.CarService.Application.Features.Companies.Queries.GetById.Validators;
+namespace Adoroid.CarService.Application.Features.Suppliers.Queries.GetById.Validators;
 
-public class CompanyGetByIdQueryValidator : AbstractValidator<CompanyGetByIdQuery>
+public class SupplierGetByIdRequestValidator : AbstractValidator<SupplierGetByIdRequest>
 {
-    public CompanyGetByIdQueryValidator()
+    public SupplierGetByIdRequestValidator()
     {
         RuleFor(x => x.Id)
          .NotNull()

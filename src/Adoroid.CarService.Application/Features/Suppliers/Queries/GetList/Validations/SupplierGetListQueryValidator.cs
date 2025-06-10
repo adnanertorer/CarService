@@ -1,14 +1,14 @@
 ﻿using Adoroid.CarService.Application.Common.ValidationMessages;
 using FluentValidation;
 
-namespace Adoroid.CarService.Application.Features.Companies.Queries.GetList.Validators;
+namespace Adoroid.CarService.Application.Features.Suppliers.Queries.GetList.Validations;
 
-public class CompanyGetListQueryValidator : AbstractValidator<CompanyGetListQuery>
+public class SupplierGetListQueryValidator : AbstractValidator<SupplierGetListQuery>
 {
-    public CompanyGetListQueryValidator()
+    public SupplierGetListQueryValidator()
     {
         RuleFor(i => i.PageRequest).NotNull()
-        .WithMessage(ValidationMessages.PageRequestRequired);
+       .WithMessage(ValidationMessages.PageRequestRequired);
 
         RuleFor(i => i.PageRequest.PageSize)
             .GreaterThan(0)
