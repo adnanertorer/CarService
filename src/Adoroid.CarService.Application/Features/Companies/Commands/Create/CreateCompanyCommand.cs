@@ -1,5 +1,6 @@
 ﻿using Adoroid.CarService.Application.Features.Companies.Dtos;
 using Adoroid.CarService.Application.Features.Companies.ExceptionMessages;
+using Adoroid.CarService.Application.Features.Companies.MapperExtensions;
 using Adoroid.CarService.Domain.Entities;
 using Adoroid.CarService.Persistence;
 using Adoroid.Core.Application.Wrappers;
@@ -42,21 +43,6 @@ public class CreateCompanyCommandHandler(CarServiceDbContext dbContext) : IReque
         await dbContext.Companies.AddAsync(company, cancellationToken);
         await dbContext.SaveChangesAsync(cancellationToken);
 
-        var companyDto = new CompanyDto
-        {
-            Id = company.Id,
-            AuthorizedName = company.AuthorizedName,
-            AuthorizedSurname = company.AuthorizedSurname,
-            CityId = company.CityId,
-            CompanyAddress = company.CompanyAddress,
-            CompanyEmail = company.CompanyEmail,
-            CompanyName = company.CompanyName,
-            CompanyPhone = company.CompanyPhone,
-            DistrictId = company.DistrictId,
-            TaxNumber = company.TaxNumber,
-            TaxOffice = company.TaxOffice
-        };
-
-        return Response<CompanyDto>.Success(companyDto);
+        return Response<CompanyDto>.Success(company.FromEntity());
     }
 }
