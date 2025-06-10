@@ -1,12 +1,16 @@
 ﻿using Adoroid.CarService.Application.Common.ValidationMessages;
 using FluentValidation;
 
-namespace Adoroid.CarService.Application.Features.Suppliers.Commands.Create.Validations;
+namespace Adoroid.CarService.Application.Features.Suppliers.Commands.Update.Validations;
 
-public class CreateSupplierCommandValidation : AbstractValidator<CreateSupplierCommand>
+public class UpdateSupplierCommandValidator : AbstractValidator<UpdateSupplierCommand>
 {
-    public CreateSupplierCommandValidation()
+    public UpdateSupplierCommandValidator()
     {
+        RuleFor(x => x.Id)
+            .NotNull()
+            .WithMessage(string.Format(ValidationMessages.Required, "Id"));
+
         RuleFor(x => x.Email)
            .NotEmpty()
            .WithMessage(string.Format(ValidationMessages.Required, "E-Posta"))

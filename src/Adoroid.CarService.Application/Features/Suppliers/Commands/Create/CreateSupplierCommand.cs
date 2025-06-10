@@ -10,7 +10,7 @@ using MinimalMediatR.Core;
 
 namespace Adoroid.CarService.Application.Features.Suppliers.Commands.Create;
 
-public record CreateSupplierCommand(Guid CompanyId, string Name, string ContactName, string PhoneNumber, string? Email, string? Address):
+public record CreateSupplierCommand(string Name, string ContactName, string PhoneNumber, string? Email, string? Address):
     IRequest<Response<SupplierDto>>;
 
 public class CreateSupplierCommandHandler(CarServiceDbContext dbContext, ICurrentUser currentUser) : IRequestHandler<CreateSupplierCommand, Response<SupplierDto>>
