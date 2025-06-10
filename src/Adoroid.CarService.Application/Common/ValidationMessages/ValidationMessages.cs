@@ -1,4 +1,4 @@
-﻿namespace Adoroid.CarService.Application.Features.Companies.ExceptionMessages;
+﻿namespace Adoroid.CarService.Application.Common.ValidationMessages;
 
 public static class ValidationMessages
 {
