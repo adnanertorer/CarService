@@ -17,8 +17,4 @@
     <ProjectReference Include="..\Adoroid.CarService.Shared\Adoroid.CarService.Shared.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Features\Companies\Queries\" />
-  </ItemGroup>
-
 </Project>
