@@ -9,4 +9,7 @@ public static class ValidationMessages
     public const string NotEmpty = "{0} alanı boş bırakılamaz.";
     public const string NotNull = "{0} alanı null olamaz.";
     public const string GreaterThanZero = "{0} alanı sıfırdan büyük olmak zorunda";
+    public const string PageRequestRequired = "Page request required";
+    public const string PageRequestPageSizeMustBeGreaterThanZero = "Page size must be greater than 0.";
+    public const string PageRequestPageSizeMustBeLessThan100 = "Page size must be less than 100.";
 }
