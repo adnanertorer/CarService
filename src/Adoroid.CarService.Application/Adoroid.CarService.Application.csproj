@@ -17,4 +17,10 @@
     <ProjectReference Include="..\Adoroid.CarService.Shared\Adoroid.CarService.Shared.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Features\Customers\Commands\Delete\" />
+    <Folder Include="Features\Customers\Commands\Update\" />
+    <Folder Include="Features\Customers\Queries\" />
+  </ItemGroup>
+
 </Project>
