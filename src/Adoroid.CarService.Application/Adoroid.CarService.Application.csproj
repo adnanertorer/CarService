@@ -17,4 +17,11 @@
     <ProjectReference Include="..\Adoroid.CarService.Shared\Adoroid.CarService.Shared.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Features\Vehicles\Commands\" />
+    <Folder Include="Features\Vehicles\ExceptionMessages\" />
+    <Folder Include="Features\Vehicles\MapperExtensions\" />
+    <Folder Include="Features\Vehicles\Queries\" />
+  </ItemGroup>
+
 </Project>
