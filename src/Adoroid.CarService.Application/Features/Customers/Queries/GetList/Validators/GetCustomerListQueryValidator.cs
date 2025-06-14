@@ -1,4 +1,4 @@
-﻿,using Adoroid.CarService.Application.Common.ValidationMessages;
+﻿using Adoroid.CarService.Application.Common.ValidationMessages;
 using FluentValidation;
 
 namespace Adoroid.CarService.Application.Features.Customers.Queries.GetList.Validators;
