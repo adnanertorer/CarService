@@ -32,7 +32,7 @@ public class CreateVehicleCommandHandler(CarServiceDbContext dbContext, ICurrent
             IsDeleted = false,
             Model = request.Model,
             Plate = request.Plate,
-            SerilNumber = request.SerilNumber,
+            SerialNumber = request.SerialNumber,
             Year = request.Year,
             CreatedDate = DateTime.UtcNow
         };

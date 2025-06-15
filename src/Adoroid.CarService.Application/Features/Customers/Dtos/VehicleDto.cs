@@ -10,5 +10,5 @@ public class VehicleDto
     public string Plate { get; set; }
     public string? Engine { get; set; }
     public int FuelTypeId { get; set; }
-    public string? SerilNumber { get; set; }
+    public string? SerialNumber { get; set; }
 }

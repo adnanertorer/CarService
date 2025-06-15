@@ -9,7 +9,7 @@ namespace Adoroid.CarService.Application.Features.Vehicles.Commands.Delete;
 
 public record DeleteVehicleCommand(Guid Id) : IRequest<Response<Guid>>;
 
-public class DeleteVehicleCommandHandler(CarServiceDbContext dbContext, ICurrentUser currentUser) : IRequestHandler<DeleteVehicleCommand, Response<Guid>{
+public class DeleteVehicleCommandHandler(CarServiceDbContext dbContext, ICurrentUser currentUser) : IRequestHandler<DeleteVehicleCommand, Response<Guid>>{
     public async Task<Response<Guid>> Handle(DeleteVehicleCommand request, CancellationToken cancellationToken)
     {
         var vehicle = await dbContext.Vehicles

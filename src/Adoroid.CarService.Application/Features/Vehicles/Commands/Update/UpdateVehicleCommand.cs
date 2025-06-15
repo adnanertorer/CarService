@@ -12,7 +12,7 @@ namespace Adoroid.CarService.Application.Features.Vehicles.Commands.Update;
 public record UpdateVehicleCommand(Guid Id, string Brand, string Model, int Year, string Plate, int FuelTypeId, string? Engine, string? SerialNumber) :
     IRequest<Response<VehicleDto>>;
 
-public class UpdateVehicleCommandHandler(CarServiceDbContext dbContext, ICurrentUser currentUser) : IRequestHandler<UpdateVehicleCommand, Response<VehicleDto>{
+public class UpdateVehicleCommandHandler(CarServiceDbContext dbContext, ICurrentUser currentUser) : IRequestHandler<UpdateVehicleCommand, Response<VehicleDto>>{
     public async Task<Response<VehicleDto>> Handle(UpdateVehicleCommand request, CancellationToken cancellationToken)
     {
         var vehicle = await dbContext.Vehicles

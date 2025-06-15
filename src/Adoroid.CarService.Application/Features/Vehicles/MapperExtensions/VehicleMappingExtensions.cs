@@ -22,7 +22,7 @@ public static class VehicleMappingExtensions
             Id = vehicle.Id,
             Model = vehicle.Model,
             Plate = vehicle.Plate,
-            SerilNumber = vehicle.SerilNumber,
+            SerialNumber = vehicle.SerialNumber,
             Year = vehicle.Year,
             MainServices = vehicle.ListFromEntity()
         };
