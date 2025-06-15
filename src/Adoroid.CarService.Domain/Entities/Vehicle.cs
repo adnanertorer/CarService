@@ -16,7 +16,7 @@ public class Vehicle : Entity<Guid>
     public string Plate { get; set; }
     public string? Engine { get; set; }
     public int FuelTypeId { get; set; }
-    public string? SerilNumber { get; set; }
+    public string? SerialNumber { get; set; }
 
     public Customer? Customer { get; set; }
     public ICollection<MainService>? MainServices { get; set; }
