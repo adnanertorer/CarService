@@ -16,7 +16,7 @@ public class VehicleConfiguration : IEntityTypeConfiguration<Vehicle>
         builder.Property(b => b.Plate).IsRequired().HasMaxLength(20);
         builder.Property(b => b.Engine).HasMaxLength(20);
         builder.Property(b => b.FuelTypeId).IsRequired();
-        builder.Property(b => b.SerilNumber).HasMaxLength(30);
+        builder.Property(b => b.SerialNumber).HasMaxLength(30);
 
         builder.Property(i => i.CreatedDate).IsRequired();
         builder.Property(c => c.CreatedBy).IsRequired().HasMaxLength(64);
