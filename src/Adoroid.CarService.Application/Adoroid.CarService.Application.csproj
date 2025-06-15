@@ -18,8 +18,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Features\Vehicles\Commands\Delete\" />
-    <Folder Include="Features\Vehicles\Commands\Update\" />
     <Folder Include="Features\Vehicles\Queries\" />
   </ItemGroup>
 

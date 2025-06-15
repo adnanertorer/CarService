@@ -1,15 +1,15 @@
 ﻿using Adoroid.CarService.Application.Common.ValidationMessages;
 using FluentValidation;
 
-namespace Adoroid.CarService.Application.Features.Vehicles.Commands.Create.Validators;
+namespace Adoroid.CarService.Application.Features.Vehicles.Commands.Update.Validators;
 
-public class CreateVehicleCommandValidator : AbstractValidator<CreateVehicleCommand>
+public class UpdateVehicleCommandValidator : AbstractValidator<UpdateVehicleCommand>
 {
-    public CreateVehicleCommandValidator()
+    public UpdateVehicleCommandValidator()
     {
-        RuleFor(x => x.CustomerId)
-          .NotNull()
-          .WithMessage(string.Format(ValidationMessages.NotNull, "CustomerId"));
+        RuleFor(x => x.Id)
+         .NotNull()
+         .WithMessage(string.Format(ValidationMessages.NotNull, "Id"));
 
         RuleFor(x => x.Brand)
             .NotEmpty()
