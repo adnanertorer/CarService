@@ -10,7 +10,7 @@ namespace Adoroid.CarService.Application.Features.Vehicles.Queries.GetById;
 
 public record GetByIdVehicleRequest(Guid Id) : IRequest<Response<VehicleDto>>;
 
-internal class GetByIdVehicleRequestHandler(CarServiceDbContext dbContext) : IRequestHandler<GetByIdVehicleRequest, Response<VehicleDto>>
+public class GetByIdVehicleRequestHandler(CarServiceDbContext dbContext) : IRequestHandler<GetByIdVehicleRequest, Response<VehicleDto>>
 {
     public async Task<Response<VehicleDto>> Handle(GetByIdVehicleRequest request, CancellationToken cancellationToken)
     {
