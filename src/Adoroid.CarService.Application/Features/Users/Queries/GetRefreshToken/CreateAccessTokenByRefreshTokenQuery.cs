@@ -1,5 +1,5 @@
 ﻿using Adoroid.CarService.Application.Common.Abstractions.Auth;
-using Adoroid.CarService.Application.Dtos.Auth;
+using Adoroid.CarService.Application.Common.Dtos.Auth;
 using Adoroid.CarService.Application.Features.Users.Dtos;
 using Adoroid.CarService.Application.Features.Users.ExceptionMessages;
 using Adoroid.CarService.Persistence;

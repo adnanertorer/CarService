@@ -1,4 +1,4 @@
-﻿using Adoroid.CarService.Application.Dtos.Auth;
+﻿using Adoroid.CarService.Application.Common.Dtos.Auth;
 using Adoroid.CarService.Application.Features.Users.Dtos;
 using Adoroid.Core.Application.Wrappers;
 
