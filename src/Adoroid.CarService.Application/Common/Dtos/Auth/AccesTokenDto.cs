@@ -1,4 +1,4 @@
-﻿namespace Adoroid.CarService.Application.Dtos.Auth;
+﻿namespace Adoroid.CarService.Application.Common.Dtos.Auth;
 
 public class AccesTokenDto
 {

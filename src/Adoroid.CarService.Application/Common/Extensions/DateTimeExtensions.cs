@@ -17,4 +17,15 @@ public static class DateTimeExtensions
 
         return queryableSource.Where(predicate);
     }
+
+    public static IQueryable<T> WhereTwoDateIsBetween<T>(this IQueryable<T> queryableSource, Expression<Func<T, DateTime>> expression, DateTime startDate, DateTime endDate)
+    {
+        var predicate = Expression.Lambda<Func<T, bool>>(
+            Expression.AndAlso(
+                Expression.GreaterThanOrEqual(expression.Body, Expression.Constant(startDate)),
+                Expression.LessThan(expression.Body, Expression.Constant(endDate))
+                ), expression.Parameters);
+
+        return queryableSource.Where(predicate);
+    }
 }
