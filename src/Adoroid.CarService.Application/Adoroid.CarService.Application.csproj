@@ -19,7 +19,7 @@
 
   <ItemGroup>
     <Folder Include="Features\MainServices\ExceptionMessages\" />
-    <Folder Include="Features\MainServices\Queries\" />
+    <Folder Include="Features\MainServices\Queries\GetList\" />
   </ItemGroup>
 
 </Project>
