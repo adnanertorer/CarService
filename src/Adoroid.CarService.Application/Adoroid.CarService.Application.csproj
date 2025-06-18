@@ -19,6 +19,10 @@
 
   <ItemGroup>
     <Folder Include="Features\MainServices\ExceptionMessages\" />
+    <Folder Include="Features\SubServices\Commands\" />
+    <Folder Include="Features\SubServices\ExceptionMessages\" />
+    <Folder Include="Features\SubServices\MapperExtensions\" />
+    <Folder Include="Features\SubServices\Queries\" />
   </ItemGroup>
 
 </Project>
