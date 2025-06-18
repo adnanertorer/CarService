@@ -15,7 +15,7 @@ public class SubService : Entity<Guid>
     public decimal? Discount { get; set; }
     public decimal Cost { get; set; }
 
-    public MainService? MainService { get; set; }
-    public Employee? Employee { get; set; }  
+    public MainService MainService { get; set; }
+    public Employee Employee { get; set; }  
     public Supplier? Supplier { get; set; }
 }

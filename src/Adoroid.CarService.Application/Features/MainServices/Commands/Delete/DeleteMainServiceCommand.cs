@@ -1,5 +1,6 @@
 ﻿using Adoroid.CarService.Application.Common.Abstractions.Auth;
 using Adoroid.CarService.Application.Features.MainServices.ExceptionMessages;
+using Adoroid.CarService.Application.Features.SubServices.ExceptionMessages;
 using Adoroid.CarService.Persistence;
 using Adoroid.Core.Application.Wrappers;
 using Microsoft.EntityFrameworkCore;
