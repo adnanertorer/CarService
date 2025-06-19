@@ -1,9 +1,8 @@
-﻿using Adoroid.Core.Repository.Repositories;
+﻿namespace Adoroid.CarService.Application.Features.SubServices.Dtos;
 
-namespace Adoroid.CarService.Domain.Entities;
-
-public class SubService : Entity<Guid>
+public class SubServiceDto
 {
+    public Guid Id { get; set; }
     public Guid MainServiceId { get; set; }
     public string Operation { get; set; }
     public Guid EmployeeId { get; set; }
@@ -15,7 +14,7 @@ public class SubService : Entity<Guid>
     public decimal? Discount { get; set; }
     public decimal Cost { get; set; }
 
-    public MainService MainService { get; set; }
-    public Employee Employee { get; set; }  
-    public Supplier? Supplier { get; set; }
+    public MainServiceDto MainService { get; set; }
+    public EmployeeDto Employee { get; set; }
+    public SupplierDto? Supplier { get; set; }
 }

@@ -1,4 +1,5 @@
 ﻿using Adoroid.CarService.Application.Common.Abstractions.Auth;
+using Adoroid.CarService.Application.Common.Enums;
 using Adoroid.CarService.Application.Common.Extensions;
 using Adoroid.CarService.Application.Features.MainServices.Dtos;
 using Adoroid.CarService.Application.Features.MainServices.ExceptionMessages;
@@ -34,7 +35,8 @@ public class CreateMainServiceCommandHandler(CarServiceDbContext dbContext, ICur
             Description = request.Description,
             CreatedDate = DateTime.UtcNow,
             ServiceDate = request.ServiceDate,
-            VehicleId = request.VehicleId
+            VehicleId = request.VehicleId,
+            ServiceStatus = (int)MainServiceStatusEnum.Opened
         };
 
         var result = await dbContext.AddAsync(entity, cancellationToken);

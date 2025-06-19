@@ -19,6 +19,7 @@
 
   <ItemGroup>
     <Folder Include="Features\MainServices\ExceptionMessages\" />
+    <Folder Include="Features\SubServices\Queries\" />
   </ItemGroup>
 
 </Project>
