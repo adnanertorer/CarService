@@ -1,4 +1,5 @@
-﻿using Adoroid.Core.Application.Rules;
+﻿using Adoroid.CarService.Application.Common.Abstractions.Auth;
+using Adoroid.Core.Application.Rules;
 using FluentValidation;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -13,6 +14,7 @@ public static class CarServiceApplicationServiceCollection
 {
     public static IServiceCollection AddCarServiceApplication(this IServiceCollection services, IConfiguration configuration)
     {
+        services.AddScoped<ICurrentUser, CurrentUser>();
         services.AddSubClassesOfType(Assembly.GetExecutingAssembly(), type: typeof(BaseBusinessRule));
         services.AddMinimalMediatR(Assembly.GetExecutingAssembly());
         services.AddTransient(typeof(IPipelineBehavior<,>), typeof(LoggingBehavior<,>));

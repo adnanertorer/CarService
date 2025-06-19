@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.14.36121.58 d17.14
+VisualStudioVersion = 17.14.36121.58
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
 EndProject
@@ -14,6 +14,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Adoroid.CarService.Infrastructure", "src\Adoroid.CarService.Infrastructure\Adoroid.CarService.Infrastructure.csproj", "{895C45DB-58FA-4BA7-8561-77138AB40F89}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Adoroid.CarService.Shared", "src\Adoroid.CarService.Shared\Adoroid.CarService.Shared.csproj", "{9BC539F8-87D8-41F6-8480-FCBD04BF6241}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Adoroid.CarService.API", "src\Adoroid.CarService.API\Adoroid.CarService.API.csproj", "{3751CA41-9199-4687-B87F-9A9D6FCB5471}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -41,6 +43,10 @@ Global
 		{9BC539F8-87D8-41F6-8480-FCBD04BF6241}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9BC539F8-87D8-41F6-8480-FCBD04BF6241}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9BC539F8-87D8-41F6-8480-FCBD04BF6241}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3751CA41-9199-4687-B87F-9A9D6FCB5471}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3751CA41-9199-4687-B87F-9A9D6FCB5471}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3751CA41-9199-4687-B87F-9A9D6FCB5471}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3751CA41-9199-4687-B87F-9A9D6FCB5471}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -51,6 +57,7 @@ Global
 		{2F6C8814-992F-49A3-9AD6-694088A018A7} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 		{895C45DB-58FA-4BA7-8561-77138AB40F89} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 		{9BC539F8-87D8-41F6-8480-FCBD04BF6241} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
+		{3751CA41-9199-4687-B87F-9A9D6FCB5471} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {EF87AD31-EBAC-4F47-9704-B3ED13607D61}
