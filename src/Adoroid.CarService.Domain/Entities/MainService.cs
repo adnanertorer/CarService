@@ -12,6 +12,7 @@ public class MainService : Entity<Guid>
     public DateTime ServiceDate { get; set; }
     public string? Description { get; set; }
     public decimal Cost { get; set; }
+    public int ServiceStatus { get; set; }
 
     public Vehicle? Vehicle { get; set; }
     public ICollection<SubService>? SubServices { get; set; }

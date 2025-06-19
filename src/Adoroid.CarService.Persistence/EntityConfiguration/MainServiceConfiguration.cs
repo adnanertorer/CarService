@@ -10,6 +10,7 @@ public class MainServiceConfiguration : IEntityTypeConfiguration<MainService>
     {
         builder.HasKey(b => b.Id);
         builder.Property(b => b.VehicleId).IsRequired();
+        builder.Property(b => b.ServiceStatus).IsRequired();
         builder.Property(b => b.ServiceDate).IsRequired();
         builder.Property(b => b.Description).HasMaxLength(250);
         builder.Property(b => b.Cost).IsRequired().HasPrecision(18, 2);

@@ -3,7 +3,7 @@ using FluentValidation;
 
 namespace Adoroid.CarService.Application.Features.MainServices.Queries.GetById.Validators;
 
-public class GetEntityByIdMainServiceQueryValidator : AbstractValidator<GetEntityByIdMainServiceQuery>
+public class GetEntityByIdMainServiceQueryValidator : AbstractValidator<GetByIdMainServiceQuery>
 {
     public GetEntityByIdMainServiceQueryValidator()
     {

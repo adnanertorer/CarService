@@ -1,7 +1,6 @@
 ﻿using Adoroid.CarService.Application.Features.MainServices.Dtos;
-using Adoroid.CarService.Application.Features.MainServices.ExceptionMessages;
 using Adoroid.CarService.Application.Features.MainServices.MapperExtensions;
-using Adoroid.CarService.Application.Features.SubServices.ExceptionMessages;
+using Adoroid.CarService.Application.Features.MainServices.ExceptionMessages;
 using Adoroid.CarService.Persistence;
 using Adoroid.Core.Application.Wrappers;
 using Microsoft.EntityFrameworkCore;
@@ -9,13 +8,13 @@ using MinimalMediatR.Core;
 
 namespace Adoroid.CarService.Application.Features.MainServices.Queries.GetById;
 
-public record GetEntityByIdMainServiceQuery(Guid Id) : IRequest<Response<MainServiceDto>>;
+public record GetByIdMainServiceQuery(Guid Id) : IRequest<Response<MainServiceDto>>;
 
 public class GetEntityByIdMainServiceQueryHandler(CarServiceDbContext dbContext)
-    : IRequestHandler<GetEntityByIdMainServiceQuery, Response<MainServiceDto>>
+    : IRequestHandler<GetByIdMainServiceQuery, Response<MainServiceDto>>
 {
 
-    public async Task<Response<MainServiceDto>> Handle(GetEntityByIdMainServiceQuery request, CancellationToken cancellationToken)
+    public async Task<Response<MainServiceDto>> Handle(GetByIdMainServiceQuery request, CancellationToken cancellationToken)
     {
         var entity = await dbContext.MainServices
             .Include(i => i.Vehicle)

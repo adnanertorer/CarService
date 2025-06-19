@@ -1,9 +1,9 @@
 ﻿using Adoroid.CarService.Application.Common.Abstractions.Auth;
+using Adoroid.CarService.Application.Common.Enums;
 using Adoroid.CarService.Application.Common.Extensions;
 using Adoroid.CarService.Application.Features.MainServices.Dtos;
 using Adoroid.CarService.Application.Features.MainServices.ExceptionMessages;
 using Adoroid.CarService.Application.Features.MainServices.MapperExtensions;
-using Adoroid.CarService.Application.Features.SubServices.ExceptionMessages;
 using Adoroid.CarService.Domain.Entities;
 using Adoroid.CarService.Persistence;
 using Adoroid.Core.Application.Wrappers;
@@ -35,7 +35,8 @@ public class CreateMainServiceCommandHandler(CarServiceDbContext dbContext, ICur
             Description = request.Description,
             CreatedDate = DateTime.UtcNow,
             ServiceDate = request.ServiceDate,
-            VehicleId = request.VehicleId
+            VehicleId = request.VehicleId,
+            ServiceStatus = (int)MainServiceStatusEnum.Opened
         };
 
         var result = await dbContext.AddAsync(entity, cancellationToken);
