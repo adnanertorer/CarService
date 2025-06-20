@@ -4,9 +4,14 @@ using Adoroid.CarService.Infrastructure;
 using Adoroid.CarService.Infrastructure.Auth;
 using Adoroid.CarService.Persistence;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.WebHost.ConfigureKestrel(options =>
+{
+    options.ListenAnyIP(7290);
+});
 
 builder.Services.AddCarServicePersistence(builder.Configuration);
 builder.Services.AddCarServiceInsfrastructure(builder.Configuration);
@@ -82,6 +87,12 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddOpenApi();
 
 var app = builder.Build();
+
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<CarServiceDbContext>();
+    db.Database.Migrate();
+}
 
 app.CompanyEndpoints();
 app.UserEndpoints();

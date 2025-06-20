@@ -11,7 +11,7 @@ public static class CarServicePersistenceServiceCollection
         services.AddDbContext<CarServiceDbContext>(options =>
         {
             options.UseNpgsql(configuration.GetConnectionString("DefaultConnectionString"),
-                m => m.MigrationsAssembly("Adoroid.CarService.Api"));
+                m => m.MigrationsAssembly("Adoroid.CarService.API"));
         });
 
         return services;
