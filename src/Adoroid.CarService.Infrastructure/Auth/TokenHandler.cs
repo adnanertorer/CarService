@@ -24,7 +24,7 @@ public class TokenHandler : ITokenHandler
 
     public async Task<Response<AccesTokenDto>> CreateAccessToken(UserDto user, CancellationToken cancellationToken)
     {
-        var accessTokenExpiration = DateTime.Now.AddMinutes(_tokenOptions.AccessTokenExpiration);
+        var accessTokenExpiration = DateTime.UtcNow.AddMinutes(_tokenOptions.AccessTokenExpiration);
         var securityKey = SignHandler.GetSecurityKey(_tokenOptions.SecurityKey);
         var signingCredentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256Signature);
         var jwtSecurityToken = new JwtSecurityToken(
