@@ -1,0 +1,114 @@
+version: '3.8'
+
+services:
+  carservice-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: carservice-api
+    restart: unless-stopped
+    ports:
+      - "7290:7290"
+      - "5013:5013"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__Postgres=Host=postgres-db;Port=5432;Username=admin;Password=secret;Database=CarServiceDb
+      - Redis__Host=redis
+      - Redis__Port=6379
+      - Redis__Password=redispass
+      - Elastic__Url=http://elastic:carservice@elasticsearch:9200
+      - Rabbit__Host=rabbitmq
+      - Rabbit__User=guest
+      - Rabbit__Password=guest
+    networks:
+      - backend
+    depends_on:
+      - postgres
+      - redis
+      - elasticsearch
+      - rabbitmq
+    command: ["/wait-for-it.sh", "postgres-db:5432", "--", "dotnet", "Adoroid.CarService.API.dll"]
+
+  postgres:
+    image: postgres:16
+    container_name: postgres-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: secret
+      POSTGRES_DB: CarServiceDb
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - backend
+
+  redis:
+    image: redis:7
+    container_name: redis
+    command: [ "redis-server", "--requirepass", "redispass" ]
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    networks:
+      - backend
+
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.13.4
+    container_name: elasticsearch
+    restart: unless-stopped
+    environment:
+      - discovery.type=single-node
+      - ELASTIC_USERNAME=elastic
+      - ELASTIC_PASSWORD=carservice
+      - xpack.security.enabled=true
+      - bootstrap.memory_lock=true
+      - ES_JAVA_OPTS=-Xms512m -Xmx512m
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - es_data:/usr/share/elasticsearch/data
+    networks:
+      - backend
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:8.13.4
+    container_name: kibana
+    restart: unless-stopped
+    environment:
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+      - ELASTICSEARCH_USERNAME=kibana_system
+      - ELASTICSEARCH_PASSWORD=carservice
+    ports:
+      - "5601:5601"
+    depends_on:
+      - elasticsearch
+    networks:
+      - backend
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    restart: unless-stopped
+    environment:
+      - RABBITMQ_DEFAULT_USER=guest
+      - RABBITMQ_DEFAULT_PASS=guest
+    ports:
+      - "5672:5672"     # AMQP
+      - "15672:15672"   # Management UI
+    networks:
+      - backend
+
+volumes:
+  postgres_data:
+  es_data:
+
+networks:
+  backend:
+    driver: bridge
