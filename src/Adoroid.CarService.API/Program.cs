@@ -15,6 +15,8 @@ builder.WebHost.ConfigureKestrel(options =>
 
 builder.Services.AddCarServicePersistence(builder.Configuration);
 builder.Services.AddCarServiceInsfrastructure(builder.Configuration);
+builder.Services.Configure<TokenOptions>(
+    builder.Configuration.GetSection("TokenOptions"));
 
 var tokenOptions = builder.Configuration.GetSection("TokenOptions").Get<TokenOptions>() 
     ?? throw new InvalidOperationException("TokenOptions configuration section is missing or malformed.");
