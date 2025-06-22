@@ -22,7 +22,7 @@ public static class EmployeeEndpointsMap
         builder.MapGet(apiPath + "/{id}", async (string id, IMediator mediator, CancellationToken cancellationToken) =>
         {
             if (!Guid.TryParse(id, out var guid))
-                return Results.BadRequest("Invalid company ID.");
+                return Results.BadRequest("Invalid employee id.");
 
             var result = await mediator.Send(new EmployeeGetByIdQuery(guid), cancellationToken);
             return result.ToResult();
