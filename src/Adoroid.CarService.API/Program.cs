@@ -8,6 +8,7 @@ using Adoroid.Core.Application.Exceptions.Middlewares;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
+using OpenTelemetry.Metrics;
 using Serilog;
 
 
@@ -106,6 +107,7 @@ using (var scope = app.Services.CreateScope())
 
 app.CompanyEndpoints();
 app.UserEndpoints();
+app.CustomerEndpoint();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
