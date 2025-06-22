@@ -42,16 +42,16 @@ public static class SubServiceMappingExtensions
             Cost = subService.Cost,
             Description = subService.Description,
             Discount = subService.Discount,
-            Employee = subService.Employee.EmployeeFromEntity(),
+            Employee = subService.Employee?.EmployeeFromEntity(),
             EmployeeId = subService.EmployeeId,
             Id = subService.Id,
-            MainService = subService.MainService.MainServiceFromEntity(),
+            MainService = subService.MainService?.MainServiceFromEntity(),
             MainServiceId = subService.MainServiceId,
             Material = subService.Material,
             MaterialBrand = subService.MaterialBrand,
             Operation = subService.Operation,
             OperationDate = subService.OperationDate,
-            Supplier = subService.Supplier != null ? subService.Supplier.SupplierFromEntity() : null,
+            Supplier = subService.Supplier?.SupplierFromEntity(),
             SupplierId = subService.SupplierId
         };
     }

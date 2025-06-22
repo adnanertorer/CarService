@@ -8,5 +8,5 @@ public class MainServiceDto
     public string? Description { get; set; }
     public decimal Cost { get; set; }
 
-    public VehicleDto Vehicle { get; set; }
+    public VehicleDto? Vehicle { get; set; }
 }

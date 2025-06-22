@@ -14,7 +14,7 @@ public class SubServiceDto
     public decimal? Discount { get; set; }
     public decimal Cost { get; set; }
 
-    public MainServiceDto MainService { get; set; }
-    public EmployeeDto Employee { get; set; }
+    public MainServiceDto? MainService { get; set; }
+    public EmployeeDto? Employee { get; set; }
     public SupplierDto? Supplier { get; set; }
 }
