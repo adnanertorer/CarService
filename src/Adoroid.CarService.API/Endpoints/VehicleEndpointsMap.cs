@@ -13,7 +13,7 @@ namespace Adoroid.CarService.API.Endpoints;
 
 public static class VehicleEndpointsMap
 {
-    private const string apiPath = "/api/supplier";
+    private const string apiPath = "/api/vehicle";
 
     public static IEndpointRouteBuilder VehicleEndpoint(this IEndpointRouteBuilder builder)
     {
