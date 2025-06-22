@@ -1,5 +1,5 @@
 FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS base
-USER root 
+USER root
 WORKDIR /app
 EXPOSE 8080
 EXPOSE 7290
@@ -16,9 +16,7 @@ COPY src/Adoroid.CarService.Shared/Adoroid.CarService.Shared.csproj Adoroid.CarS
 COPY src/Adoroid.CarService.Infrastructure/Adoroid.CarService.Infrastructure.csproj Adoroid.CarService.Infrastructure/
 
 RUN dotnet restore Adoroid.CarService.API/Adoroid.CarService.API.csproj
-
 COPY src/ .
-
 WORKDIR /src/Adoroid.CarService.API
 RUN dotnet build Adoroid.CarService.API.csproj -c $BUILD_CONFIGURATION -o /app/build
 
@@ -29,12 +27,13 @@ RUN dotnet publish Adoroid.CarService.API.csproj -c $BUILD_CONFIGURATION -o /app
 FROM base AS final
 WORKDIR /app
 
-RUN apt-get update && apt-get install -y netcat-openbsd
+RUN apt-get update && apt-get install -y netcat-openbsd dos2unix && rm -rf /var/lib/apt/lists/*
 
 COPY --from=publish /app/publish .
-COPY wait-for-postgres.sh /wait-for-postgres.sh
-RUN chmod +x /wait-for-postgres.sh
+COPY wait-for-postgres.sh /app/wait-for-postgres.sh
+RUN dos2unix /app/wait-for-postgres.sh && chmod +x /app/wait-for-postgres.sh
 
-USER $APP_UID  
-ENTRYPOINT ["/wait-for-postgres.sh", "postgres-db:5432", "--", "dotnet", "Adoroid.CarService.API.dll"]
+RUN adduser --disabled-password --gecos '' appuser
+USER appuser
 
+ENTRYPOINT ["/app/wait-for-postgres.sh", "postgres-db:5432", "--", "dotnet", "Adoroid.CarService.API.dll"]
