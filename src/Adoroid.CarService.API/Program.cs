@@ -108,6 +108,7 @@ using (var scope = app.Services.CreateScope())
 app.CompanyEndpoints();
 app.UserEndpoints();
 app.CustomerEndpoint();
+app.EmployeeEndpoint();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
