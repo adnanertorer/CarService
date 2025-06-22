@@ -19,7 +19,6 @@
 
   <ItemGroup>
     <Folder Include="Features\MainServices\ExceptionMessages\" />
-    <Folder Include="Features\MasterServices\Commands\Delete\" />
     <Folder Include="Features\MasterServices\Queries\" />
   </ItemGroup>
 
