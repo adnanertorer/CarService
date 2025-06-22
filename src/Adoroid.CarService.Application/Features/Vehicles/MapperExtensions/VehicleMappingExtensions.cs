@@ -11,12 +11,12 @@ public static class VehicleMappingExtensions
         {
             Brand = vehicle.Brand,
             CustomerId = vehicle.CustomerId,
-            Customer = new CustomerDto
+            Customer = vehicle.Customer != null ? new CustomerDto
             {
                 Id = vehicle.CustomerId,
                 Name = vehicle.Customer!.Name,
                 Surname = vehicle.Customer!.Surname,
-            },
+            } : null,
             Engine = vehicle.Engine,
             FuelTypeId = vehicle.FuelTypeId,
             Id = vehicle.Id,
