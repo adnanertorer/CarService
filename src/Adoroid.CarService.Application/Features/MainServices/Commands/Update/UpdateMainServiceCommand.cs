@@ -11,7 +11,7 @@ using MinimalMediatR.Core;
 
 namespace Adoroid.CarService.Application.Features.MainServices.Commands.Update;
 
-public record UpdateMainServiceCommand(Guid Id, Guid VehicleId, DateTime ServiceDate, string? Description, int ServiceStatus) : IRequest<Response<MainServiceDto>>;
+public record UpdateMainServiceCommand(Guid Id, Guid VehicleId, DateTime ServiceDate, string? Description, MainServiceStatusEnum ServiceStatus) : IRequest<Response<MainServiceDto>>;
 
 public class UpdateMainServiceCommandHandler(CarServiceDbContext dbContext, ICurrentUser currentUser)
         : IRequestHandler<UpdateMainServiceCommand, Response<MainServiceDto>>
@@ -29,12 +29,12 @@ public class UpdateMainServiceCommandHandler(CarServiceDbContext dbContext, ICur
         entity.ServiceDate = request.ServiceDate;
         entity.Description = request.Description;
         entity.VehicleId = request.VehicleId;
-        entity.ServiceStatus = request.ServiceStatus;
+        entity.ServiceStatus = (int)request.ServiceStatus;
 
         entity.UpdatedBy = Guid.Parse(currentUser.Id!);
         entity.UpdatedDate = DateTime.UtcNow;
 
-        if(request.ServiceStatus == (int)MainServiceStatusEnum.Done)
+        if(request.ServiceStatus == MainServiceStatusEnum.Done)
         {
             entity.Cost = await GetTotalPrice(request.Id, cancellationToken);
 
