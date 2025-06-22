@@ -13,7 +13,7 @@ public static class MainServiceMappingExtension
             Description = mainService.Description,
             Id = mainService.Id,
             ServiceDate = mainService.ServiceDate,
-            Vehicle = new VehicleDto
+            Vehicle = mainService.Vehicle !=null ? new VehicleDto
             {
                 Brand = mainService.Vehicle!.Brand,
                 CustomerId = mainService.Vehicle!.CustomerId,
@@ -24,7 +24,7 @@ public static class MainServiceMappingExtension
                 Plate = mainService.Vehicle!.Plate,
                 SerialNumber = mainService.Vehicle!.SerialNumber,
                 Year = mainService.Vehicle!.Year
-            },
+            } : null,
             VehicleId = mainService.VehicleId
         };
     }
