@@ -2,10 +2,14 @@ using Adoroid.CarService.API.Endpoints;
 using Adoroid.CarService.Application;
 using Adoroid.CarService.Infrastructure;
 using Adoroid.CarService.Infrastructure.Auth;
+using Adoroid.CarService.Infrastructure.Logging;
 using Adoroid.CarService.Persistence;
+using Adoroid.Core.Application.Exceptions.Middlewares;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
+using Serilog;
+
 
 var builder = WebApplication.CreateBuilder(args);
 builder.WebHost.ConfigureKestrel(options =>
@@ -14,7 +18,7 @@ builder.WebHost.ConfigureKestrel(options =>
 });
 
 builder.Services.AddCarServicePersistence(builder.Configuration);
-builder.Services.AddCarServiceInsfrastructure(builder.Configuration);
+builder.Services.AddCarServiceInsfrastructure();
 builder.Services.Configure<TokenOptions>(
     builder.Configuration.GetSection("TokenOptions"));
 
@@ -85,10 +89,14 @@ builder.Services.AddSwaggerGen(setup =>
 
 builder.Services.AddAuthorization();
 
+builder.Services.AddLoggingAndMonitoring(builder);
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddOpenApi();
 
 var app = builder.Build();
+
+app.UseSerilogRequestLogging();
 
 using (var scope = app.Services.CreateScope())
 {
@@ -108,6 +116,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseCors("CorsPolicy");
+
+app.UseMiddleware<ExceptionMiddleware>();
 
 app.UseHttpsRedirection();
 
