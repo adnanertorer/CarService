@@ -11,7 +11,7 @@ namespace Adoroid.CarService.Application.Features.MasterServices.Commands.Update
 
 public record UpdateMasterServiceCommand(Guid Id, string ServiceName, int OrderIndex) : IRequest<Response<MasterServiceDto>>;
 
-public class UpdateEntityCommandHandler(CarServiceDbContext dbContext, ICurrentUser currentUser)
+public class UpdateMasterServiceCommandHandler(CarServiceDbContext dbContext, ICurrentUser currentUser)
     : IRequestHandler<UpdateMasterServiceCommand, Response<MasterServiceDto>>
 {
     public async Task<Response<MasterServiceDto>> Handle(UpdateMasterServiceCommand request, CancellationToken cancellationToken)
