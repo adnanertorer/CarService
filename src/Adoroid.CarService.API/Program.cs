@@ -113,6 +113,7 @@ app.MainServiceEndpoint();
 app.SubServiceEndpoint();
 app.SupplierEndpoint();
 app.VehicleEndpoint();
+app.MasterServiceEndpoint();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
