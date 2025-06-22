@@ -12,6 +12,6 @@ public class VehicleDto
     public int FuelTypeId { get; set; }
     public string? SerialNumber { get; set; }
 
-    public CustomerDto Customer { get; set; }
+    public CustomerDto? Customer { get; set; }
     public List<MainServiceDto>? MainServices { get; set; }
 }
