@@ -1,60 +1,67 @@
 # CarService — Next Generation Auto Repair Management
 
-**CarService**, araç bakım ve tamirat sektöründeki küçük ve orta ölçekli atölyeler için geliştirilen modern, esnek ve ölçeklenebilir bir yönetim sistemidir.
+CarService is a modern, flexible, and scalable management system designed for small and medium-sized auto repair workshops.
 
-Atölyenizi dijitalleştirin.  
-İş süreçlerinizi merkezi ve kontrollü şekilde yönetin.  
-Geleceğin SaaS platformları için güçlü bir temel sunar.
-
----
-
-## Proje Durumu
-
-- Proje aktif geliştirme aşamasındadır.
-- Domain ve Application katmanları büyük ölçüde tamamlanmıştır.
-- Auth ve JWT tabanlı temel kimlik doğrulama sistemine sahiptir.
-- API katmanı henüz geliştirme aşamasındadır.
+Digitize your workshop.
+Manage your business processes centrally and with full control.
+Provides a solid foundation for the SaaS platforms of the future.
 
 ---
 
-## Temel Özellikler
+## Project Status
 
-- **Müşteri Yönetimi:** Müşteri ve araç bilgileri takibi
-- **Bakım ve Tamir Kayıtları:** Yapılan işlemler, değiştirilen parçalar, tedarikçiler ve servis geçmişi
-- **Cari Hesap Takibi:** Ödemeler ve bakiye yönetimi
-- **Yetkilendirme:** JWT tabanlı güvenli kimlik doğrulama altyapısı
-- **Genişletilebilir Modüler Yapı:** Gelecek SaaS ihtiyaçları düşünülerek tasarlandı
+The project is under active development.
 
----
+Domain and Application layers are largely complete.
 
-## Teknoloji Altyapısı
+Includes a basic authentication system based on Auth and JWT.
 
-- ✅ **Dil & Platform:** C# (.NET 9)
-- ✅ **Mimari:** Modüler Monolit
-- ✅ **CQRS:** Command & Query Responsibility Segregation Pattern
-- ✅ **Validation:** FluentValidation
-- ✅ **Paging:** Performanslı sayfalama
-- ✅ **Response Handling:** Standardize Response Wrapper
-- ✅ **Mapping:** Manuel Mapping Extension metotları
-- ✅ **Kimlik Doğrulama:** JWT (JSON Web Token)
-- ✅ **Temiz Kod:** SOLID ve Clean Architecture prensiplerine uygun katmanlı yapı
 
 ---
 
-## SaaS Genişleme Potansiyeli
+## Core Features
+**Customer Management:** Track customer and vehicle information
 
-CarService, ilerleyen sürümlerde SaaS mimarisine dönüştürülebilecek güçlü bir çekirdek sunar:
+**Maintenance & Repair Records:** Track operations, replaced parts, suppliers, and service history
 
-- Çoklu tenant (multi-tenant) yapısı
-- Abonelik ve ödeme sistemi entegrasyonu
-- Web UI / Admin paneli
-- Raporlama ve analiz modülleri
+**Account Management:** Manage payments and account balances
+
+**Authorization:** Secure authentication infrastructure based on JWT
+
+**Extensible Modular Structure:** Designed with future SaaS needs in mind
 
 ---
 
-## Kurulum ve Katılım
+## Technology Stack
+**Language & Platform:** C# (.NET 9)
 
-Projeyi geliştirmek ve katkıda bulunmak isteyen geliştiriciler için:
+**Architecture:** Modular Monolith
+
+**CQRS:** Command & Query Responsibility Segregation Pattern
+
+**Validation:** FluentValidation
+
+**Paging:** High-performance pagination
+
+**Response Handling:** Standardized Response Wrapper
+
+**Mapping:** Manual Mapping Extension Methods
+
+**Authentication:** JWT (JSON Web Token)
+
+**Clean Code:** Layered structure following SOLID and Clean Architecture principles
+
+**Database:** Postresql
+
+**Messaging and streaming broker:** RabbitMQ
+
+**Logging:** Elasticsearch - Serilog
+
+
+
+## Setup & Contribution
+
+For developers who want to contribute and develop the project:
 
 ```bash
 git clone https://github.com/adnanertorer/CarService.git
