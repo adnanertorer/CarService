@@ -18,7 +18,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Features\CompanyMasterServices\Queries\" />
+    <Folder Include="Features\CompanyMasterServices\Queries\GetList\" />
     <Folder Include="Features\MainServices\ExceptionMessages\" />
   </ItemGroup>
 
