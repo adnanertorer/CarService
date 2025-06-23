@@ -10,7 +10,7 @@ using MinimalMediatR.Core;
 
 namespace Adoroid.CarService.Application.Features.AccountTransactions.Commands.Create;
 
-public record CreateClaimCommand(Guid CustomerId, decimal Claim, DateTime TransactionDate) 
+public record CreateClaimCommand(Guid CustomerId, decimal Claim, DateTime TransactionDate, string? Description) 
     : IRequest<Response<AccountTransactionDto>>;
 
 public class CreateClaimCommandHandler(CarServiceDbContext dbContext, ICurrentUser currentUser)
@@ -31,7 +31,8 @@ public class CreateClaimCommandHandler(CarServiceDbContext dbContext, ICurrentUs
             Balance = balance - request.Claim,
             CustomerId = request.CustomerId,
             CompanyId = Guid.Parse(currentUser.CompanyId!),
-            TransactionType = (int)TransactionTypeEnum.Receivable
+            TransactionType = (int)TransactionTypeEnum.Receivable,
+            Description = request.Description
         };
 
         await dbContext.AddAsync(entity, cancellationToken);
