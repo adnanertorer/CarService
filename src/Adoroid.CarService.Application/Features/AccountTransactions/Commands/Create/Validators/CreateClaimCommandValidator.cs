@@ -15,7 +15,7 @@ public class CreateClaimCommandValidator : AbstractValidator<CreateClaimCommand>
           .NotNull()
           .WithMessage(string.Format(ValidationMessages.Required, "İşlem Tarihi"))
           .GreaterThan(DateTime.UtcNow)
-          .WithMessage(string.Format(ValidationMessages.GreaterThanNow, "İşlem Tarihi");
+          .WithMessage(string.Format(ValidationMessages.GreaterThanNow, "İşlem Tarihi"));
 
         RuleFor(x => x.Claim)
          .NotNull()

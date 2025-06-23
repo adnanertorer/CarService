@@ -8,6 +8,7 @@ public class AccountTransactionDto
     public decimal Debt { get; set; } // Debt amount for incomes
     public decimal Balance { get; set; } // Balance after the transaction
     public DateTime TransactionDate { get; set; } // Date of the transaction
+    public string? Description { get; set; }
 
     public CustomerDto? Customer { get; set; }
 }
