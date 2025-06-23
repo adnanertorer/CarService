@@ -27,7 +27,7 @@ public class CompanyServiceConfiguration : IEntityTypeConfiguration<CompanyServi
 
         builder.HasOne(b => b.MasterService)
           .WithMany(c => c.CompanyServices)
-          .HasForeignKey(b => b.CompanyId)
+          .HasForeignKey(b => b.MasterServiceId)
           .OnDelete(DeleteBehavior.NoAction);
     }
 }
