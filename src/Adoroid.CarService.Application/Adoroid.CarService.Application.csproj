@@ -19,7 +19,6 @@
 
   <ItemGroup>
     <Folder Include="Features\CompanyMasterServices\Commands\Delete\" />
-    <Folder Include="Features\CompanyMasterServices\Commands\Update\" />
     <Folder Include="Features\CompanyMasterServices\Queries\" />
     <Folder Include="Features\MainServices\ExceptionMessages\" />
   </ItemGroup>
