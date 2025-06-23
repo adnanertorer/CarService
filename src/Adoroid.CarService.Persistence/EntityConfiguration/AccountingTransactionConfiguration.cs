@@ -16,6 +16,7 @@ public class AccountingTransactionConfiguration : IEntityTypeConfiguration<Accou
         builder.Property(b => b.Debt).IsRequired().HasPrecision(18, 2);
         builder.Property(b => b.Balance).IsRequired().HasPrecision(18, 2);
         builder.Property(b => b.TransactionDate).IsRequired();
+        builder.Property(b => b.Description).HasMaxLength(250);
 
         builder.Property(i => i.CreatedDate).IsRequired();
         builder.Property(c => c.CreatedBy).IsRequired().HasMaxLength(64);

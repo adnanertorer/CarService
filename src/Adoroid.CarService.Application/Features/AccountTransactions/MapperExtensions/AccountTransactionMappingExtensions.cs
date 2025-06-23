@@ -20,7 +20,8 @@ public static class AccountTransactionMappingExtensions
             CustomerId = accountingTransaction.CustomerId,
             Debt = accountingTransaction.Debt,
             TransactionDate = accountingTransaction.TransactionDate,
-            TransactionType = accountingTransaction.TransactionType
+            TransactionType = accountingTransaction.TransactionType,
+            Description = accountingTransaction.Description
         };
     }
 }
