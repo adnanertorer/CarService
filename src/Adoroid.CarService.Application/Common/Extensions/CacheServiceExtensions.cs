@@ -1,4 +1,6 @@
 ﻿using Adoroid.CarService.Application.Common.Abstractions.Caching;
+using Adoroid.Core.Application.Wrappers;
+using Adoroid.Core.Repository.Paging;
 
 namespace Adoroid.CarService.Application.Common.Extensions;
 
@@ -10,8 +12,17 @@ public static class CacheServiceExtensions
         if (cached is not null)
             return cached;
 
-        var data = await factory();
-        await cache.SetAsync(key, data, expiry);
-        return data;
+        var result = await factory();
+        if (result?.GetType().IsGenericType == true && result.GetType().GetGenericTypeDefinition() == typeof(Paginate<>))
+        {
+            var dataProperty = result.GetType().GetProperty("Items");
+            var data = dataProperty?.GetValue(result);
+
+            if (data is not null)
+            {
+                await cache.SetAsync(key, data, expiry);
+            }
+        }
+        return result;
     }
 }
