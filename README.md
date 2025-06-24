@@ -57,6 +57,8 @@ Includes a basic authentication system based on Auth and JWT.
 
 **Logging:** Elasticsearch - Serilog
 
+**Caching:** Redis
+
 
 
 ## Setup & Contribution
