@@ -1,4 +1,5 @@
 ﻿using Adoroid.CarService.Application.Common.Abstractions.Caching;
+using System.Collections.Generic;
 using System.Text.Json;
 
 namespace Adoroid.CarService.Application.Common.Extensions;
@@ -19,7 +20,7 @@ public static class CacheServiceExtensions
         return result;
     }
 
-    public static async Task TryAppendToListAsync<T>(this ICacheService cache, string listKey, T data, TimeSpan? expiry = null)
+    public static async Task AppendToListAsync<T>(this ICacheService cache, string listKey, T data, TimeSpan? expiry = null)
     {
         var existingList = await cache.GetAsync<List<T>>(listKey);
 
@@ -32,6 +33,24 @@ public static class CacheServiceExtensions
             existingList.Add(data);
             await cache.SetAsync(listKey, existingList, expiry);
         }
+    }
+
+    public static async Task UpdateToListAsync<T>(this ICacheService cache, string listKey, string dataKey, T data, TimeSpan? expiry = null)
+    {
+        var list = await cache.GetAsync<List<JsonElement>>(listKey) ?? [];
+
+        var itemToRemove = list.FirstOrDefault(x =>
+            x.TryGetProperty("Id", out var idProp) && idProp.GetString() == dataKey);
+
+        if (itemToRemove.ValueKind != JsonValueKind.Undefined)
+        {
+            list.Remove(itemToRemove);
+        }
+
+        var element = ConvertToJsonElement(data);
+        list.Add(element);
+
+        await cache.SetAsync(listKey, list, expiry);
     }
 
     public static async Task RemoveFromListAsync<T>(this ICacheService cache, string listKey, string dataKey)
@@ -47,5 +66,11 @@ public static class CacheServiceExtensions
             list.Remove(itemToRemove);
             await cache.SetAsync(listKey, list);
         }
+    }
+
+    static JsonElement ConvertToJsonElement<T>(T obj)
+    {
+        var json = JsonSerializer.Serialize(obj);
+        return JsonSerializer.Deserialize<JsonElement>(json);
     }
 }

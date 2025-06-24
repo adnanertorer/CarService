@@ -19,6 +19,7 @@ public record CreateMainServiceCommand(Guid VehicleId, DateTime ServiceDate, str
 public class CreateMainServiceCommandHandler(CarServiceDbContext dbContext, ICurrentUser currentUser, ICacheService cacheService) 
     : IRequestHandler<CreateMainServiceCommand, Response<MainServiceDto>>
 {
+    const string redisKeyPrefix = "mainservice:list";
     public async Task<Response<MainServiceDto>> Handle(CreateMainServiceCommand request, CancellationToken cancellationToken)
     {
         var vehicle = await dbContext.Vehicles.AsNoTracking()
@@ -45,7 +46,7 @@ public class CreateMainServiceCommandHandler(CarServiceDbContext dbContext, ICur
 
         var resultDto = result.Entity.FromEntity();
 
-        await cacheService.TryAppendToListAsync($"mainservice:list:{currentUser.CompanyId!}", resultDto, null);
+        await cacheService.AppendToListAsync($"{redisKeyPrefix}:{currentUser.CompanyId!}", resultDto, null);
 
         return Response<MainServiceDto>.Success(resultDto);
     }
