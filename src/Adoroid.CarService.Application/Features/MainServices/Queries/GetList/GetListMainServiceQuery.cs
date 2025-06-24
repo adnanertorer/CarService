@@ -25,7 +25,7 @@ public class GetListMainServiceQueryHandler(CarServiceDbContext dbContext, ICurr
 
         var cacheKey = $"mainservice:list:{currentUser.CompanyId!}";
 
-        var list = await cacheService.GetOrSetAsync<Paginate<MainServiceDto>>(cacheKey,
+        var list = await cacheService.GetOrSetAsync<List<MainServiceDto>>(cacheKey,
             async () =>
             {
                 var query = dbContext.MainServices
@@ -59,9 +59,9 @@ public class GetListMainServiceQueryHandler(CarServiceDbContext dbContext, ICurr
 
                 return await query
                     .OrderByDescending(i => i.ServiceDate)
-                    .Select(i => i.FromEntity()).ToPaginateAsync(request.FilterRequest.PageRequest.PageIndex, request.FilterRequest.PageRequest.PageSize, cancellationToken);
+                    .Select(i => i.FromEntity()).ToListAsync(cancellationToken);
             }, TimeSpan.FromHours(2));
 
-        return Response<Paginate<MainServiceDto>>.Success(list);
+        return Response<Paginate<MainServiceDto>>.Success(list.AsQueryable().ToPaginate(request.FilterRequest.PageRequest.PageIndex, request.FilterRequest.PageRequest.PageSize));
     }
 }
