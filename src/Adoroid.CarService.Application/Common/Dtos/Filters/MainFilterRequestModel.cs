@@ -2,4 +2,4 @@
 
 namespace Adoroid.CarService.Application.Common.Dtos.Filters;
 
-public record MainFilterRequestModel(PageRequest PageRequest, string? Search, DateTime? StartDate, DateTime? EndDate);
+public record MainFilterRequestModel(PageRequest PageRequest, string? Search, DateTime? StartDate, DateTime? EndDate, Guid? CustomerId);
