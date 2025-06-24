@@ -11,8 +11,8 @@ namespace Adoroid.CarService.Application.Features.MainServices.Queries.GetById;
 
 public record GetByIdMainServiceQuery(Guid Id) : ICacheableQuery<Response<MainServiceDto>>, IRequest<Response<MainServiceDto>>
 {
-public TimeSpan? Expiration => TimeSpan.FromHours(2);
-    public string GetCacheKey() => $"main-service:{Id}";
+    public TimeSpan? Expiration => TimeSpan.FromHours(2);
+    public string GetCacheKey() => $"mainservice:{Id}";
 }
 
 public class GetEntityByIdMainServiceQueryHandler(CarServiceDbContext dbContext)
