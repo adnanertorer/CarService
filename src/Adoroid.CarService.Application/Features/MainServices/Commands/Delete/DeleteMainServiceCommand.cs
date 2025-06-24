@@ -16,6 +16,7 @@ namespace Adoroid.CarService.Application.Features.MainServices.Commands.Delete
         : IRequestHandler<DeleteMainServiceCommand, Response<Guid>>
     {
         const string redisKeyPrefix = "mainservice:list";
+        const string redisSubServiceKeyPrefix = "subservice:list";
         public async Task<Response<Guid>> Handle(DeleteMainServiceCommand request, CancellationToken cancellationToken)
         {
             var entity = await dbContext.MainServices.FirstOrDefaultAsync(e => e.Id == request.Id, cancellationToken);
@@ -26,6 +27,20 @@ namespace Adoroid.CarService.Application.Features.MainServices.Commands.Delete
             entity.IsDeleted = true;
             entity.DeletedBy = Guid.Parse(currentUser.Id!);
             entity.DeletedDate = DateTime.UtcNow;
+
+            dbContext.MainServices.Update(entity);
+
+            var subServices = await dbContext.SubServices.Where(i => i.MainServiceId == request.Id).ToListAsync(cancellationToken);
+            foreach(var item in subServices)
+            {
+                item.IsDeleted = true;
+                item.DeletedBy = Guid.Parse(currentUser.Id!);
+                item.DeletedDate = DateTime.UtcNow;
+
+                dbContext.SubServices.Update(item);
+                var cacheSubServiceKey = $"{redisSubServiceKeyPrefix}:{currentUser.CompanyId!}";
+                await cacheService.RemoveFromListAsync<dynamic>(cacheSubServiceKey, item.Id.ToString());
+            }
 
             await dbContext.SaveChangesAsync(cancellationToken);
 
