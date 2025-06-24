@@ -16,7 +16,7 @@ public static class AccountTransactionMappingExtensions
                 Id = accountingTransaction.Customer.Id,
                 Name = accountingTransaction.Customer.Name,
                 Surname = accountingTransaction.Customer.Surname
-            },
+            } : null,
             CustomerId = accountingTransaction.CustomerId,
             Debt = accountingTransaction.Debt,
             TransactionDate = accountingTransaction.TransactionDate,
