@@ -24,7 +24,17 @@ public class UpdateSubServiceCommandHandler(CarServiceDbContext dbContext, ICurr
 
         if (entity is null)
             return Response<SubServiceDto>.Fail(BusinessExceptionMessages.NotFound);
-        
+
+        var mainServiceEntity = await dbContext.MainServices.AsNoTracking().FirstOrDefaultAsync(i => i.Id == entity.MainServiceId, cancellationToken);
+        if (mainServiceEntity == null)
+            return Response<SubServiceDto>.Fail(BusinessExceptionMessages.MainServiceNotFound);
+
+        var employee = await dbContext.Employees
+            .AsNoTracking()
+            .FirstOrDefaultAsync(i => i.Id == request.EmployeeId, cancellationToken);
+        if (employee == null)
+            return Response<SubServiceDto>.Fail(BusinessExceptionMessages.EmployeeNotFound);
+
         entity.SupplierId = request.SupplierId;
         entity.Description = request.Description;
         entity.Material = request.Material;
@@ -40,6 +50,9 @@ public class UpdateSubServiceCommandHandler(CarServiceDbContext dbContext, ICurr
 
         dbContext.SubServices.Update(entity);
         await dbContext.SaveChangesAsync(cancellationToken);
+
+        entity.MainService = mainServiceEntity;
+        entity.Employee = employee;
 
         var resultDto = entity.FromEntity();
 
