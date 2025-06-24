@@ -19,11 +19,11 @@ public record GetListMainServiceQuery(MainFilterRequestModel FilterRequest)
 public class GetListMainServiceQueryHandler(CarServiceDbContext dbContext, ICurrentUser currentUser, ICacheService cacheService)
     : IRequestHandler<GetListMainServiceQuery, Response<Paginate<MainServiceDto>>>
 {
-
+    const string redisKeyPrefix = "mainservice:list";
     public async Task<Response<Paginate<MainServiceDto>>> Handle(GetListMainServiceQuery request, CancellationToken cancellationToken)
     {
 
-        var cacheKey = $"mainservice:list:{currentUser.CompanyId!}";
+        var cacheKey = $"{redisKeyPrefix}:{currentUser.CompanyId!}";
 
         var list = await cacheService.GetOrSetPaginateAsync<List<MainServiceDto>>(cacheKey,
             async () =>
