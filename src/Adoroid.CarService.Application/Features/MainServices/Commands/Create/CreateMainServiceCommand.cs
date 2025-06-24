@@ -9,12 +9,17 @@ using Adoroid.CarService.Domain.Entities;
 using Adoroid.CarService.Persistence;
 using Adoroid.Core.Application.Wrappers;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Caching.Distributed;
 using MinimalMediatR.Core;
 
 namespace Adoroid.CarService.Application.Features.MainServices.Commands.Create;
 
-public record CreateMainServiceCommand(Guid VehicleId, DateTime ServiceDate, string? Description) : IRequest<Response<MainServiceDto>>;
+public record CreateMainServiceCommand(Guid VehicleId, DateTime ServiceDate, string? Description) : IRequest<Response<MainServiceDto>>, ICacheRemovableCommand
+{
+    public IEnumerable<string> GetCacheKeysToRemove()
+    {
+        yield return "main-service:list";
+    }
+}
 
 
 public class CreateMainServiceCommandHandler(CarServiceDbContext dbContext, ICurrentUser currentUser, ICacheService cacheService) 
