@@ -18,9 +18,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Features\AccountTransactions\Commands\Delete\" />
     <Folder Include="Features\AccountTransactions\Commands\Update\" />
-    <Folder Include="Features\AccountTransactions\ExceptionMessages\" />
     <Folder Include="Features\AccountTransactions\Queries\" />
     <Folder Include="Features\MainServices\ExceptionMessages\" />
   </ItemGroup>

@@ -9,7 +9,6 @@ using Microsoft.EntityFrameworkCore;
 using MinimalMediatR.Core;
 
 namespace Adoroid.CarService.Application.Features.AccountTransactions.Commands.Create;
-
 public record CreateClaimCommand(Guid CustomerId, decimal Claim, DateTime TransactionDate, string? Description) 
     : IRequest<Response<AccountTransactionDto>>;
 
