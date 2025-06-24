@@ -25,7 +25,7 @@ public class GetListMainServiceQueryHandler(CarServiceDbContext dbContext, ICurr
 
         var cacheKey = $"mainservice:list:{currentUser.CompanyId!}";
 
-        var list = await cacheService.GetOrSetAsync<List<MainServiceDto>>(cacheKey,
+        var list = await cacheService.GetOrSetPaginateAsync<List<MainServiceDto>>(cacheKey,
             async () =>
             {
                 var query = dbContext.MainServices
