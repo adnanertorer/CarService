@@ -18,6 +18,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Features\AccountTransactions\Commands\Update\" />
     <Folder Include="Features\MainServices\ExceptionMessages\" />
   </ItemGroup>
 

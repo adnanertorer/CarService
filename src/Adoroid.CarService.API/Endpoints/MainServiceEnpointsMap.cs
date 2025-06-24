@@ -31,7 +31,7 @@ public static class MainServiceEnpointsMap
         }).RequireAuthorization();
         builder.MapGet(apiPath + "/list", async ([AsParameters] PageRequest pageRequest, string? search, DateTime? startDate, DateTime? endDate, IMediator mediator, CancellationToken cancellationToken) =>
         {
-            var result = await mediator.Send(new GetListMainServiceQuery(new MainFilterRequestModel(pageRequest, search, startDate, endDate)), cancellationToken);
+            var result = await mediator.Send(new GetListMainServiceQuery(new MainFilterRequestModel(pageRequest, search, startDate, endDate, null)), cancellationToken);
             return result.ToResult();
         }).RequireAuthorization();
         return builder;
