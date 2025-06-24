@@ -52,8 +52,6 @@ public class CreateSubServiceCommandHandler(CarServiceDbContext dbContext, ICurr
 
         var result = await dbContext.AddAsync(entity, cancellationToken);
 
-        mainServiceEntity.Cost += request.Cost - (request.Discount ?? 0);
-
         await dbContext.SaveChangesAsync(cancellationToken);
 
         var model = result.Entity;
