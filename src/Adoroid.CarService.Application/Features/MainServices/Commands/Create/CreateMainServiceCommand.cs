@@ -13,13 +13,7 @@ using MinimalMediatR.Core;
 
 namespace Adoroid.CarService.Application.Features.MainServices.Commands.Create;
 
-public record CreateMainServiceCommand(Guid VehicleId, DateTime ServiceDate, string? Description) : IRequest<Response<MainServiceDto>>, ICacheRemovableCommand
-{
-    public IEnumerable<string> GetCacheKeysToRemove()
-    {
-        yield return "main-service:list";
-    }
-}
+public record CreateMainServiceCommand(Guid VehicleId, DateTime ServiceDate, string? Description) : IRequest<Response<MainServiceDto>>;
 
 
 public class CreateMainServiceCommandHandler(CarServiceDbContext dbContext, ICurrentUser currentUser, ICacheService cacheService) 
@@ -27,14 +21,11 @@ public class CreateMainServiceCommandHandler(CarServiceDbContext dbContext, ICur
 {
     public async Task<Response<MainServiceDto>> Handle(CreateMainServiceCommand request, CancellationToken cancellationToken)
     {
-        var isExist = await dbContext.MainServices
-            .AsNoTracking()
-            .Where(i => i.VehicleId == request.VehicleId)
-            .WhereDateIsBetween(i => i.ServiceDate, request.ServiceDate)
-            .AnyAsync(cancellationToken);
+        var vehicle = await dbContext.Vehicles.AsNoTracking()
+            .FirstOrDefaultAsync(i => i.Id == request.VehicleId, cancellationToken);
 
-        if (isExist)
-            return Response<MainServiceDto>.Fail(BusinessExceptionMessages.AlreadyExists);
+        if (vehicle is null)
+            return Response<MainServiceDto>.Fail(BusinessExceptionMessages.VehicleNotFound);
 
         var entity = new MainService
         {
@@ -49,8 +40,9 @@ public class CreateMainServiceCommandHandler(CarServiceDbContext dbContext, ICur
 
         var result = await dbContext.AddAsync(entity, cancellationToken);
         await dbContext.SaveChangesAsync(cancellationToken);
-
-        await cacheService.SetAsync($"main-service:{entity.Id}", entity, null);
+        result.Entity.Vehicle = vehicle;
+        
+        await cacheService.TryAppendToListAsync($"mainservice:list:{currentUser.CompanyId!}", result.Entity.FromEntity(), null);
 
         return Response<MainServiceDto>.Success(result.Entity.FromEntity());
     }
