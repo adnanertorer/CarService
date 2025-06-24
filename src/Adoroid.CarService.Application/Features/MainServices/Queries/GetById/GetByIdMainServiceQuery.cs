@@ -1,6 +1,7 @@
-﻿using Adoroid.CarService.Application.Features.MainServices.Dtos;
-using Adoroid.CarService.Application.Features.MainServices.MapperExtensions;
+﻿using Adoroid.CarService.Application.Common.Abstractions.Caching;
+using Adoroid.CarService.Application.Features.MainServices.Dtos;
 using Adoroid.CarService.Application.Features.MainServices.ExceptionMessages;
+using Adoroid.CarService.Application.Features.MainServices.MapperExtensions;
 using Adoroid.CarService.Persistence;
 using Adoroid.Core.Application.Wrappers;
 using Microsoft.EntityFrameworkCore;
@@ -8,7 +9,11 @@ using MinimalMediatR.Core;
 
 namespace Adoroid.CarService.Application.Features.MainServices.Queries.GetById;
 
-public record GetByIdMainServiceQuery(Guid Id) : IRequest<Response<MainServiceDto>>;
+public record GetByIdMainServiceQuery(Guid Id) : ICacheableQuery<Response<MainServiceDto>>, IRequest<Response<MainServiceDto>>
+{
+public TimeSpan? Expiration => TimeSpan.FromHours(2);
+    public string GetCacheKey() => $"main-service:{Id}";
+}
 
 public class GetEntityByIdMainServiceQueryHandler(CarServiceDbContext dbContext)
     : IRequestHandler<GetByIdMainServiceQuery, Response<MainServiceDto>>
