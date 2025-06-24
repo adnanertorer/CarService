@@ -1,4 +1,6 @@
-﻿namespace Adoroid.CarService.Application.Features.MainServices.Dtos;
+﻿using Adoroid.CarService.Application.Features.Vehicles.Dtos;
+
+namespace Adoroid.CarService.Application.Features.MainServices.Dtos;
 
 public class VehicleDto
 {
@@ -11,4 +13,6 @@ public class VehicleDto
     public string? Engine { get; set; }
     public int FuelTypeId { get; set; }
     public string? SerialNumber { get; set; }
+
+    public CustomerDto? Customer { get; set; }
 }
