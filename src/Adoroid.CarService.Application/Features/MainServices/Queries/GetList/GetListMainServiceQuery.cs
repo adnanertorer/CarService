@@ -1,4 +1,5 @@
 ﻿using Adoroid.CarService.Application.Common.Abstractions.Auth;
+using Adoroid.CarService.Application.Common.Abstractions.Caching;
 using Adoroid.CarService.Application.Common.Dtos.Filters;
 using Adoroid.CarService.Application.Common.Extensions;
 using Adoroid.CarService.Application.Features.MainServices.Dtos;
@@ -15,40 +16,52 @@ namespace Adoroid.CarService.Application.Features.MainServices.Queries.GetList;
 public record GetListMainServiceQuery(MainFilterRequestModel FilterRequest)
     : IRequest<Response<Paginate<MainServiceDto>>>;
 
-public class GetListMainServiceQueryHandler(CarServiceDbContext dbContext, ICurrentUser currentUser)
+public class GetListMainServiceQueryHandler(CarServiceDbContext dbContext, ICurrentUser currentUser, ICacheService cacheService)
     : IRequestHandler<GetListMainServiceQuery, Response<Paginate<MainServiceDto>>>
 {
-
+    const string redisKeyPrefix = "mainservice:list";
     public async Task<Response<Paginate<MainServiceDto>>> Handle(GetListMainServiceQuery request, CancellationToken cancellationToken)
     {
-        var query = dbContext.MainServices
-            .Include(i => i.Vehicle)
-            .ThenInclude(i => i!.Customer)
-            .AsNoTracking()
-            .Where(i => i.Vehicle != null && i.Vehicle.Customer != null && i.Vehicle!.Customer!.CompanyId == Guid.Parse(currentUser.CompanyId!));
 
-        if (request.FilterRequest.StartDate.HasValue && request.FilterRequest.EndDate.HasValue)
-        {
-            query = query.WhereTwoDateIsBetween(
-                i => i.ServiceDate,
-                request.FilterRequest.StartDate.Value.Date,
-                request.FilterRequest.EndDate.Value.Date.AddDays(1));
-        }
-        else if (request.FilterRequest.StartDate.HasValue)
-        {
-            query = query.WhereDateIsBetween(i => i.ServiceDate, request.FilterRequest.StartDate.Value);
-        }
+        var cacheKey = $"{redisKeyPrefix}:{currentUser.CompanyId!}";
 
+        var list = await cacheService.GetOrSetPaginateAsync<List<MainServiceDto>>(cacheKey,
+            async () =>
+            {
+                var query = dbContext.MainServices
+                    .Include(i => i.Vehicle)
+                        .ThenInclude(i => i!.Customer)
+                    .AsNoTracking()
+                    .Where(i => i.Vehicle != null &&
+                                i.Vehicle.Customer != null &&
+                                i.Vehicle.Customer.CompanyId == Guid.Parse(currentUser.CompanyId!));
 
-        if (!string.IsNullOrWhiteSpace(request.FilterRequest.Search))
-            query = query.Where(i => i.Vehicle!.Brand.Contains(request.FilterRequest.Search) || i.Vehicle!.Model.Contains(request.FilterRequest.Search)
-            || i.Vehicle!.Plate.Contains(request.FilterRequest.Search));
+                if (request.FilterRequest.StartDate.HasValue && request.FilterRequest.EndDate.HasValue)
+                {
+                    query = query.WhereTwoDateIsBetween(
+                        i => i.ServiceDate,
+                        request.FilterRequest.StartDate.Value.Date,
+                        request.FilterRequest.EndDate.Value.Date.AddDays(1));
+                }
+                else if (request.FilterRequest.StartDate.HasValue)
+                {
+                    query = query.WhereDateIsBetween(i => i.ServiceDate, request.FilterRequest.StartDate.Value);
+                }
 
-        var result = await query
-            .OrderByDescending(i => i.ServiceDate)
-            .Select(i => i.FromEntity())
-            .ToPaginateAsync(request.FilterRequest.PageRequest.PageIndex, request.FilterRequest.PageRequest.PageSize, cancellationToken);
+                if (!string.IsNullOrWhiteSpace(request.FilterRequest.Search))
+                {
+                    var search = request.FilterRequest.Search;
+                    query = query.Where(i =>
+                        i.Vehicle!.Brand.Contains(search) ||
+                        i.Vehicle!.Model.Contains(search) ||
+                        i.Vehicle!.Plate.Contains(search));
+                }
 
-        return Response<Paginate<MainServiceDto>>.Success(result);
+                return await query
+                    .OrderByDescending(i => i.ServiceDate)
+                    .Select(i => i.FromEntity()).ToListAsync(cancellationToken);
+            }, TimeSpan.FromHours(2));
+
+        return Response<Paginate<MainServiceDto>>.Success(list.AsQueryable().ToPaginate(request.FilterRequest.PageRequest.PageIndex, request.FilterRequest.PageRequest.PageSize));
     }
 }

@@ -1,4 +1,5 @@
-﻿using Adoroid.CarService.Application.Features.SubServices.Dtos;
+﻿using Adoroid.CarService.Application.Common.Abstractions.Caching;
+using Adoroid.CarService.Application.Features.SubServices.Dtos;
 using Adoroid.CarService.Application.Features.SubServices.ExceptionMessages;
 using Adoroid.CarService.Application.Features.SubServices.MapperExtensions;
 using Adoroid.CarService.Persistence;
@@ -8,7 +9,11 @@ using MinimalMediatR.Core;
 
 namespace Adoroid.CarService.Application.Features.SubServices.Queries.GetById;
 
-public record GetByIdSubServiceQuery(Guid Id) : IRequest<Response<SubServiceDto>>;
+public record GetByIdSubServiceQuery(Guid Id) : IRequest<Response<SubServiceDto>>, ICacheableQuery<Response<SubServiceDto>>
+{
+    public TimeSpan? Expiration => TimeSpan.FromHours(2);
+    public string GetCacheKey() => $"subservice:{Id}";
+}
 
 public class GetEntityByIdQueryHandler(CarServiceDbContext dbContext)
     : IRequestHandler<GetByIdSubServiceQuery, Response<SubServiceDto>>
