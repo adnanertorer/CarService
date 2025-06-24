@@ -7,7 +7,7 @@ using MinimalMediatR.Core;
 
 namespace Adoroid.CarService.Application.Features.AccountTransactions.Commands.Delete;
 
-public record DeleteClaimCommand(Guid Id) : IRequest<Response<Guid>>;
+public record DeleteClaimCommand(Guid Id) : IRequest<Response<Guid>>; //kullanılmayacak
 
 public class DeleteClaimCommandHandler(CarServiceDbContext dbContext, ICurrentUser currentUser)
     : IRequestHandler<DeleteClaimCommand, Response<Guid>>
