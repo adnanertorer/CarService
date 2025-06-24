@@ -1,5 +1,6 @@
 ﻿using Adoroid.CarService.Application.Common.Abstractions.Auth;
 using Adoroid.CarService.Application.Common.Abstractions.Caching;
+using Adoroid.CarService.Application.Common.Extensions;
 using Adoroid.CarService.Application.Features.SubServices.ExceptionMessages;
 using Adoroid.CarService.Persistence;
 using Adoroid.Core.Application.Wrappers;
@@ -9,16 +10,9 @@ using MinimalMediatR.Core;
 namespace Adoroid.CarService.Application.Features.MainServices.Commands.Delete
 {
 
-    public record DeleteMainServiceCommand(Guid Id) : IRequest<Response<Guid>>, ICacheRemovableCommand
-    {
-        public IEnumerable<string> GetCacheKeysToRemove()
-        {
-            yield return $"main-service:{Id}";
-            yield return "main-service:list";
-        }
-    }
+    public record DeleteMainServiceCommand(Guid Id) : IRequest<Response<Guid>>;
 
-    public class DeleteMainServiceCommandHandler(CarServiceDbContext dbContext, ICurrentUser currentUser)
+    public class DeleteMainServiceCommandHandler(CarServiceDbContext dbContext, ICurrentUser currentUser, ICacheService cacheService)
         : IRequestHandler<DeleteMainServiceCommand, Response<Guid>>
     {
         public async Task<Response<Guid>> Handle(DeleteMainServiceCommand request, CancellationToken cancellationToken)
@@ -33,6 +27,9 @@ namespace Adoroid.CarService.Application.Features.MainServices.Commands.Delete
             entity.DeletedDate = DateTime.UtcNow;
 
             await dbContext.SaveChangesAsync(cancellationToken);
+
+            var cacheListKey = $"mainservice:list:{currentUser.CompanyId!}";
+            await cacheService.RemoveFromListAsync<dynamic>(cacheListKey, request.Id.ToString());
 
             return Response<Guid>.Success(entity.Id);
         }

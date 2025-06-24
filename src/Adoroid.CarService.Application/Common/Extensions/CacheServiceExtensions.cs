@@ -1,7 +1,5 @@
 ﻿using Adoroid.CarService.Application.Common.Abstractions.Caching;
-using Adoroid.Core.Application.Wrappers;
-using Adoroid.Core.Repository.Paging;
-using static System.Runtime.InteropServices.JavaScript.JSType;
+using System.Text.Json;
 
 namespace Adoroid.CarService.Application.Common.Extensions;
 
@@ -33,6 +31,21 @@ public static class CacheServiceExtensions
         {
             existingList.Add(data);
             await cache.SetAsync(listKey, existingList, expiry);
+        }
+    }
+
+    public static async Task RemoveFromListAsync<T>(this ICacheService cache, string listKey, string dataKey)
+    {
+        var list = await cache.GetAsync<List<JsonElement>>(listKey);
+        if (list is null) return;
+
+        var itemToRemove = list.FirstOrDefault(x =>
+            x.TryGetProperty("Id", out var idProp) && idProp.GetString() == dataKey);
+
+        if (itemToRemove.ValueKind != JsonValueKind.Undefined)
+        {
+            list.Remove(itemToRemove);
+            await cache.SetAsync(listKey, list);
         }
     }
 }

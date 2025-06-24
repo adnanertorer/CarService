@@ -21,10 +21,21 @@ public class RedisCacheService : ICacheService
         return value.HasValue ? JsonSerializer.Deserialize<T>(value!) : default;
     }
 
+    public async Task<string?> GetStringAsync(string key)
+    {
+        var value = await _db.StringGetAsync(key);
+        return value.HasValue ? value.ToString() : null;
+    }
+
     public async Task SetAsync<T>(string key, T value, TimeSpan? expiry = null)
     {
         var json = JsonSerializer.Serialize(value);
         await _db.StringSetAsync(key, json, expiry);
+    }
+
+    public async Task SetStringAsync(string key, string value, TimeSpan? expiry = null)
+    {
+        await _db.StringSetAsync(key, value, expiry);
     }
 
     public async Task RemoveAsync(string key) => await _db.KeyDeleteAsync(key);
