@@ -1,4 +1,5 @@
 ﻿using Adoroid.CarService.Application.Common.Abstractions.Auth;
+using Adoroid.CarService.Application.Common.Abstractions.Caching;
 using Adoroid.CarService.Application.Common.Enums;
 using Adoroid.CarService.Application.Common.Extensions;
 using Adoroid.CarService.Application.Features.MainServices.Dtos;
@@ -15,18 +16,17 @@ namespace Adoroid.CarService.Application.Features.MainServices.Commands.Create;
 public record CreateMainServiceCommand(Guid VehicleId, DateTime ServiceDate, string? Description) : IRequest<Response<MainServiceDto>>;
 
 
-public class CreateMainServiceCommandHandler(CarServiceDbContext dbContext, ICurrentUser currentUser) : IRequestHandler<CreateMainServiceCommand, Response<MainServiceDto>>
+public class CreateMainServiceCommandHandler(CarServiceDbContext dbContext, ICurrentUser currentUser, ICacheService cacheService) 
+    : IRequestHandler<CreateMainServiceCommand, Response<MainServiceDto>>
 {
+    const string redisKeyPrefix = "mainservice:list";
     public async Task<Response<MainServiceDto>> Handle(CreateMainServiceCommand request, CancellationToken cancellationToken)
     {
-        var isExist = await dbContext.MainServices
-            .AsNoTracking()
-            .Where(i => i.VehicleId == request.VehicleId)
-            .WhereDateIsBetween(i => i.ServiceDate, request.ServiceDate)
-            .AnyAsync(cancellationToken);
+        var vehicle = await dbContext.Vehicles.AsNoTracking()
+            .FirstOrDefaultAsync(i => i.Id == request.VehicleId, cancellationToken);
 
-        if (isExist)
-            return Response<MainServiceDto>.Fail(BusinessExceptionMessages.AlreadyExists);
+        if (vehicle is null)
+            return Response<MainServiceDto>.Fail(BusinessExceptionMessages.VehicleNotFound);
 
         var entity = new MainService
         {
@@ -41,7 +41,13 @@ public class CreateMainServiceCommandHandler(CarServiceDbContext dbContext, ICur
 
         var result = await dbContext.AddAsync(entity, cancellationToken);
         await dbContext.SaveChangesAsync(cancellationToken);
+        
+        result.Entity.Vehicle = vehicle;
 
-        return Response<MainServiceDto>.Success(result.Entity.FromEntity());
+        var resultDto = result.Entity.FromEntity();
+
+        await cacheService.AppendToListAsync($"{redisKeyPrefix}:{currentUser.CompanyId!}", resultDto, null);
+
+        return Response<MainServiceDto>.Success(resultDto);
     }
 }
