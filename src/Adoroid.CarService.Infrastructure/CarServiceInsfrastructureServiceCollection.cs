@@ -25,9 +25,10 @@ public static class CarServiceInsfrastructureServiceCollection
 
         services.AddSingleton<IConnectionMultiplexer>(sp =>
            ConnectionMultiplexer.Connect(configuration.GetConnectionString("RedisConnectionString")!));
-        services.Decorate(
-        typeof(IRequestHandler<,>),
-        typeof(CacheQueryHandlerDecorator<,>));
+        
+        services.Decorate(typeof(IRequestHandler<,>), typeof(CacheQueryHandlerDecorator<,>));
+
+        services.Decorate(typeof(IRequestHandler<,>), typeof(CacheRemoveCommandDecorator<,>));
 
         services.AddScoped<ICacheService, RedisCacheService>();
         return services;

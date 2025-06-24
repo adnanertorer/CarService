@@ -1,4 +1,5 @@
 ﻿using Adoroid.CarService.Application.Common.Abstractions.Auth;
+using Adoroid.CarService.Application.Common.Abstractions.Caching;
 using Adoroid.CarService.Application.Common.Enums;
 using Adoroid.CarService.Application.Features.MainServices.Dtos;
 using Adoroid.CarService.Application.Features.MainServices.ExceptionMessages;
@@ -11,7 +12,15 @@ using MinimalMediatR.Core;
 
 namespace Adoroid.CarService.Application.Features.MainServices.Commands.Update;
 
-public record UpdateMainServiceCommand(Guid Id, Guid VehicleId, DateTime ServiceDate, string? Description, MainServiceStatusEnum ServiceStatus) : IRequest<Response<MainServiceDto>>;
+public record UpdateMainServiceCommand(Guid Id, Guid VehicleId, DateTime ServiceDate, string? Description, MainServiceStatusEnum ServiceStatus)
+    : IRequest<Response<MainServiceDto>>, ICacheRemovableCommand
+{
+    public IEnumerable<string> GetCacheKeysToRemove()
+    {
+        yield return $"main-service:{Id}";
+        yield return "main-service:list";
+    }
+}
 
 public class UpdateMainServiceCommandHandler(CarServiceDbContext dbContext, ICurrentUser currentUser)
         : IRequestHandler<UpdateMainServiceCommand, Response<MainServiceDto>>

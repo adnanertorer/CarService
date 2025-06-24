@@ -1,7 +1,6 @@
 ﻿using Adoroid.CarService.Application.Common.Abstractions.Caching;
 using Adoroid.Core.Application.Wrappers;
 using MinimalMediatR.Core;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Adoroid.CarService.Infrastructure.Caching;
 
@@ -29,7 +28,16 @@ public class CacheQueryHandlerDecorator<TRequest, TResponse>
 
         var result = await _inner.Handle(request, cancellationToken);
 
-        await _cache.SetAsync(request.GetCacheKey(), result, request.Expiration);
+        if (result?.GetType().IsGenericType == true && result.GetType().GetGenericTypeDefinition() == typeof(Response<>))
+        {
+            var dataProperty = result.GetType().GetProperty("Data");
+            var data = dataProperty?.GetValue(result);
+
+            if (data is not null)
+            {
+                await _cache.SetAsync(request.GetCacheKey(), data, request.Expiration);
+            }
+        }
 
         return result;
     }
