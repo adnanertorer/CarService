@@ -1,4 +1,6 @@
 ﻿using Adoroid.CarService.Application.Common.Abstractions.Auth;
+using Adoroid.CarService.Application.Common.Abstractions.Caching;
+using Adoroid.CarService.Application.Common.Extensions;
 using Adoroid.CarService.Application.Features.SubServices.Dtos;
 using Adoroid.CarService.Application.Features.SubServices.ExceptionMessages;
 using Adoroid.CarService.Application.Features.SubServices.MapperExtensions;
@@ -13,7 +15,7 @@ namespace Adoroid.CarService.Application.Features.SubServices.Commands.Create;
 public record CreateSubServiceCommand(Guid MainServiceId, string Operation, Guid EmployeeId, DateTime OperationDate, string? Description,
     string? Material, string? MaterialBrand, Guid? SupplierId, decimal? Discount, decimal Cost) : IRequest<Response<SubServiceDto>>;
 
-public class CreateSubServiceCommandHandler(CarServiceDbContext dbContext, ICurrentUser currentUser)
+public class CreateSubServiceCommandHandler(CarServiceDbContext dbContext, ICurrentUser currentUser, ICacheService cacheService)
     : IRequestHandler<CreateSubServiceCommand, Response<SubServiceDto>>
 {
     public async Task<Response<SubServiceDto>> Handle(CreateSubServiceCommand request, CancellationToken cancellationToken)
@@ -22,6 +24,13 @@ public class CreateSubServiceCommandHandler(CarServiceDbContext dbContext, ICurr
 
         if (mainServiceEntity == null)
             return Response<SubServiceDto>.Fail(BusinessExceptionMessages.MainServiceNotFound);
+
+        var employee = await dbContext.Employees
+            .AsNoTracking()
+            .FirstOrDefaultAsync(i => i.Id == request.EmployeeId, cancellationToken);
+
+        if (employee == null)
+            return Response<SubServiceDto>.Fail(BusinessExceptionMessages.EmployeeNotFound);
 
         var entity = new SubService
         {
@@ -40,12 +49,20 @@ public class CreateSubServiceCommandHandler(CarServiceDbContext dbContext, ICurr
             CreatedDate = DateTime.UtcNow
         };
 
-        await dbContext.AddAsync(entity, cancellationToken);
+        var result = await dbContext.AddAsync(entity, cancellationToken);
 
         mainServiceEntity.Cost += request.Cost - (request.Discount ?? 0);
 
         await dbContext.SaveChangesAsync(cancellationToken);
 
-        return Response<SubServiceDto>.Success(entity.FromEntity());
+        var model = result.Entity;
+        model.MainService = mainServiceEntity;
+        model.Employee = employee;
+
+        var resultDto = model.FromEntity();
+
+        await cacheService.TryAppendToListAsync($"subservices:list:{currentUser.CompanyId!}", resultDto, null);
+
+        return Response<SubServiceDto>.Success(resultDto);
     }
 }
