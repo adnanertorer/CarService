@@ -29,4 +29,8 @@
     <ProjectReference Include="..\Adoroid.CarService.Application\Adoroid.CarService.Application.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Caching\Extensions\" />
+  </ItemGroup>
+
 </Project>
