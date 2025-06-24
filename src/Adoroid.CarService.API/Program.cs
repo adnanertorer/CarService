@@ -115,6 +115,7 @@ app.SupplierEndpoint();
 app.VehicleEndpoint();
 app.MasterServiceEndpoint();
 app.CompanyServiceEndpoints();
+app.AccountTransactionEndpoint();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
