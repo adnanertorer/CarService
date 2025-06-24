@@ -2,6 +2,7 @@ using Adoroid.CarService.API.Endpoints;
 using Adoroid.CarService.Application;
 using Adoroid.CarService.Infrastructure;
 using Adoroid.CarService.Infrastructure.Auth;
+using Adoroid.CarService.Infrastructure.Caching;
 using Adoroid.CarService.Infrastructure.Logging;
 using Adoroid.CarService.Persistence;
 using Adoroid.Core.Application.Exceptions.Middlewares;
@@ -19,11 +20,13 @@ builder.WebHost.ConfigureKestrel(options =>
 });
 
 builder.Services.AddCarServicePersistence(builder.Configuration);
-builder.Services.AddCarServiceInsfrastructure();
+builder.Services.AddCarServiceApplication(builder.Configuration);
+builder.Services.AddCarServiceInsfrastructure(builder.Configuration);
+#region token_options
 builder.Services.Configure<TokenOptions>(
-    builder.Configuration.GetSection("TokenOptions"));
+    builder.Configuration.GetSection(nameof(TokenOptions)));
 
-var tokenOptions = builder.Configuration.GetSection("TokenOptions").Get<TokenOptions>() 
+var tokenOptions = builder.Configuration.GetSection(nameof(TokenOptions)).Get<TokenOptions>() 
     ?? throw new InvalidOperationException("TokenOptions configuration section is missing or malformed.");
 
 builder.Services
@@ -48,7 +51,18 @@ builder.Services
                    };
                });
 
-builder.Services.AddCarServiceApplication(builder.Configuration);
+#endregion
+
+#region redis_options
+/*builder.Services.Configure<RedisConfig>(builder.Configuration.GetSection(nameof(RedisConfig)));
+var redisConfig = builder.Configuration.GetSection(nameof(RedisConfig)).Get<RedisConfig>() 
+    ?? throw new InvalidOperationException("Redis configuration section is missing or malformed.");
+builder.Services.AddStackExchangeRedisCache(options =>
+{
+    options.Configuration = $"{redisConfig.Host}:{redisConfig.Port},password={redisConfig.Password}";
+});*/
+#endregion
+
 
 builder.Services.AddHttpContextAccessor();
 

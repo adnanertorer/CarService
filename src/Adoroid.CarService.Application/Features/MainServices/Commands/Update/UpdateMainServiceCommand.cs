@@ -1,5 +1,7 @@
 ﻿using Adoroid.CarService.Application.Common.Abstractions.Auth;
+using Adoroid.CarService.Application.Common.Abstractions.Caching;
 using Adoroid.CarService.Application.Common.Enums;
+using Adoroid.CarService.Application.Common.Extensions;
 using Adoroid.CarService.Application.Features.MainServices.Dtos;
 using Adoroid.CarService.Application.Features.MainServices.ExceptionMessages;
 using Adoroid.CarService.Application.Features.MainServices.MapperExtensions;
@@ -11,12 +13,13 @@ using MinimalMediatR.Core;
 
 namespace Adoroid.CarService.Application.Features.MainServices.Commands.Update;
 
-public record UpdateMainServiceCommand(Guid Id, Guid VehicleId, DateTime ServiceDate, string? Description, MainServiceStatusEnum ServiceStatus) : IRequest<Response<MainServiceDto>>;
+public record UpdateMainServiceCommand(Guid Id, Guid VehicleId, DateTime ServiceDate, string? Description, MainServiceStatusEnum ServiceStatus)
+    : IRequest<Response<MainServiceDto>>;
 
-public class UpdateMainServiceCommandHandler(CarServiceDbContext dbContext, ICurrentUser currentUser)
+public class UpdateMainServiceCommandHandler(CarServiceDbContext dbContext, ICurrentUser currentUser, ICacheService cacheService)
         : IRequestHandler<UpdateMainServiceCommand, Response<MainServiceDto>>
 {
-
+    const string redisKeyPrefix = "mainservice:list";
     public async Task<Response<MainServiceDto>> Handle(UpdateMainServiceCommand request, CancellationToken cancellationToken)
     {
         var entity = await dbContext.MainServices
@@ -60,8 +63,11 @@ public class UpdateMainServiceCommandHandler(CarServiceDbContext dbContext, ICur
 
         await dbContext.SaveChangesAsync(cancellationToken);
 
+        var resultDto = entity.FromEntity();
 
-        return Response<MainServiceDto>.Success(entity.FromEntity());
+        await cacheService.UpdateToListAsync($"{redisKeyPrefix}:{currentUser.CompanyId!}", request.Id.ToString(), resultDto, null);
+
+        return Response<MainServiceDto>.Success(resultDto);
     }
 
     private async Task<decimal> GetBalance(Guid customerId, CancellationToken cancellationToken)
