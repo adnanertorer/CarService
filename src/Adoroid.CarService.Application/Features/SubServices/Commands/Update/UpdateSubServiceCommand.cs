@@ -1,4 +1,6 @@
 ﻿using Adoroid.CarService.Application.Common.Abstractions.Auth;
+using Adoroid.CarService.Application.Common.Abstractions.Caching;
+using Adoroid.CarService.Application.Common.Extensions;
 using Adoroid.CarService.Application.Features.SubServices.Dtos;
 using Adoroid.CarService.Application.Features.SubServices.ExceptionMessages;
 using Adoroid.CarService.Application.Features.SubServices.MapperExtensions;
@@ -12,9 +14,10 @@ namespace Adoroid.CarService.Application.Features.SubServices.Commands.Update;
 public record UpdateSubServiceCommand(Guid Id, string Operation, Guid EmployeeId, DateTime OperationDate, string? Description,
     string? Material, string? MaterialBrand, Guid? SupplierId, decimal? Discount, decimal Cost) : IRequest<Response<SubServiceDto>>;
 
-public class UpdateSubServiceCommandHandler(CarServiceDbContext dbContext, ICurrentUser currentUser)
+public class UpdateSubServiceCommandHandler(CarServiceDbContext dbContext, ICurrentUser currentUser, ICacheService cacheService)
     : IRequestHandler<UpdateSubServiceCommand, Response<SubServiceDto>>
 {
+    const string redisKeyPrefix = "subservice:list";
     public async Task<Response<SubServiceDto>> Handle(UpdateSubServiceCommand request, CancellationToken cancellationToken)
     {
         var entity = await dbContext.SubServices.FirstOrDefaultAsync(e => e.Id == request.Id, cancellationToken);
@@ -35,7 +38,12 @@ public class UpdateSubServiceCommandHandler(CarServiceDbContext dbContext, ICurr
         entity.UpdatedBy = Guid.Parse(currentUser.Id!);
         entity.UpdatedDate = DateTime.UtcNow;
 
+        dbContext.SubServices.Update(entity);
         await dbContext.SaveChangesAsync(cancellationToken);
+
+        var resultDto = entity.FromEntity();
+
+        await cacheService.UpdateToListAsync($"{redisKeyPrefix}:{currentUser.CompanyId!}", request.Id.ToString(), resultDto, null);
 
         return Response<SubServiceDto>.Success(entity.FromEntity());
     }
