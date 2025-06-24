@@ -1,4 +1,5 @@
 ﻿using Adoroid.CarService.Application.Common.Abstractions.Auth;
+using Adoroid.CarService.Application.Common.Abstractions.Caching;
 using Adoroid.CarService.Application.Features.SubServices.ExceptionMessages;
 using Adoroid.CarService.Persistence;
 using Adoroid.Core.Application.Wrappers;
@@ -8,7 +9,14 @@ using MinimalMediatR.Core;
 namespace Adoroid.CarService.Application.Features.MainServices.Commands.Delete
 {
 
-    public record DeleteMainServiceCommand(Guid Id) : IRequest<Response<Guid>>;
+    public record DeleteMainServiceCommand(Guid Id) : IRequest<Response<Guid>>, ICacheRemovableCommand
+    {
+        public IEnumerable<string> GetCacheKeysToRemove()
+        {
+            yield return $"main-service:{Id}";
+            yield return "main-service:list";
+        }
+    }
 
     public class DeleteMainServiceCommandHandler(CarServiceDbContext dbContext, ICurrentUser currentUser)
         : IRequestHandler<DeleteMainServiceCommand, Response<Guid>>
