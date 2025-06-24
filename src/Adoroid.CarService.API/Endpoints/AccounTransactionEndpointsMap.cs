@@ -25,12 +25,16 @@ public static class AccounTransactionEndpointsMap
             var result = await mediator.Send(new GetByIdAccountTransactionRequest(guid), cancellationToken);
             return result.ToResult();
         }).RequireAuthorization();
-        builder.MapGet(apiPath + "/list", async ([AsParameters] PageRequest pageRequest, string? search, DateTime? startDate, DateTime? endDate, string customerId, IMediator mediator, CancellationToken cancellationToken) =>
+        builder.MapGet(apiPath + "/list", async ([AsParameters] PageRequest pageRequest, string? search, DateTime? startDate, DateTime? endDate, string? customerId, IMediator mediator, CancellationToken cancellationToken) =>
         {
-            if (!string.IsNullOrEmpty(customerId) && !Guid.TryParse(customerId, out var guid))
-                return Results.BadRequest("Invalid customer id.");
-
-            var result = await mediator.Send(new GetListAccountTransactionRequest(new MainFilterRequestModel(pageRequest, search, startDate, endDate, guid)), cancellationToken);
+            Guid? cId = null;
+            if (!string.IsNullOrEmpty(customerId))
+            {
+                if (!Guid.TryParse(customerId, out var id))
+                    return Results.BadRequest("Invalid customer id.");
+                cId = id;
+            }
+            var result = await mediator.Send(new GetListAccountTransactionRequest(new MainFilterRequestModel(pageRequest, search, startDate, endDate, cId)), cancellationToken);
             return result.ToResult();
         }).RequireAuthorization();
         return builder;
