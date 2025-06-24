@@ -40,10 +40,13 @@ public class CreateMainServiceCommandHandler(CarServiceDbContext dbContext, ICur
 
         var result = await dbContext.AddAsync(entity, cancellationToken);
         await dbContext.SaveChangesAsync(cancellationToken);
-        result.Entity.Vehicle = vehicle;
         
-        await cacheService.TryAppendToListAsync($"mainservice:list:{currentUser.CompanyId!}", result.Entity.FromEntity(), null);
+        result.Entity.Vehicle = vehicle;
 
-        return Response<MainServiceDto>.Success(result.Entity.FromEntity());
+        var resultDto = result.Entity.FromEntity();
+
+        await cacheService.TryAppendToListAsync($"mainservice:list:{currentUser.CompanyId!}", resultDto, null);
+
+        return Response<MainServiceDto>.Success(resultDto);
     }
 }
