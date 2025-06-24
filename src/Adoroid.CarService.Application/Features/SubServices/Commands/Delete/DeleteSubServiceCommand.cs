@@ -14,6 +14,7 @@ public record DeleteSubServiceCommand(Guid Id) : IRequest<Response<Guid>>;
 public class DeleteSubServiceCommandHandler(CarServiceDbContext dbContext, ICurrentUser currentUser, ICacheService cacheService)
     : IRequestHandler<DeleteSubServiceCommand, Response<Guid>>
 {
+    const string redisKeyPrefix = "subservice:list";
     public async Task<Response<Guid>> Handle(DeleteSubServiceCommand request, CancellationToken cancellationToken)
     {
         var entity = await dbContext.SubServices.FirstOrDefaultAsync(e => e.Id == request.Id, cancellationToken);
@@ -27,7 +28,7 @@ public class DeleteSubServiceCommandHandler(CarServiceDbContext dbContext, ICurr
 
         await dbContext.SaveChangesAsync(cancellationToken);
 
-        var cacheListKey = $"subservices:list:{currentUser.CompanyId!}";
+        var cacheListKey = $"{redisKeyPrefix}:{currentUser.CompanyId!}";
         await cacheService.RemoveFromListAsync<dynamic>(cacheListKey, request.Id.ToString());
 
         return Response<Guid>.Success(entity.Id);

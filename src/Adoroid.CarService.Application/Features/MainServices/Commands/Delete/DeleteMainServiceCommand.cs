@@ -15,6 +15,7 @@ namespace Adoroid.CarService.Application.Features.MainServices.Commands.Delete
     public class DeleteMainServiceCommandHandler(CarServiceDbContext dbContext, ICurrentUser currentUser, ICacheService cacheService)
         : IRequestHandler<DeleteMainServiceCommand, Response<Guid>>
     {
+        const string redisKeyPrefix = "mainservice:list";
         public async Task<Response<Guid>> Handle(DeleteMainServiceCommand request, CancellationToken cancellationToken)
         {
             var entity = await dbContext.MainServices.FirstOrDefaultAsync(e => e.Id == request.Id, cancellationToken);
@@ -28,7 +29,7 @@ namespace Adoroid.CarService.Application.Features.MainServices.Commands.Delete
 
             await dbContext.SaveChangesAsync(cancellationToken);
 
-            var cacheListKey = $"mainservice:list:{currentUser.CompanyId!}";
+            var cacheListKey = $"{redisKeyPrefix}:{currentUser.CompanyId!}";
             await cacheService.RemoveFromListAsync<dynamic>(cacheListKey, request.Id.ToString());
 
             return Response<Guid>.Success(entity.Id);

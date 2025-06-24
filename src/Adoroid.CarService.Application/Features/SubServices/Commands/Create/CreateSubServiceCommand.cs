@@ -18,6 +18,7 @@ public record CreateSubServiceCommand(Guid MainServiceId, string Operation, Guid
 public class CreateSubServiceCommandHandler(CarServiceDbContext dbContext, ICurrentUser currentUser, ICacheService cacheService)
     : IRequestHandler<CreateSubServiceCommand, Response<SubServiceDto>>
 {
+    const string redisKeyPrefix = "subservice:list";
     public async Task<Response<SubServiceDto>> Handle(CreateSubServiceCommand request, CancellationToken cancellationToken)
     {
         var mainServiceEntity = await dbContext.MainServices.FirstOrDefaultAsync(i => i.Id == request.MainServiceId, cancellationToken);
@@ -61,7 +62,7 @@ public class CreateSubServiceCommandHandler(CarServiceDbContext dbContext, ICurr
 
         var resultDto = model.FromEntity();
 
-        await cacheService.TryAppendToListAsync($"subservices:list:{currentUser.CompanyId!}", resultDto, null);
+        await cacheService.AppendToListAsync($"{redisKeyPrefix}:{currentUser.CompanyId!}", resultDto, null);
 
         return Response<SubServiceDto>.Success(resultDto);
     }
