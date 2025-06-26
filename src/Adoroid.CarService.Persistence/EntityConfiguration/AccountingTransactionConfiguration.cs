@@ -31,10 +31,5 @@ public class AccountingTransactionConfiguration : IEntityTypeConfiguration<Accou
          .WithMany(c => c.AccountingTransactions)
          .HasForeignKey(b => b.CompanyId)
          .OnDelete(DeleteBehavior.NoAction);
-
-        builder.HasOne(b => b.Customer)
-        .WithMany(c => c.AccountingTransactions)
-        .HasForeignKey(b => b.CustomerId)
-        .OnDelete(DeleteBehavior.NoAction);
     }
 }
