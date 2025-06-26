@@ -7,7 +7,6 @@ public class Customer : Entity<Guid>
     public Customer()
     {
         Vehicles = new HashSet<Vehicle>();
-        AccountingTransactions = new HashSet<AccountingTransaction>();
     }
 
     public Guid CompanyId { get; set; }
@@ -22,5 +21,4 @@ public class Customer : Entity<Guid>
 
     public Company? Company { get; set; }
     public ICollection<Vehicle>? Vehicles { get; set; }
-    public ICollection<AccountingTransaction> AccountingTransactions { get; set; }
 }
