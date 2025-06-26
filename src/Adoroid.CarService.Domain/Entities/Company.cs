@@ -12,6 +12,7 @@ public class Company : Entity<Guid>
         Suppliers = new HashSet<Supplier>();
         AccountingTransactions = new HashSet<AccountingTransaction>();
         CompanyServices = new HashSet<CompanyService>();
+        MainServices = new HashSet<MainService>();
     }
 
     public string CompanyName { get; set; }
@@ -31,4 +32,5 @@ public class Company : Entity<Guid>
     public ICollection<Supplier>? Suppliers { get; set; }
     public ICollection<AccountingTransaction> AccountingTransactions { get; set; }
     public ICollection<CompanyService> CompanyServices { get; set; }
+    public ICollection<MainService> MainServices { get; set; }
 }
