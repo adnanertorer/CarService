@@ -1,6 +1,6 @@
 using Adoroid.CarService.Application.Common.Abstractions.Auth;
 using Adoroid.CarService.Application.Common.Dtos.Auth;
-using Adoroid.CarService.Application.Features.Users.Dtos;
+using Adoroid.CarService.Application.Features.MobileUsers.Dtos;
 using Adoroid.CarService.Persistence;
 using Adoroid.Core.Application.Wrappers;
 using Microsoft.EntityFrameworkCore;
@@ -22,7 +22,7 @@ public class MobileUserTokenHandler : IMobileUserTokenHandler
         _dbContext = dbContext;
     }
 
-    public async Task<Response<MobileUserAccessTokenDto>> CreateAccessToken(UserDto user, CancellationToken cancellationToken)
+    public async Task<Response<MobileUserAccessTokenDto>> CreateAccessToken(MobileUserDto user, CancellationToken cancellationToken)
     {
         var accessTokenExpiration = DateTime.UtcNow.AddMinutes(_tokenOptions.AccessTokenExpiration);
         var securityKey = SignHandler.GetSecurityKey(_tokenOptions.SecurityKey);
@@ -65,7 +65,7 @@ public class MobileUserTokenHandler : IMobileUserTokenHandler
         return Convert.ToBase64String(numberByte);
     }
 
-    public Response<MobileUserAccessTokenDto> ReturnAccessToken(UserDto user)
+    public Response<MobileUserAccessTokenDto> ReturnAccessToken(MobileUserDto user)
     {
         if (user.RefreshTokenEndDate == null || user.RefreshToken is null)
         {
@@ -95,7 +95,7 @@ public class MobileUserTokenHandler : IMobileUserTokenHandler
         return Response<MobileUserAccessTokenDto>.Success(accessToken);
     }
 
-    private static List<Claim> GetClaims(UserDto user)
+    private static List<Claim> GetClaims(MobileUserDto user)
     {
         var claims = new List<Claim>
         {
@@ -108,7 +108,7 @@ public class MobileUserTokenHandler : IMobileUserTokenHandler
         return claims;
     }
 
-    public void RevokeRefreshToken(UserDto user)
+    public void RevokeRefreshToken(MobileUserDto user)
     {
         user.RefreshToken = null;
     }
