@@ -17,6 +17,7 @@ public class CarServiceDbContext(DbContextOptions<CarServiceDbContext> options):
     public DbSet<AccountingTransaction> AccountingTransactions { get; set; }
     public DbSet<MasterService> MasterServices { get; set; }
     public DbSet<CompanyService> CompanyServices { get; set; }
+    public DbSet<MobileUser> MobileUsers { get; set; }
 
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
