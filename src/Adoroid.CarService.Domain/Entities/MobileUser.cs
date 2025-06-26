@@ -18,5 +18,5 @@ public class MobileUser : Entity<Guid>
     public string? OtpCode { get; init; }
     public DateTime? RefreshTokenExpr { get; set; }
 
-     public ICollection<Vehicle>? Vehicles { get; set; }
+    public ICollection<Vehicle>? Vehicles { get; set; }
 }
