@@ -41,20 +41,38 @@ public class UpdateMainServiceCommandHandler(CarServiceDbContext dbContext, ICur
         {
             entity.Cost = await GetTotalPrice(request.Id, cancellationToken);
 
-            var balance = await GetBalance(entity.Vehicle!.CustomerId, cancellationToken);
-            var accountTransaction = new AccountingTransaction
+            if(entity.Vehicle is null)
+                return Response<MainServiceDto>.Fail(BusinessExceptionMessages.VehicleNotFound);
+
+            decimal balance = 0;
+
+            if (entity.Vehicle.CustomerId != null)
+                    balance = await GetBalance(entity.Vehicle!.CustomerId.Value, cancellationToken);
+
+            else if (entity.Vehicle.MobileUserId != null)
+                    balance = await GetBalance(entity.Vehicle!.MobileUserId.Value, cancellationToken);
+
+            var accountTransaction = new AccountingTransaction();
+            accountTransaction.Balance = balance - entity.Cost;
+            accountTransaction.Claim = 0;
+            accountTransaction.CompanyId = Guid.Parse(currentUser.CompanyId!);
+            accountTransaction.CreatedBy = Guid.Parse(currentUser.Id!);
+            accountTransaction.CreatedDate = DateTime.UtcNow;
+
+            if (entity.Vehicle.CustomerId != null)
             {
-                Balance = balance + entity.Cost,
-                Claim = 0,
-                CompanyId = Guid.Parse(currentUser.CompanyId!),
-                CreatedBy = Guid.Parse(currentUser.Id!),
-                CreatedDate = DateTime.UtcNow,
-                CustomerId = entity.Vehicle!.CustomerId,
-                Debt = entity.Cost,
-                IsDeleted = false,
-                TransactionType = (int)TransactionTypeEnum.Payable,
-                TransactionDate = DateTime.UtcNow
-            };
+                accountTransaction.AccountOwnerId = entity.Vehicle.CustomerId.Value;
+                accountTransaction.AccountOwnerType = (int)AccountOwnerTypeEnum.Customer;
+            }
+            else if (entity.Vehicle.MobileUserId != null)
+            {
+                accountTransaction.AccountOwnerId = entity.Vehicle.MobileUserId.Value;
+                accountTransaction.AccountOwnerType = (int)AccountOwnerTypeEnum.MobileUser;
+            }
+            accountTransaction.Debt = entity.Cost;
+            accountTransaction.IsDeleted = false;
+            accountTransaction.TransactionType = (int)TransactionTypeEnum.Payable;
+            accountTransaction.TransactionDate = DateTime.UtcNow;
 
             await dbContext.AddAsync(accountTransaction, cancellationToken);
         }
@@ -73,11 +91,11 @@ public class UpdateMainServiceCommandHandler(CarServiceDbContext dbContext, ICur
     private async Task<decimal> GetBalance(Guid customerId, CancellationToken cancellationToken)
     {
         var totalDebt = await dbContext.AccountingTransactions.AsNoTracking()
-            .Where(i => i.CustomerId == customerId && i.CompanyId == Guid.Parse(currentUser.CompanyId!))
+            .Where(i => i.AccountOwnerId == customerId && i.CompanyId == Guid.Parse(currentUser.CompanyId!))
             .SumAsync(i => i.Debt, cancellationToken);
 
         var totalClaim = await dbContext.AccountingTransactions.AsNoTracking()
-            .Where(i => i.CustomerId == customerId && i.CompanyId == Guid.Parse(currentUser.CompanyId!))
+            .Where(i => i.AccountOwnerId == customerId && i.CompanyId == Guid.Parse(currentUser.CompanyId!))
             .SumAsync(i => i.Claim, cancellationToken);
 
         return Math.Abs(totalDebt - totalClaim);

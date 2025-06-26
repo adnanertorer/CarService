@@ -11,6 +11,7 @@ public class CurrentUser(IHttpContextAccessor httpContextAccessor) : ICurrentUse
     public string? Email => httpContextAccessor.HttpContext?.User.FindFirst(ClaimTypes.Email)?.Value;
     public string? CompanyId => httpContextAccessor.HttpContext?.User.FindFirst(ClaimTypes.UserData)?.Value;
     public List<string>? Roles => httpContextAccessor.HttpContext?.User.FindAll(ClaimTypes.Role).Select(r => r.Value).ToList();
+    public string? UserType => httpContextAccessor.HttpContext?.User.FindFirst("user_type")?.Value;
 
     public string? Token
     {
