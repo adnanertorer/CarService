@@ -7,5 +7,6 @@ public interface ICurrentUser
     string? UserName { get; }
     string? Email { get; }
     string? Token { get; }
+    string? UserType { get; }
     List<string>? Roles { get; }
 }

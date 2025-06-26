@@ -27,5 +27,10 @@ public class MainServiceConfiguration : IEntityTypeConfiguration<MainService>
         .WithMany(c => c.MainServices)
         .HasForeignKey(b => b.VehicleId)
         .OnDelete(DeleteBehavior.NoAction);
+
+        builder.HasOne(b => b.Company)
+            .WithMany(c => c.MainServices)
+            .HasForeignKey(b => b.CompanyId)
+            .OnDelete(DeleteBehavior.NoAction);
     }
 }
