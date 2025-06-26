@@ -1,5 +1,6 @@
 ﻿using Adoroid.CarService.Application.Common.Abstractions.Auth;
 using Adoroid.CarService.Application.Common.Dtos.Auth;
+using Adoroid.CarService.Application.Features.MobileUsers.Dtos;
 using Adoroid.CarService.Application.Features.MobileUsers.ExceptionMessages;
 using Adoroid.CarService.Application.Features.Users.Dtos;
 using Adoroid.CarService.Persistence;
@@ -23,7 +24,7 @@ public class MobileUserLoginQueryHandler(CarServiceDbContext dbContext, IMobileU
         if (user is null)
             return Response<MobileUserAccessTokenDto>.Fail(BusinessExceptionMessages.UserNotFound);
 
-        var accessToken = await tokenHandler.CreateAccessToken(new UserDto
+        var accessToken = await tokenHandler.CreateAccessToken(new MobileUserDto
         {
             Id = user.Id,
             Name = user.Name,
