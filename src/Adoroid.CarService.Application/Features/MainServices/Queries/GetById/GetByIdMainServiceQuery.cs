@@ -22,11 +22,12 @@ public class GetEntityByIdMainServiceQueryHandler(CarServiceDbContext dbContext)
     public async Task<Response<MainServiceDto>> Handle(GetByIdMainServiceQuery request, CancellationToken cancellationToken)
     {
         var entity = await dbContext.MainServices
-            .Include(i => i.Vehicle)
+            .Include(i => i.Vehicle).ThenInclude(i => i.Customer)
+            .Include(i => i.Vehicle).ThenInclude(i => i.MobileUser)
             .AsNoTracking()
             .FirstOrDefaultAsync(e => e.Id == request.Id, cancellationToken);
 
-        if (entity is null)
+        if (entity?.Vehicle?.Customer == null || entity?.Vehicle?.MobileUser == null) // bir hizmette arabanın mutlaka sahibi olması gerekiyor
             return Response<MainServiceDto>.Fail(BusinessExceptionMessages.NotFound);
 
         return Response<MainServiceDto>.Success(entity.FromEntity());
