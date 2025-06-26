@@ -1,11 +1,11 @@
 ﻿using Adoroid.CarService.Application.Common.ValidationMessages;
 using FluentValidation;
 
-namespace Adoroid.CarService.Application.Features.Users.Queries.Login.Validators;
+namespace Adoroid.CarService.Application.Features.MobileUsers.Queries.Login.Validators;
 
-public class UserLoginQueryValidator : AbstractValidator<UserLoginQuery>
+public class MobileUserLoginQueryValidator : AbstractValidator<MobileUserLoginQuery>
 {
-    public UserLoginQueryValidator()
+    public MobileUserLoginQueryValidator()
     {
         RuleFor(x => x.Email)
                .NotEmpty()

@@ -10,7 +10,8 @@ using Adoroid.CarService.Application.Features.Vehicles.ExceptionMessages;
 
 namespace Adoroid.CarService.Application.Features.Vehicles.Commands.Create;
 
-public record CreateVehicleCommand(Guid CustomerId, string Brand, string Model, int Year, string Plate, int FuelTypeId, string? Engine, string? SerialNumber) : IRequest<Response<VehicleDto>>;
+public record CreateVehicleCommand(Guid? CustomerId, string Brand, string Model, int Year, string Plate,
+    int FuelTypeId, string? Engine, string? SerialNumber) : IRequest<Response<VehicleDto>>;
 
 public class CreateVehicleCommandHandler(CarServiceDbContext dbContext, ICurrentUser currentUser) : IRequestHandler<CreateVehicleCommand, Response<VehicleDto>>
 {
@@ -28,13 +29,14 @@ public class CreateVehicleCommandHandler(CarServiceDbContext dbContext, ICurrent
             CreatedBy = Guid.Parse(currentUser.Id!),
             Engine = request.Engine,
             FuelTypeId = request.FuelTypeId,
-            CustomerId = request.CustomerId,
+            CustomerId = currentUser.UserType == "company" ? request.CustomerId : null,
             IsDeleted = false,
             Model = request.Model,
             Plate = request.Plate,
             SerialNumber = request.SerialNumber,
             Year = request.Year,
-            CreatedDate = DateTime.UtcNow
+            CreatedDate = DateTime.UtcNow,
+            MobileUserId = currentUser.UserType == "mobileUser" ? Guid.Parse(currentUser.Id!) : null
         };
 
         var resultEntity = await dbContext.Vehicles.AddAsync(entity, cancellationToken);

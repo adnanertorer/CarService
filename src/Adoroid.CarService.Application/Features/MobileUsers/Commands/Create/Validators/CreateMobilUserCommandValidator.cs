@@ -1,19 +1,17 @@
 ﻿using Adoroid.CarService.Application.Common.ValidationMessages;
 using FluentValidation;
 
-namespace Adoroid.CarService.Application.Features.Users.Commands.Create.Validators;
+namespace Adoroid.CarService.Application.Features.MobileUsers.Commands.Create.Validators;
 
-public class CreateUserCommandValidator : AbstractValidator<CreateUserCommand>
+public class CreateMobilUserCommandValidator : AbstractValidator<CreateMobilUserCommand>
 {
-    public CreateUserCommandValidator()
+    public CreateMobilUserCommandValidator()
     {
         RuleFor(x => x.Email)
                .NotEmpty()
                .WithMessage(string.Format(ValidationMessages.Required, "E-Posta"))
                .EmailAddress()
                .WithMessage(string.Format(ValidationMessages.Email, "E-Posta"));
-
-        RuleFor(x => x.CompanyId).NotNull().WithMessage(string.Format(ValidationMessages.Required, "Firma"));
 
         RuleFor(x => x.Name)
              .NotEmpty()
