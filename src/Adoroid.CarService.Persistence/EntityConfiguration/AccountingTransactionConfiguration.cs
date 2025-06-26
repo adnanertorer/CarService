@@ -9,7 +9,8 @@ public class AccountingTransactionConfiguration : IEntityTypeConfiguration<Accou
     public void Configure(EntityTypeBuilder<AccountingTransaction> builder)
     {
         builder.HasKey(b => b.Id);
-        builder.Property(b => b.CustomerId).IsRequired();
+        builder.Property(b => b.AccountOwnerId).IsRequired();
+        builder.Property(b => b.AccountOwnerType).IsRequired();
         builder.Property(b => b.CompanyId).IsRequired();
         builder.Property(b => b.TransactionType).IsRequired();
         builder.Property(b => b.Claim).IsRequired().HasPrecision(18,2);
@@ -30,10 +31,5 @@ public class AccountingTransactionConfiguration : IEntityTypeConfiguration<Accou
          .WithMany(c => c.AccountingTransactions)
          .HasForeignKey(b => b.CompanyId)
          .OnDelete(DeleteBehavior.NoAction);
-
-        builder.HasOne(b => b.Customer)
-        .WithMany(c => c.AccountingTransactions)
-        .HasForeignKey(b => b.CustomerId)
-        .OnDelete(DeleteBehavior.NoAction);
     }
 }

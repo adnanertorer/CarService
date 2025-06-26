@@ -1,6 +1,6 @@
-﻿using Adoroid.CarService.Application.Common.Abstractions.Auth;
+using Adoroid.CarService.Application.Common.Abstractions.Auth;
 using Adoroid.CarService.Application.Common.Dtos.Auth;
-using Adoroid.CarService.Application.Features.Users.Dtos;
+using Adoroid.CarService.Application.Features.MobileUsers.Dtos;
 using Adoroid.CarService.Persistence;
 using Adoroid.Core.Application.Wrappers;
 using Microsoft.EntityFrameworkCore;
@@ -10,19 +10,19 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
 
-namespace Adoroid.CarService.Infrastructure.Auth;
+namespace Adoroid.CarService.Infrastructure.Auth.MobileUser;
 
-public class TokenHandler : ITokenHandler
+public class MobileUserTokenHandler : IMobileUserTokenHandler
 {
-    private readonly TokenOptions _tokenOptions;
+    private readonly MobileTokenOptions _tokenOptions;
     private readonly CarServiceDbContext _dbContext;
-    public TokenHandler(IOptions<TokenOptions> tokenOptions, CarServiceDbContext dbContext)
+     public MobileUserTokenHandler(IOptions<MobileTokenOptions> tokenOptions, CarServiceDbContext dbContext)
     {
         _tokenOptions = tokenOptions.Value;
         _dbContext = dbContext;
     }
 
-    public async Task<Response<AccesTokenDto>> CreateAccessToken(UserDto user, CancellationToken cancellationToken)
+    public async Task<Response<MobileUserAccessTokenDto>> CreateAccessToken(MobileUserDto user, CancellationToken cancellationToken)
     {
         var accessTokenExpiration = DateTime.UtcNow.AddMinutes(_tokenOptions.AccessTokenExpiration);
         var securityKey = SignHandler.GetSecurityKey(_tokenOptions.SecurityKey);
@@ -32,30 +32,29 @@ public class TokenHandler : ITokenHandler
             notBefore: DateTime.Now, signingCredentials: signingCredentials, claims: GetClaims(user));
         var handler = new JwtSecurityTokenHandler();
         var token = handler.WriteToken(jwtSecurityToken);
-        var accessToken = new AccesTokenDto
+        var accessToken = new MobileUserAccessTokenDto
         {
             Token = token,
             RefreshToken = CreateRefreshToken(),
             Expiration = accessTokenExpiration,
             FullName = user.Name + " " + user.Surname,
-            UserId = user.Id,
-            CompanyId = user.CompanyId
+            UserId = user.Id
         };
         user.RefreshToken = accessToken.RefreshToken;
         user.RefreshTokenEndDate = accessToken.Expiration;
 
-        var userEntity = await _dbContext.Users.FirstOrDefaultAsync(i => i.Id == user.Id, cancellationToken);
+        var userEntity = await _dbContext.MobileUsers.FirstOrDefaultAsync(i => i.Id == user.Id, cancellationToken);
         if(userEntity is null)
-            return Response<AccesTokenDto>.Fail("User not found");
+            return Response<MobileUserAccessTokenDto>.Fail("User not found");
 
         userEntity.RefreshToken = accessToken.RefreshToken;
         userEntity.RefreshTokenExpr = accessToken.Expiration;
 
         _dbContext.Entry(userEntity).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
-        _dbContext.Users.Update(userEntity);
+        _dbContext.MobileUsers.Update(userEntity);
         await _dbContext.SaveChangesAsync(cancellationToken);
 
-        return Response<AccesTokenDto>.Success(accessToken, "Access token created successfully");
+        return Response<MobileUserAccessTokenDto>.Success(accessToken, "Access token created successfully");
     }
 
     private static string CreateRefreshToken()
@@ -66,11 +65,11 @@ public class TokenHandler : ITokenHandler
         return Convert.ToBase64String(numberByte);
     }
 
-    public Response<AccesTokenDto> ReturnAccessToken(UserDto user)
+    public Response<MobileUserAccessTokenDto> ReturnAccessToken(MobileUserDto user)
     {
         if (user.RefreshTokenEndDate == null || user.RefreshToken is null)
         {
-            return Response<AccesTokenDto>.Fail("Refresh token end date or token is null");
+            return Response<MobileUserAccessTokenDto>.Fail("Refresh token end date or token is null");
         }
 
         var accessTokenExpiration = user.RefreshTokenEndDate.Value;
@@ -80,39 +79,37 @@ public class TokenHandler : ITokenHandler
 
         var jwtSecurityToken = new JwtSecurityToken(
             issuer: _tokenOptions.Issuer, audience: _tokenOptions.Audience, expires: accessTokenExpiration,
-            notBefore: DateTime.Now, signingCredentials: signingCredentials, claims: GetClaims(user));
+            notBefore: DateTime.UtcNow, signingCredentials: signingCredentials, claims: GetClaims(user));
 
         var handler = new JwtSecurityTokenHandler();
         var token = handler.WriteToken(jwtSecurityToken);
 
-        var accessToken = new AccesTokenDto
+        var accessToken = new MobileUserAccessTokenDto
         {
             Token = token,
             RefreshToken = user.RefreshToken!,
             Expiration = accessTokenExpiration,
             FullName = user.Name + " " + user.Surname,
-            UserId = user.Id,
-            CompanyId = user.CompanyId
+            UserId = user.Id
         };
-        return Response<AccesTokenDto>.Success(accessToken);
+        return Response<MobileUserAccessTokenDto>.Success(accessToken);
     }
 
-    private static List<Claim> GetClaims(UserDto user)
+    private static List<Claim> GetClaims(MobileUserDto user)
     {
         var claims = new List<Claim>
         {
             new(ClaimTypes.NameIdentifier, user.Id.ToString()),
             new(JwtRegisteredClaimNames.Email, user.Email),
             new(ClaimTypes.Name, $"{ user.Name} { user.Surname }"),
-            new(type: ClaimTypes.UserData, value: user.CompanyId.ToString()),
             new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-            new("user_type", "company")
+            new("user_type", "mobile")
         };
 
         return claims;
     }
 
-    public void RevokeRefreshToken(UserDto user)
+    public void RevokeRefreshToken(MobileUserDto user)
     {
         user.RefreshToken = null;
     }

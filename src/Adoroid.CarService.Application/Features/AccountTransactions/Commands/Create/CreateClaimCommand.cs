@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore;
 using MinimalMediatR.Core;
 
 namespace Adoroid.CarService.Application.Features.AccountTransactions.Commands.Create;
-public record CreateClaimCommand(Guid CustomerId, decimal Claim, DateTime TransactionDate, string? Description) 
+public record CreateClaimCommand(Guid CustomerId, AccountOwnerTypeEnum AccountOwnerType, decimal Claim, DateTime TransactionDate, string? Description) 
     : IRequest<Response<AccountTransactionDto>>;
 
 public class CreateClaimCommandHandler(CarServiceDbContext dbContext, ICurrentUser currentUser)
@@ -28,7 +28,8 @@ public class CreateClaimCommandHandler(CarServiceDbContext dbContext, ICurrentUs
             Debt = 0,
             TransactionDate = request.TransactionDate,
             Balance = balance - request.Claim,
-            CustomerId = request.CustomerId,
+            AccountOwnerId = request.CustomerId,
+            AccountOwnerType = (int)request.AccountOwnerType,
             CompanyId = Guid.Parse(currentUser.CompanyId!),
             TransactionType = (int)TransactionTypeEnum.Receivable,
             Description = request.Description
@@ -43,11 +44,11 @@ public class CreateClaimCommandHandler(CarServiceDbContext dbContext, ICurrentUs
     private async Task<decimal> GetBalance(Guid customerId, CancellationToken cancellationToken)
     {
         var totalDebt = await dbContext.AccountingTransactions.AsNoTracking()
-            .Where(i => i.CustomerId == customerId && i.CompanyId == Guid.Parse(currentUser.CompanyId!))
+            .Where(i => i.AccountOwnerId == customerId && i.CompanyId == Guid.Parse(currentUser.CompanyId!))
             .SumAsync(i => i.Debt, cancellationToken);
 
         var totalClaim = await dbContext.AccountingTransactions.AsNoTracking()
-            .Where(i => i.CustomerId == customerId && i.CompanyId == Guid.Parse(currentUser.CompanyId!))
+            .Where(i => i.AccountOwnerId == customerId && i.CompanyId == Guid.Parse(currentUser.CompanyId!))
             .SumAsync(i => i.Claim, cancellationToken);
 
         return Math.Abs(totalDebt - totalClaim);
