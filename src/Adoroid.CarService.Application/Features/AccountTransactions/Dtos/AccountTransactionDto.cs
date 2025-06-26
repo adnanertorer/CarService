@@ -5,6 +5,7 @@ namespace Adoroid.CarService.Application.Features.AccountTransactions.Dtos;
 public class AccountTransactionDto
 {
     public Guid Id { get; set; }
+    public Guid CompanyId { get; set; } // Company ID for multi-tenancy support
     public Guid AccountOwnerId { get; set; }
     public AccountOwnerTypeEnum AccountOwnerType { get; set; } // 0: Customer, 1: MobileUser
     public int TransactionType { get; set; } // 0: Income, 1: Expense
