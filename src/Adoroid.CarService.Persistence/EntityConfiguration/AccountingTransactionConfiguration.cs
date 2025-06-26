@@ -9,7 +9,8 @@ public class AccountingTransactionConfiguration : IEntityTypeConfiguration<Accou
     public void Configure(EntityTypeBuilder<AccountingTransaction> builder)
     {
         builder.HasKey(b => b.Id);
-        builder.Property(b => b.CustomerId).IsRequired();
+        builder.Property(b => b.AccountOwnerId).IsRequired();
+        builder.Property(b => b.AccountOwnerType).IsRequired();
         builder.Property(b => b.CompanyId).IsRequired();
         builder.Property(b => b.TransactionType).IsRequired();
         builder.Property(b => b.Claim).IsRequired().HasPrecision(18,2);

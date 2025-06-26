@@ -105,7 +105,8 @@ public class TokenHandler : ITokenHandler
             new(JwtRegisteredClaimNames.Email, user.Email),
             new(ClaimTypes.Name, $"{ user.Name} { user.Surname }"),
             new(type: ClaimTypes.UserData, value: user.CompanyId.ToString()),
-            new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+            new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+            new("user_type", "company")
         };
 
         return claims;
