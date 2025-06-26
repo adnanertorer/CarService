@@ -2,14 +2,12 @@ using Adoroid.CarService.API.Endpoints;
 using Adoroid.CarService.Application;
 using Adoroid.CarService.Infrastructure;
 using Adoroid.CarService.Infrastructure.Auth;
-using Adoroid.CarService.Infrastructure.Caching;
 using Adoroid.CarService.Infrastructure.Logging;
 using Adoroid.CarService.Persistence;
 using Adoroid.Core.Application.Exceptions.Middlewares;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
-using OpenTelemetry.Metrics;
 using Serilog;
 
 
