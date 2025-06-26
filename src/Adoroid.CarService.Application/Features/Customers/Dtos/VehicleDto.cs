@@ -3,7 +3,7 @@
 public class VehicleDto
 {
     public Guid Id { get; set; }
-    public Guid CustomerId { get; set; }
+    public Guid? CustomerId { get; set; }
     public string Brand { get; set; }
     public string Model { get; set; }
     public int Year { get; set; }
