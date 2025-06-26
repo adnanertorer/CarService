@@ -20,6 +20,8 @@
   <ItemGroup>
     <Folder Include="Features\AccountTransactions\Commands\Update\" />
     <Folder Include="Features\MainServices\ExceptionMessages\" />
+    <Folder Include="Features\MobileUsers\Commands\Create\" />
+    <Folder Include="Features\MobileUsers\Queries\" />
   </ItemGroup>
 
 </Project>
