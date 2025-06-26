@@ -102,7 +102,8 @@ public class MobileUserTokenHandler : IMobileUserTokenHandler
             new(ClaimTypes.NameIdentifier, user.Id.ToString()),
             new(JwtRegisteredClaimNames.Email, user.Email),
             new(ClaimTypes.Name, $"{ user.Name} { user.Surname }"),
-            new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+            new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+            new("user_type", "mobile")
         };
 
         return claims;

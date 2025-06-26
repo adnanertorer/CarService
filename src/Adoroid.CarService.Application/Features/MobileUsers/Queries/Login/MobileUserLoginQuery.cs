@@ -13,7 +13,7 @@ namespace Adoroid.CarService.Application.Features.MobileUsers.Queries.Login;
 public record MobileUserLoginQuery(string Email, string Password) : IRequest<Response<MobileUserAccessTokenDto>>;
 
 public class MobileUserLoginQueryHandler(CarServiceDbContext dbContext, IMobileUserTokenHandler tokenHandler, IAesEncryptionHelper aesEncryptionHelper)
-    : IRequestHandler<MobileUserLoginQuery, Response<MobileUserAccessTokenDto>{
+    : IRequestHandler<MobileUserLoginQuery, Response<MobileUserAccessTokenDto>>{
     public async Task<Response<MobileUserAccessTokenDto>> Handle(MobileUserLoginQuery request, CancellationToken cancellationToken)
     {
         var encryptedPassword = aesEncryptionHelper.Encrypt(request.Password);
