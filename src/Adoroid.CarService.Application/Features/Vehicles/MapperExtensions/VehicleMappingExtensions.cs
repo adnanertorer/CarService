@@ -13,7 +13,7 @@ public static class VehicleMappingExtensions
             CustomerId = vehicle.CustomerId,
             Customer = vehicle.Customer != null ? new CustomerDto
             {
-                Id = vehicle.CustomerId,
+                Id = vehicle.CustomerId!.Value,
                 Name = vehicle.Customer!.Name,
                 Surname = vehicle.Customer!.Surname,
             } : null,
@@ -24,7 +24,15 @@ public static class VehicleMappingExtensions
             Plate = vehicle.Plate,
             SerialNumber = vehicle.SerialNumber,
             Year = vehicle.Year,
-            MainServices = vehicle.ListFromEntity()
+            MainServices = vehicle.ListFromEntity(),
+            MobileUserId = vehicle.MobileUserId,
+            MobileUser = vehicle.MobileUser != null ? new MobileUserDto
+            {
+                Id = vehicle.MobileUserId!.Value,
+                Name = vehicle.MobileUser!.Name,
+                Surname = vehicle.MobileUser!.Surname,
+                Email = vehicle.MobileUser!.Email
+            } : null
         };
     }
 
