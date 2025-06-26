@@ -11,13 +11,6 @@ public static class AccountTransactionMappingExtensions
         {
             Balance = accountingTransaction.Balance,
             Claim = accountingTransaction.Claim,
-            Customer = accountingTransaction.Customer != null ? new CustomerDto
-            {
-                Id = accountingTransaction.Customer.Id,
-                Name = accountingTransaction.Customer.Name,
-                Surname = accountingTransaction.Customer.Surname
-            } : null,
-            CustomerId = accountingTransaction.CustomerId,
             Debt = accountingTransaction.Debt,
             TransactionDate = accountingTransaction.TransactionDate,
             TransactionType = accountingTransaction.TransactionType,

@@ -13,7 +13,9 @@ public class MainService : Entity<Guid>
     public string? Description { get; set; }
     public decimal Cost { get; set; }
     public int ServiceStatus { get; set; }
+    public Guid CompanyId { get; set; }
 
     public Vehicle? Vehicle { get; set; }
+    public Company? Company { get; set; }
     public ICollection<SubService>? SubServices { get; set; }
 }
