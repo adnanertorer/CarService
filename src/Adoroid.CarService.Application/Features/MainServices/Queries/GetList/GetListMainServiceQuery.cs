@@ -31,10 +31,9 @@ public class GetListMainServiceQueryHandler(CarServiceDbContext dbContext, ICurr
                 var query = dbContext.MainServices
                     .Include(i => i.Vehicle)
                         .ThenInclude(i => i!.Customer)
+                    .Include(i => i.Vehicle).ThenInclude(i => i.MobileUser)
                     .AsNoTracking()
-                    .Where(i => i.Vehicle != null &&
-                                i.Vehicle.Customer != null &&
-                                i.Vehicle.Customer.CompanyId == Guid.Parse(currentUser.CompanyId!));
+                    .Where(i => i.Vehicle != null && i.CompanyId == Guid.Parse(currentUser.CompanyId!));
 
                 if (request.FilterRequest.StartDate.HasValue && request.FilterRequest.EndDate.HasValue)
                 {
