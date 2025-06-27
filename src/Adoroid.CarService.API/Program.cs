@@ -2,11 +2,13 @@ using Adoroid.CarService.API.Endpoints;
 using Adoroid.CarService.Application;
 using Adoroid.CarService.Infrastructure;
 using Adoroid.CarService.Infrastructure.Auth;
+using Adoroid.CarService.Infrastructure.Auth.MobileUser;
 using Adoroid.CarService.Infrastructure.Logging;
 using Adoroid.CarService.Persistence;
 using Adoroid.Core.Application.Exceptions.Middlewares;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Serilog;
 
@@ -24,30 +26,50 @@ builder.Services.AddCarServiceInsfrastructure(builder.Configuration);
 builder.Services.Configure<TokenOptions>(
     builder.Configuration.GetSection(nameof(TokenOptions)));
 
+builder.Services.Configure<MobileTokenOptions>(
+    builder.Configuration.GetSection(nameof(MobileTokenOptions)));
+
 var tokenOptions = builder.Configuration.GetSection(nameof(TokenOptions)).Get<TokenOptions>() 
     ?? throw new InvalidOperationException("TokenOptions configuration section is missing or malformed.");
 
+var mobileTokenOptions = builder.Configuration.GetSection(nameof(MobileTokenOptions)).Get<MobileTokenOptions>() 
+    ?? throw new InvalidOperationException("MobileTokenOptions configuration section is missing or malformed.");
+
 builder.Services
-               .AddAuthentication(options =>
-               {
-                   options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-                   options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-                   options.DefaultSignInScheme = JwtBearerDefaults.AuthenticationScheme;
-               })
-               .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options =>
-               {
-                   options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters()
-                   {
-                       ValidateAudience = true,
-                       ValidateIssuer = true,
-                       ValidateLifetime = true,
-                       ValidateIssuerSigningKey = true,
-                       ValidIssuer = tokenOptions?.Issuer,
-                       ValidAudience = tokenOptions?.Audience,
-                       IssuerSigningKey = SignHandler.GetSecurityKey(tokenOptions!.SecurityKey),
-                       ClockSkew = TimeSpan.Zero
-                   };
-               });
+    .AddAuthentication(options =>
+    {
+        options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+        options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+    })
+    .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateAudience = true,
+            ValidateIssuer = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            ValidIssuer = tokenOptions.Issuer,
+            ValidAudience = tokenOptions.Audience,
+            IssuerSigningKey = SignHandler.GetSecurityKey(tokenOptions.SecurityKey),
+            ClockSkew = TimeSpan.Zero
+        };
+    })
+    .AddJwtBearer("MobileUser", options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateAudience = true,
+            ValidateIssuer = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            ValidIssuer = mobileTokenOptions.Issuer,
+            ValidAudience = mobileTokenOptions.Audience,
+            IssuerSigningKey = SignHandler.GetSecurityKey(mobileTokenOptions.SecurityKey),
+            ClockSkew = TimeSpan.Zero
+        };
+    });
+
 
 #endregion
 
@@ -128,6 +150,7 @@ app.VehicleEndpoint();
 app.MasterServiceEndpoint();
 app.CompanyServiceEndpoints();
 app.AccountTransactionEndpoint();
+app.MobileUserEndpoints();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
