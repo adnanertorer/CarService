@@ -36,7 +36,8 @@ public class CreateMainServiceCommandHandler(CarServiceDbContext dbContext, ICur
             CreatedDate = DateTime.UtcNow,
             ServiceDate = request.ServiceDate,
             VehicleId = request.VehicleId,
-            ServiceStatus = (int)MainServiceStatusEnum.Opened
+            ServiceStatus = (int)MainServiceStatusEnum.Opened,
+            CompanyId = Guid.Parse(currentUser.CompanyId!)
         };
 
         var result = await dbContext.AddAsync(entity, cancellationToken);
