@@ -26,6 +26,9 @@ builder.Services.AddCarServiceInsfrastructure(builder.Configuration);
 builder.Services.Configure<TokenOptions>(
     builder.Configuration.GetSection(nameof(TokenOptions)));
 
+builder.Services.Configure<MobileTokenOptions>(
+    builder.Configuration.GetSection(nameof(MobileTokenOptions)));
+
 var tokenOptions = builder.Configuration.GetSection(nameof(TokenOptions)).Get<TokenOptions>() 
     ?? throw new InvalidOperationException("TokenOptions configuration section is missing or malformed.");
 

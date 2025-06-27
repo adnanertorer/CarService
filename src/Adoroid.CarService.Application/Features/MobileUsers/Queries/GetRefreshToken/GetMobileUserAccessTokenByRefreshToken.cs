@@ -38,7 +38,11 @@ public class GetMobileUserAccessTokenByRefreshTokenHandler(CarServiceDbContext d
         var accessTokenResponse = tokenHandler.ReturnAccessToken(new MobileUserDto
         {
             RefreshToken = request.RefreshToken,
-            RefreshTokenEndDate = user.RefreshTokenExpr.Value
+            RefreshTokenEndDate = user.RefreshTokenExpr.Value,
+            Email = user.Email,
+            Id = user.Id,
+            Name = user.Name,
+            Surname = user.Surname
         });
 
         return accessTokenResponse is { Succeeded: true, Data: not null }

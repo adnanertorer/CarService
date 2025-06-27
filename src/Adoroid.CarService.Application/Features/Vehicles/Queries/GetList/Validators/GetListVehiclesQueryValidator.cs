@@ -7,10 +7,6 @@ public class GetListVehiclesQueryValidator : AbstractValidator<GetListVehiclesQu
 {
     public GetListVehiclesQueryValidator()
     {
-        RuleFor(x => x.CustomerId)
-       .NotNull()
-       .WithMessage(string.Format(ValidationMessages.NotNull, "Customer Id"));
-
         RuleFor(i => i.PageRequest).NotNull()
        .WithMessage(ValidationMessages.PageRequestRequired);
 
