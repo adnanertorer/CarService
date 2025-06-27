@@ -21,5 +21,5 @@ public class Vehicle : Entity<Guid>
     
     public MobileUser? MobileUser { get; set; }
     public Customer? Customer { get; set; }
-    public ICollection<MainService>? MainServices { get; set; }
+    public ICollection<MainService> MainServices { get; set; }
 }
