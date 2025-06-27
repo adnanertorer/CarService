@@ -9,7 +9,7 @@ public class CarServiceDbContextFactory : IDesignTimeDbContextFactory<CarService
     public CarServiceDbContext CreateDbContext(string[] args = null)
     {
         var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Development";
-        var basePath = Path.Combine(Directory.GetCurrentDirectory(), "../Adoroid.CarService.Api");
+        var basePath = Path.Combine(Directory.GetCurrentDirectory(), "../Adoroid.CarService.API");
 
         var configuration = new ConfigurationBuilder()
               .SetBasePath(basePath)
