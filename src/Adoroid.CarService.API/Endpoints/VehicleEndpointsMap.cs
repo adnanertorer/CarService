@@ -20,12 +20,17 @@ public static class VehicleEndpointsMap
     {
         var schemes = new[] { JwtBearerDefaults.AuthenticationScheme, "MobileUser" };
 
-        builder.MinimalMediatrMapCommand<CreateVehicleCommand, VehicleDto>(apiPath).RequireAuthorization(policy => 
-        policy.AddAuthenticationSchemes(schemes).RequireAuthenticatedUser());
+        builder.MinimalMediatrMapCommand<CreateVehicleCommand, VehicleDto>(apiPath)
+            .RequireAuthorization(policy => 
+                policy.AddAuthenticationSchemes(schemes).RequireAuthenticatedUser()
+            );
+
         builder.MinimalMediatrMapCommand<UpdateVehicleCommand, VehicleDto>(apiPath, "PUT").RequireAuthorization(policy =>
         policy.AddAuthenticationSchemes(schemes).RequireAuthenticatedUser());
+
         builder.MinimalMediatrMapCommand<DeleteVehicleCommand, Guid>(apiPath, "DELETE").RequireAuthorization(policy =>
         policy.AddAuthenticationSchemes(schemes).RequireAuthenticatedUser());
+
         builder.MapGet(apiPath + "/{id}", async (string id, IMediator mediator, CancellationToken cancellationToken) =>
         {
             if (!Guid.TryParse(id, out var guid))
@@ -35,20 +40,24 @@ public static class VehicleEndpointsMap
             return result.ToResult();
         }).RequireAuthorization(policy =>
         policy.AddAuthenticationSchemes(schemes).RequireAuthenticatedUser());
-        builder.MapGet(apiPath + "/list", async ([AsParameters] PageRequest pageRequest, string? customerId, string? search, IMediator mediator, CancellationToken cancellationToken) =>
+
+        builder.MapGet(apiPath + "/list", async ([AsParameters] PageRequest pageRequest, string customerId, string? search, IMediator mediator, CancellationToken cancellationToken) =>
         {
-            Guid? guid = null;
-            if (!string.IsNullOrEmpty(customerId))
-            {
-                if (!Guid.TryParse(customerId, out var parsedGuid))
-                    return Results.BadRequest("Invalid customer id.");
-                guid = parsedGuid;
-            }
+            if (!Guid.TryParse(customerId, out var guid))
+                return Results.BadRequest("Invalid customer id.");
 
             var result = await mediator.Send(new GetListVehiclesQuery(pageRequest, guid, search), cancellationToken);
             return result.ToResult();
         }).RequireAuthorization(policy =>
-        policy.AddAuthenticationSchemes(schemes).RequireAuthenticatedUser());
+        policy.AddAuthenticationSchemes([JwtBearerDefaults.AuthenticationScheme]).RequireAuthenticatedUser());
+
+        builder.MapGet(apiPath + "/my-vehicles", async ([AsParameters] PageRequest pageRequest, string? search, IMediator mediator, CancellationToken cancellationToken) =>
+        {
+            var result = await mediator.Send(new GetMyVehicleListQuery(pageRequest, search), cancellationToken);
+            return result.ToResult();
+        }).RequireAuthorization(policy =>
+        policy.AddAuthenticationSchemes(["MobileUser"]).RequireAuthenticatedUser());
+
         return builder;
     }
 }

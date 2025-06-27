@@ -28,6 +28,7 @@ public static class SubServiceEnpointsMap
             var result = await mediator.Send(new GetByIdSubServiceQuery(guid), cancellationToken);
             return result.ToResult();
         }).RequireAuthorization();
+
         builder.MapGet(apiPath + "/list", async ([AsParameters] PageRequest pageRequest, string mainServiceId, IMediator mediator, CancellationToken cancellationToken) =>
         {
             if (!Guid.TryParse(mainServiceId, out var guid))
@@ -36,6 +37,18 @@ public static class SubServiceEnpointsMap
             var result = await mediator.Send(new GetListSubServiceQuery(pageRequest, guid), cancellationToken);
             return result.ToResult();
         }).RequireAuthorization();
+
+
+        builder.MapGet(apiPath + "/my-subservices", async ([AsParameters] PageRequest pageRequest, string mainServiceId, IMediator mediator, CancellationToken cancellationToken) =>
+        {
+            if (!Guid.TryParse(mainServiceId, out var guid))
+                return Results.BadRequest("Invalid main-service id.");
+
+            var result = await mediator.Send(new GetListMySubServiceQuery(pageRequest, guid), cancellationToken);
+            return result.ToResult();
+        }).RequireAuthorization(policy =>
+        policy.AddAuthenticationSchemes(["MobileUser"]).RequireAuthenticatedUser());
+
         return builder;
     }
 }

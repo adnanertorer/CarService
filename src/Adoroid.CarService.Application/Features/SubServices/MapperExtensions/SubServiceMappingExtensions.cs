@@ -55,4 +55,21 @@ public static class SubServiceMappingExtensions
             SupplierId = subService.SupplierId
         };
     }
+
+    public static MobileSubServiceDto FromEntityToMobile(this SubService subService)
+    {
+        return new MobileSubServiceDto
+        {
+            Cost = subService.Cost,
+            Description = subService.Description,
+            Discount = subService.Discount,
+            Id = subService.Id,
+            MainService = subService.MainService?.MainServiceFromEntity(),
+            MainServiceId = subService.MainServiceId,
+            Material = subService.Material,
+            MaterialBrand = subService.MaterialBrand,
+            Operation = subService.Operation,
+            OperationDate = subService.OperationDate,
+        };
+    }
 }
