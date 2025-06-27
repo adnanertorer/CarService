@@ -29,7 +29,7 @@ public class MobileUserTokenHandler : IMobileUserTokenHandler
         var signingCredentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256Signature);
         var jwtSecurityToken = new JwtSecurityToken(
             issuer: _tokenOptions.Issuer, audience: _tokenOptions.Audience, expires: accessTokenExpiration,
-            notBefore: DateTime.Now, signingCredentials: signingCredentials, claims: GetClaims(user));
+            notBefore: DateTime.UtcNow, signingCredentials: signingCredentials, claims: GetClaims(user));
         var handler = new JwtSecurityTokenHandler();
         var token = handler.WriteToken(jwtSecurityToken);
         var accessToken = new MobileUserAccessTokenDto
@@ -103,7 +103,7 @@ public class MobileUserTokenHandler : IMobileUserTokenHandler
             new(JwtRegisteredClaimNames.Email, user.Email),
             new(ClaimTypes.Name, $"{ user.Name} { user.Surname }"),
             new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-            new("user_type", "mobile")
+            new("user_type", "mobileUser")
         };
 
         return claims;

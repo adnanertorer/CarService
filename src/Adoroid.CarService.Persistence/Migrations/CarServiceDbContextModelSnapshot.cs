@@ -28,6 +28,12 @@ namespace Adoroid.CarService.Persistence.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
+                    b.Property<Guid>("AccountOwnerId")
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("AccountOwnerType")
+                        .HasColumnType("integer");
+
                     b.Property<decimal>("Balance")
                         .HasPrecision(18, 2)
                         .HasColumnType("numeric(18,2)");
@@ -45,9 +51,6 @@ namespace Adoroid.CarService.Persistence.Migrations
 
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("timestamp with time zone");
-
-                    b.Property<Guid>("CustomerId")
-                        .HasColumnType("uuid");
 
                     b.Property<decimal>("Debt")
                         .HasPrecision(18, 2)
@@ -83,8 +86,6 @@ namespace Adoroid.CarService.Persistence.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("CompanyId");
-
-                    b.HasIndex("CustomerId");
 
                     b.ToTable("AccountingTransactions");
                 });
@@ -361,6 +362,9 @@ namespace Adoroid.CarService.Persistence.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
+                    b.Property<Guid>("CompanyId")
+                        .HasColumnType("uuid");
+
                     b.Property<decimal>("Cost")
                         .HasPrecision(18, 2)
                         .HasColumnType("numeric(18,2)");
@@ -403,6 +407,8 @@ namespace Adoroid.CarService.Persistence.Migrations
                         .HasColumnType("uuid");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("CompanyId");
 
                     b.HasIndex("VehicleId");
 
@@ -967,15 +973,7 @@ namespace Adoroid.CarService.Persistence.Migrations
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
-                    b.HasOne("Adoroid.CarService.Domain.Entities.Customer", "Customer")
-                        .WithMany("AccountingTransactions")
-                        .HasForeignKey("CustomerId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
                     b.Navigation("Company");
-
-                    b.Navigation("Customer");
                 });
 
             modelBuilder.Entity("Adoroid.CarService.Domain.Entities.CompanyService", b =>
@@ -1021,11 +1019,19 @@ namespace Adoroid.CarService.Persistence.Migrations
 
             modelBuilder.Entity("Adoroid.CarService.Domain.Entities.MainService", b =>
                 {
+                    b.HasOne("Adoroid.CarService.Domain.Entities.Company", "Company")
+                        .WithMany("MainServices")
+                        .HasForeignKey("CompanyId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
                     b.HasOne("Adoroid.CarService.Domain.Entities.Vehicle", "Vehicle")
                         .WithMany("MainServices")
                         .HasForeignKey("VehicleId")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
+
+                    b.Navigation("Company");
 
                     b.Navigation("Vehicle");
                 });
@@ -1104,6 +1110,8 @@ namespace Adoroid.CarService.Persistence.Migrations
 
                     b.Navigation("Employees");
 
+                    b.Navigation("MainServices");
+
                     b.Navigation("Suppliers");
 
                     b.Navigation("Users");
@@ -1111,8 +1119,6 @@ namespace Adoroid.CarService.Persistence.Migrations
 
             modelBuilder.Entity("Adoroid.CarService.Domain.Entities.Customer", b =>
                 {
-                    b.Navigation("AccountingTransactions");
-
                     b.Navigation("Vehicles");
                 });
 

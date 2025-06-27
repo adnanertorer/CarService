@@ -37,7 +37,12 @@ public class CreateAccessTokenByRefreshTokenQueryHandler(CarServiceDbContext dbC
         var accessTokenResponse = tokenHandler.ReturnAccessToken(new UserDto
         {
             RefreshToken = request.RefreshToken,
-            RefreshTokenEndDate = user.RefreshTokenExpr.Value
+            RefreshTokenEndDate = user.RefreshTokenExpr.Value,
+            Email = user.Email,
+            Id = user.Id,
+            Name = user.Name,
+            Surname = user.Surname,
+            CompanyId = user.CompanyId
         });
 
         return accessTokenResponse is { Succeeded: true, Data: not null }
