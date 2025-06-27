@@ -6,4 +6,6 @@ public class MainServiceDto
     public DateTime ServiceDate { get; set; }
     public string? Description { get; set; }
     public decimal Cost { get; set; }
+
+    public CompanyDto? Company { get; set; }
 }

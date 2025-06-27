@@ -43,7 +43,22 @@ public static class VehicleMappingExtensions
             Cost = mainService.Cost,
             Description = mainService.Description,
             Id = mainService.Id,
-            ServiceDate = mainService.ServiceDate
+            ServiceDate = mainService.ServiceDate,
+            Company = mainService.Company?.FromCompanyEntity()
+        };
+    }
+
+    public static CompanyDto FromCompanyEntity(this Company company)
+    {
+        return new CompanyDto
+        {
+            AuthorizedName = company.AuthorizedName,
+            AuthorizedSurname = company.AuthorizedSurname,
+            CompanyAddress = company.CompanyAddress,
+            CompanyEmail = company.CompanyEmail,
+            CompanyName = company.CompanyName,
+            CompanyPhone = company.CompanyPhone,
+            Id = company.Id
         };
     }
 

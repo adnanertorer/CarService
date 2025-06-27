@@ -1,4 +1,5 @@
-﻿using Adoroid.CarService.Application.Features.Vehicles.Dtos;
+﻿using Adoroid.CarService.Application.Common.Abstractions.Auth;
+using Adoroid.CarService.Application.Features.Vehicles.Dtos;
 using Adoroid.CarService.Application.Features.Vehicles.MapperExtensions;
 using Adoroid.CarService.Persistence;
 using Adoroid.Core.Application.Requests;
@@ -9,17 +10,20 @@ using MinimalMediatR.Core;
 
 namespace Adoroid.CarService.Application.Features.Vehicles.Queries.GetList;
 
-public record GetListVehiclesQuery(PageRequest PageRequest, Guid CustomerId, string? Search) : IRequest<Response<Paginate<VehicleDto>>>;
+public record GetMyVehicleListQuery(PageRequest PageRequest, string? Search)
+    : IRequest<Response<Paginate<VehicleDto>>>;
 
-public class GetListVehiclesQueryHandler(CarServiceDbContext dbContext) : IRequestHandler<GetListVehiclesQuery, Response<Paginate<VehicleDto>>>
+public class GetMyVehicleListQueryHandler(CarServiceDbContext dbContext, ICurrentUser currentUser)
+    : IRequestHandler<GetMyVehicleListQuery, Response<Paginate<VehicleDto>>>
 {
-    public async Task<Response<Paginate<VehicleDto>>> Handle(GetListVehiclesQuery request, CancellationToken cancellationToken)
+    public async Task<Response<Paginate<VehicleDto>>> Handle(GetMyVehicleListQuery request, CancellationToken cancellationToken)
     {
         var query = dbContext.Vehicles
-            .Include(i => i.Customer)
-            .Include(i => i.MobileUser)
-            .Where(i => i.CustomerId == request.CustomerId)
-            .AsNoTracking();
+           .Include(i => i.MobileUser)
+           .Include(i => i.MainServices).ThenInclude(i => i.SubServices)
+           .Include(i => i.MainServices).ThenInclude(i => i.Company)
+           .Where(i => i.MobileUserId == Guid.Parse(currentUser.Id!))
+           .AsNoTracking();
 
         if (!string.IsNullOrWhiteSpace(request.Search))
             query = query.Where(i => i.Brand.Contains(request.Search) || i.Model.Contains(request.Search) || i.Plate.Contains(request.Search)
@@ -32,3 +36,4 @@ public class GetListVehiclesQueryHandler(CarServiceDbContext dbContext) : IReque
         return Response<Paginate<VehicleDto>>.Success(result);
     }
 }
+
