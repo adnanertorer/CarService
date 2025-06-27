@@ -29,7 +29,7 @@ public class TokenHandler : ITokenHandler
         var signingCredentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256Signature);
         var jwtSecurityToken = new JwtSecurityToken(
             issuer: _tokenOptions.Issuer, audience: _tokenOptions.Audience, expires: accessTokenExpiration,
-            notBefore: DateTime.Now, signingCredentials: signingCredentials, claims: GetClaims(user));
+            notBefore: DateTime.UtcNow, signingCredentials: signingCredentials, claims: GetClaims(user));
         var handler = new JwtSecurityTokenHandler();
         var token = handler.WriteToken(jwtSecurityToken);
         var accessToken = new AccesTokenDto
@@ -80,7 +80,7 @@ public class TokenHandler : ITokenHandler
 
         var jwtSecurityToken = new JwtSecurityToken(
             issuer: _tokenOptions.Issuer, audience: _tokenOptions.Audience, expires: accessTokenExpiration,
-            notBefore: DateTime.Now, signingCredentials: signingCredentials, claims: GetClaims(user));
+            notBefore: DateTime.UtcNow, signingCredentials: signingCredentials, claims: GetClaims(user));
 
         var handler = new JwtSecurityTokenHandler();
         var token = handler.WriteToken(jwtSecurityToken);
