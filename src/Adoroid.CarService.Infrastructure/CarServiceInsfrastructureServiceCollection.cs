@@ -2,6 +2,7 @@
 using Adoroid.CarService.Application.Common.Abstractions.Caching;
 using Adoroid.CarService.Application.Features.MainServices.Commands.Create;
 using Adoroid.CarService.Infrastructure.Auth;
+using Adoroid.CarService.Infrastructure.Auth.MobileUser;
 using Adoroid.CarService.Infrastructure.Caching;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -16,6 +17,7 @@ public static class CarServiceInsfrastructureServiceCollection
     {
         services.AddScoped<IAesEncryptionHelper, AesEncryptionHelper>();
         services.AddScoped<ITokenHandler, TokenHandler>();
+        services.AddScoped<IMobileUserTokenHandler, MobileUserTokenHandler>();
 
         services.Scan(scan => scan.FromAssemblies(
             typeof(CreateMainServiceCommand).Assembly
