@@ -31,7 +31,8 @@ public static class VehicleMappingExtensions
                 Id = vehicle.MobileUserId!.Value,
                 Name = vehicle.MobileUser!.Name,
                 Surname = vehicle.MobileUser!.Surname,
-                Email = vehicle.MobileUser!.Email
+                Email = vehicle.MobileUser!.Email,
+                PhoneNumber = vehicle.MobileUser!.PhoneNumber
             } : null
         };
     }
