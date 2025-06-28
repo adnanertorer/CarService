@@ -27,5 +27,15 @@ public class CompanyConfiguration : IEntityTypeConfiguration<Company>
         builder.Property(c => c.DeletedBy).HasMaxLength(64);
 
         builder.HasQueryFilter(c => c.IsDeleted == false || c.DeletedDate == null);
+
+        builder.HasOne(b => b.City)
+            .WithMany(b => b.Companies)
+            .HasForeignKey(b => b.CityId)
+            .OnDelete(DeleteBehavior.NoAction);
+
+        builder.HasOne(b => b.District)
+            .WithMany(b => b.Companies)
+            .HasForeignKey(b => b.DistrictId)
+            .OnDelete(DeleteBehavior.NoAction);
     }
 }
