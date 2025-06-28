@@ -18,6 +18,7 @@ public class CompanyGetListQueryHandler(CarServiceDbContext dbContext) : IReques
         var companies = dbContext.Companies
             .Include(i => i.City)
             .Include(i => i.District)
+            .Include(i =>i.CompanyServices).ThenInclude(i => i.MasterService)
             .AsNoTracking();
 
         if(!string.IsNullOrWhiteSpace(request.Search))

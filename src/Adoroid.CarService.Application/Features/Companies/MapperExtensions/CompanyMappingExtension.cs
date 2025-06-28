@@ -21,7 +21,8 @@ public static class CompanyMappingExtension
             TaxNumber = entity.TaxNumber,
             TaxOffice = entity.TaxOffice,
             City = entity.City.FromCityEntity(),
-            District = entity.District.FromDistrictEntity()
+            District = entity.District.FromDistrictEntity(),
+            CompanyServices = entity.CompanyServicesFromEntity()
         };
     }
 
@@ -59,5 +60,22 @@ public static class CompanyMappingExtension
             DistrictId = companyDto.DistrictId,
             TaxNumber = companyDto.TaxNumber
         };
+    }
+
+    public static List<CompanyServiceDto> CompanyServicesFromEntity(this Company company)
+    {
+        var list = new List<CompanyServiceDto>();
+
+        foreach(var service in company.CompanyServices)
+        {
+            list.Add(new CompanyServiceDto
+            {
+                CompanyId = service.CompanyId,
+                MasterServiceId = service.MasterServiceId,
+                ServiceName = service.MasterService.ServiceName
+            });
+        }
+
+        return list;
     }
 }
