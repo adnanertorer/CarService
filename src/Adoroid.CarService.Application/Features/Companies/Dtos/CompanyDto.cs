@@ -16,4 +16,5 @@ public class CompanyDto
 
     public CityDto City { get; set; }
     public DistrictDto District { get; set; }
+    public List<CompanyServiceDto> CompanyServices { get; set; } = new List<CompanyServiceDto>();
 }
