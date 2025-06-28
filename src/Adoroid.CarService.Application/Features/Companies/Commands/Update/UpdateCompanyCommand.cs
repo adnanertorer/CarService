@@ -21,7 +21,7 @@ namespace Adoroid.CarService.Application.Features.Companies.Commands.Update
             if (company == null)
                 return Response<CompanyDto>.Fail(BusinessExceptionMessages.CompanyNotFound);
 
-            company.UpdatedDate = DateTime.Now;
+            company.UpdatedDate = DateTime.UtcNow;
             company.UpdatedBy = Guid.Parse(currentUser.Id!);
             company.TaxOffice = request.TaxOffice;
             company.CityId = request.CityId;

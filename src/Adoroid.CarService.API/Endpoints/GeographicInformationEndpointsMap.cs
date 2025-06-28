@@ -14,14 +14,14 @@ public static class GeographicInformationEndpointsMap
     {
         var schemes = new[] { JwtBearerDefaults.AuthenticationScheme, "MobileUser" };
 
-        builder.MapGet(apiPath + "/cities", async ([AsParameters] string? search, IMediator mediator, CancellationToken cancellationToken) =>
+        builder.MapGet(apiPath + "/cities", async (IMediator mediator, CancellationToken cancellationToken) =>
         {
-            var result = await mediator.Send(new GetListCityQuery(search), cancellationToken);
+            var result = await mediator.Send(new GetListCityQuery(), cancellationToken);
             return result.ToResult();
         }).RequireAuthorization(policy =>
         policy.AddAuthenticationSchemes(schemes).RequireAuthenticatedUser());
 
-        builder.MapGet(apiPath + "/districts", async ([AsParameters] int cityId, string? search, IMediator mediator, CancellationToken cancellationToken) =>
+        builder.MapGet(apiPath + "/districts", async (int cityId, string? search, IMediator mediator, CancellationToken cancellationToken) =>
         {
             var result = await mediator.Send(new GetDistrictListQuery(cityId, search), cancellationToken);
             return result.ToResult();

@@ -19,7 +19,28 @@ public static class CompanyMappingExtension
             DistrictId = entity.DistrictId,
             Id = entity.Id,
             TaxNumber = entity.TaxNumber,
-            TaxOffice = entity.TaxOffice
+            TaxOffice = entity.TaxOffice,
+            City = entity.City.FromCityEntity(),
+            District = entity.District.FromDistrictEntity()
+        };
+    }
+
+    public static CityDto FromCityEntity(this City city)
+    {
+        return new CityDto
+        {
+            Id = city.Id,
+            Name = city.Name
+        };
+    }
+
+    public static DistrictDto FromDistrictEntity(this District district)
+    {
+        return new DistrictDto
+        {
+            CityId = district.CityId,
+            Id = district.Id,
+            Name = district.Name
         };
     }
 
