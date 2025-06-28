@@ -18,6 +18,8 @@ public class CarServiceDbContext(DbContextOptions<CarServiceDbContext> options):
     public DbSet<MasterService> MasterServices { get; set; }
     public DbSet<CompanyService> CompanyServices { get; set; }
     public DbSet<MobileUser> MobileUsers { get; set; }
+    public DbSet<City> Cities { get; set; }
+    public DbSet<District> Districts { get; set; }
 
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
