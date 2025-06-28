@@ -15,8 +15,10 @@ public class CompanyGetByIdQueryHandler(CarServiceDbContext dbContext) : IReques
     public async Task<Response<CompanyDto>> Handle(CompanyGetByIdQuery request, CancellationToken cancellationToken)
     {
         var company = await dbContext.Companies
-             .AsNoTracking()
-             .FirstOrDefaultAsync(i => i.Id == request.Id, cancellationToken);
+            .Include(i => i.City)
+            .Include(i => i.District)
+            .AsNoTracking()
+            .FirstOrDefaultAsync(i => i.Id == request.Id, cancellationToken);
 
         if (company is null)
             return Response<CompanyDto>.Fail(BusinessExceptionMessages.CompanyNotFound);
