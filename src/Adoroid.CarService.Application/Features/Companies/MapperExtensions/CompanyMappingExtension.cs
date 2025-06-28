@@ -20,8 +20,8 @@ public static class CompanyMappingExtension
             Id = entity.Id,
             TaxNumber = entity.TaxNumber,
             TaxOffice = entity.TaxOffice,
-            City = entity.City.FromCityEntity(),
-            District = entity.District.FromDistrictEntity(),
+            City = entity.City?.FromCityEntity(),
+            District = entity.District?.FromDistrictEntity(),
             CompanyServices = entity.CompanyServicesFromEntity()
         };
     }
