@@ -23,4 +23,10 @@
     <ProjectReference Include="..\Adoroid.CarService.Domain\Adoroid.CarService.Domain.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="Migrations\Scripts\SeedCitiesAndDistricts.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>
