@@ -13,4 +13,8 @@ public class CompanyDto
     public string CompanyAddress { get; set; }
     public string CompanyPhone { get; set; }
     public string CompanyEmail { get; set; }
+
+    public CityDto City { get; set; }
+    public DistrictDto District { get; set; }
+    public List<CompanyServiceDto> CompanyServices { get; set; } = new List<CompanyServiceDto>();
 }
