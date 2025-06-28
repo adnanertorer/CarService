@@ -2,7 +2,6 @@
 using Adoroid.CarService.Application.Common.Extensions;
 using Adoroid.CarService.Domain.Entities;
 using Adoroid.CarService.Persistence;
-using Adoroid.Core.Application.Requests;
 using Adoroid.Core.Application.Wrappers;
 using Adoroid.Core.Repository.Paging;
 using Microsoft.EntityFrameworkCore;
@@ -10,7 +9,7 @@ using MinimalMediatR.Core;
 
 namespace Adoroid.CarService.Application.Features.Cities.Queries.GetList;
 
-public record GetListCityQuery(PageRequest PageRequest, string? Search) : IRequest<Response<Paginate<City>>>;
+public record GetListCityQuery(string? Search) : IRequest<Response<Paginate<City>>>;
 
 public class GetListCityQueryHandler(CarServiceDbContext dbContext, ICacheService cacheService) : IRequestHandler<GetListCityQuery, Response<Paginate<City>>>
 {
@@ -31,6 +30,6 @@ public class GetListCityQueryHandler(CarServiceDbContext dbContext, ICacheServic
                   .ToListAsync(cancellationToken);
         }, TimeSpan.FromHours(7));
 
-        return Response<Paginate<City>>.Success(list.AsQueryable().ToPaginate(request.PageRequest.PageIndex, 100));
+        return Response<Paginate<City>>.Success(list.AsQueryable().ToPaginate(0, 100));
     }
 }
