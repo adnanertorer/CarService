@@ -9,7 +9,7 @@ using MinimalMediatR.Core;
 
 namespace Adoroid.CarService.Application.Features.Companies.Queries.GetList;
 
-public record CompanyGetListQuery(PageRequest PageRequest, string? Search) : IRequest<Response<Paginate<CompanyDto>>>;
+public record CompanyGetListQuery(PageRequest PageRequest, int? CityId, int? DistrictId, string? Search) : IRequest<Response<Paginate<CompanyDto>>>;
 
 public class CompanyGetListQueryHandler(CarServiceDbContext dbContext) : IRequestHandler<CompanyGetListQuery, Response<Paginate<CompanyDto>>>
 {
@@ -21,10 +21,18 @@ public class CompanyGetListQueryHandler(CarServiceDbContext dbContext) : IReques
             .Include(i =>i.CompanyServices).ThenInclude(i => i.MasterService)
             .AsNoTracking();
 
+        if(request.CityId.HasValue)
+            companies = companies.Where(i => i.CityId == request.CityId);
+
+        if(request.DistrictId.HasValue)
+            companies = companies.Where(i => i.DistrictId == request.DistrictId);
+
+
         if(!string.IsNullOrWhiteSpace(request.Search))
            companies =  companies.Where(i => i.AuthorizedName.Contains(request.Search) || i.AuthorizedSurname.Contains(request.Search)
             || i.TaxNumber.Contains(request.Search) || i.TaxOffice.Contains(request.Search) || i.CompanyName.Contains(request.Search)
-            || i.CompanyPhone.Contains(request.Search) || i.CompanyEmail.Contains(request.Search));
+            || i.CompanyPhone.Contains(request.Search) || i.CompanyEmail.Contains(request.Search)
+            || i.CompanyServices.Any(i=>i.MasterService.ServiceName.Contains(request.Search)));
 
         var result = await companies.OrderBy(i => i.CompanyName)
             .Select(i => i.FromEntity())
