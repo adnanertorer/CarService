@@ -17,6 +17,7 @@ public class CompanyGetByIdQueryHandler(CarServiceDbContext dbContext) : IReques
         var company = await dbContext.Companies
             .Include(i => i.City)
             .Include(i => i.District)
+            .Include(i => i.CompanyServices).ThenInclude(i => i.MasterService)
             .AsNoTracking()
             .FirstOrDefaultAsync(i => i.Id == request.Id, cancellationToken);
 
