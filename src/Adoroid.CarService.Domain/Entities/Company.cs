@@ -34,6 +34,6 @@ public class Company : Entity<Guid>
     public ICollection<CompanyService> CompanyServices { get; set; }
     public ICollection<MainService> MainServices { get; set; }
 
-    public City City { get; set; }
-    public District District { get; set; }
+    public City? City { get; set; }
+    public District? District { get; set; }
 }
