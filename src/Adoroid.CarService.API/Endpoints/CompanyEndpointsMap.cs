@@ -17,8 +17,8 @@ public static class CompanyEndpointsMap
     public static IEndpointRouteBuilder CompanyEndpoints(this IEndpointRouteBuilder builder)
     {
         builder.MinimalMediatrMapCommand<CreateCompanyCommand, CompanyDto>(apiPath, "POST");
-        builder.MinimalMediatrMapCommand<UpdateCompanyCommand, CompanyDto>(apiPath, "PUT");
-        builder.MinimalMediatrMapCommand<DeleteCompanyCommand, Guid>(apiPath, "DELETE");
+        builder.MinimalMediatrMapCommand<UpdateCompanyCommand, CompanyDto>(apiPath, "PUT").RequireAuthorization();
+        builder.MinimalMediatrMapCommand<DeleteCompanyCommand, Guid>(apiPath, "DELETE").RequireAuthorization();
         builder.MapGet(apiPath + "/{id}", async (string id, IMediator mediator, CancellationToken cancellationToken) =>
         {
             if (!Guid.TryParse(id, out var guid))
@@ -26,12 +26,12 @@ public static class CompanyEndpointsMap
 
             var result = await mediator.Send(new CompanyGetByIdQuery(guid), cancellationToken);
             return result.ToResult();
-        });
+        }).RequireAuthorization();
         builder.MapGet(apiPath + "/list", async ([AsParameters] PageRequest pageRequest, string? search, IMediator mediator, CancellationToken cancellationToken) =>
         {
             var result = await mediator.Send(new CompanyGetListQuery(pageRequest, search), cancellationToken);
             return result.ToResult();
-        });
+        }).RequireAuthorization();
         return builder;
     }
 }

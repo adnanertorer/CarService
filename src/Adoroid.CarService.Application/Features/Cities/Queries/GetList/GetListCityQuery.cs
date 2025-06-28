@@ -9,7 +9,7 @@ using MinimalMediatR.Core;
 
 namespace Adoroid.CarService.Application.Features.Cities.Queries.GetList;
 
-public record GetListCityQuery(string? Search) : IRequest<Response<Paginate<City>>>;
+public record GetListCityQuery() : IRequest<Response<Paginate<City>>>;
 
 public class GetListCityQueryHandler(CarServiceDbContext dbContext, ICacheService cacheService) : IRequestHandler<GetListCityQuery, Response<Paginate<City>>>
 {
@@ -21,9 +21,6 @@ public class GetListCityQueryHandler(CarServiceDbContext dbContext, ICacheServic
         {
             var query = dbContext.Cities
                 .AsNoTracking();
-
-            if (!string.IsNullOrEmpty(request.Search))
-                query = query.Where(i => i.Name.Contains(request.Search));
 
             return await query
                   .OrderBy(i => i.Name)

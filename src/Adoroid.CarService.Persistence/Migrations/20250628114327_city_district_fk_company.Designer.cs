@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Adoroid.CarService.Persistence.Migrations
 {
     [DbContext(typeof(CarServiceDbContext))]
-    [Migration("20250627193542_Seed_Cities_And_Districts")]
-    partial class Seed_Cities_And_Districts
+    [Migration("20250628114327_city_district_fk_company")]
+    partial class city_district_fk_company
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -93,6 +93,32 @@ namespace Adoroid.CarService.Persistence.Migrations
                     b.ToTable("AccountingTransactions");
                 });
 
+            modelBuilder.Entity("Adoroid.CarService.Domain.Entities.City", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int>("PhoneCode")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("PlateNumber")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("RowNumber")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Cities");
+                });
+
             modelBuilder.Entity("Adoroid.CarService.Domain.Entities.Company", b =>
                 {
                     b.Property<Guid>("Id")
@@ -170,6 +196,10 @@ namespace Adoroid.CarService.Persistence.Migrations
                         .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("CityId");
+
+                    b.HasIndex("DistrictId");
 
                     b.ToTable("Companies");
                 });
@@ -291,6 +321,30 @@ namespace Adoroid.CarService.Persistence.Migrations
                     b.HasIndex("CompanyId");
 
                     b.ToTable("Customers");
+                });
+
+            modelBuilder.Entity("Adoroid.CarService.Domain.Entities.District", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("CityId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("CityName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Districts");
                 });
 
             modelBuilder.Entity("Adoroid.CarService.Domain.Entities.Employee", b =>
@@ -979,6 +1033,25 @@ namespace Adoroid.CarService.Persistence.Migrations
                     b.Navigation("Company");
                 });
 
+            modelBuilder.Entity("Adoroid.CarService.Domain.Entities.Company", b =>
+                {
+                    b.HasOne("Adoroid.CarService.Domain.Entities.City", "City")
+                        .WithMany("Companies")
+                        .HasForeignKey("CityId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("Adoroid.CarService.Domain.Entities.District", "District")
+                        .WithMany("Companies")
+                        .HasForeignKey("DistrictId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("City");
+
+                    b.Navigation("District");
+                });
+
             modelBuilder.Entity("Adoroid.CarService.Domain.Entities.CompanyService", b =>
                 {
                     b.HasOne("Adoroid.CarService.Domain.Entities.Company", "Company")
@@ -1103,6 +1176,11 @@ namespace Adoroid.CarService.Persistence.Migrations
                     b.Navigation("MobileUser");
                 });
 
+            modelBuilder.Entity("Adoroid.CarService.Domain.Entities.City", b =>
+                {
+                    b.Navigation("Companies");
+                });
+
             modelBuilder.Entity("Adoroid.CarService.Domain.Entities.Company", b =>
                 {
                     b.Navigation("AccountingTransactions");
@@ -1123,6 +1201,11 @@ namespace Adoroid.CarService.Persistence.Migrations
             modelBuilder.Entity("Adoroid.CarService.Domain.Entities.Customer", b =>
                 {
                     b.Navigation("Vehicles");
+                });
+
+            modelBuilder.Entity("Adoroid.CarService.Domain.Entities.District", b =>
+                {
+                    b.Navigation("Companies");
                 });
 
             modelBuilder.Entity("Adoroid.CarService.Domain.Entities.Employee", b =>

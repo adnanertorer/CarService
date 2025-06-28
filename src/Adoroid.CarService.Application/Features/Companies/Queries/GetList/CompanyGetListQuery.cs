@@ -16,6 +16,8 @@ public class CompanyGetListQueryHandler(CarServiceDbContext dbContext) : IReques
     public async Task<Response<Paginate<CompanyDto>>> Handle(CompanyGetListQuery request, CancellationToken cancellationToken)
     {
         var companies = dbContext.Companies
+            .Include(i => i.City)
+            .Include(i => i.District)
             .AsNoTracking();
 
         if(!string.IsNullOrWhiteSpace(request.Search))
