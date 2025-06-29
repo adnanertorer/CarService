@@ -53,7 +53,7 @@ public class UpdateMainServiceCommandHandler(CarServiceDbContext dbContext, ICur
                     balance = await GetBalance(entity.Vehicle!.MobileUserId.Value, cancellationToken);
 
             var accountTransaction = new AccountingTransaction();
-            accountTransaction.Balance = balance - entity.Cost;
+            accountTransaction.Balance = balance + entity.Cost;
             accountTransaction.Claim = 0;
             accountTransaction.CompanyId = Guid.Parse(currentUser.CompanyId!);
             accountTransaction.CreatedBy = Guid.Parse(currentUser.Id!);
