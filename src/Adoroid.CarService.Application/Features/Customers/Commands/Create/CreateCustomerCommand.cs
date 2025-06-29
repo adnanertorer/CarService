@@ -19,7 +19,9 @@ public class CreateCustomerCommandHandler(CarServiceDbContext dbContext, ICurren
     public async Task<Response<CustomerDto>> Handle(CreateCustomerCommand request, CancellationToken cancellationToken)
     {
         var isExist = await dbContext.Customers.AsNoTracking()
-            .AnyAsync(i => i.Name == request.Name && i.Surname == request.Surname, cancellationToken);
+            .AnyAsync(i => i.Name == request.Name && 
+            i.Surname == request.Surname && 
+            i.CompanyId == Guid.Parse(currentUser.CompanyId!), cancellationToken);
 
         if (isExist)
             return Response<CustomerDto>.Fail(BusinessExceptionMessages.NotFound);
