@@ -16,12 +16,12 @@ public class UserToCompanyConfiguration : IEntityTypeConfiguration<UserToCompany
         builder.HasOne(i => i.User)
             .WithMany(i => i.UserToCompanies)
             .HasForeignKey(i => i.UserId)
-            .OnDelete(DeleteBehavior.Cascade);
+            .OnDelete(DeleteBehavior.NoAction);
 
         builder.HasOne(i => i.Company)
             .WithMany(i => i.UserToCompanies)
             .HasForeignKey(i => i.CompanyId)
-            .OnDelete(DeleteBehavior.Cascade);
+            .OnDelete(DeleteBehavior.NoAction);
 
         builder.Property(i => i.CreatedDate).IsRequired();
         builder.Property(c => c.CreatedBy).IsRequired().HasMaxLength(64);
