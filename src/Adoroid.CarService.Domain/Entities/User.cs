@@ -4,7 +4,10 @@ namespace Adoroid.CarService.Domain.Entities;
 
 public class User : Entity<Guid>
 {
-    
+    public User()
+    {
+        UserToCompanies = new HashSet<UserToCompany>();
+    }
     public Guid CompanyId { get; set; }
     public string Name { get; set; }
     public string Surname { get; set; }
@@ -16,4 +19,5 @@ public class User : Entity<Guid>
     public DateTime? RefreshTokenExpr { get; set; }
 
     public Company? Company { get; set; }
+    public ICollection<UserToCompany>? UserToCompanies { get; set; } 
 }
