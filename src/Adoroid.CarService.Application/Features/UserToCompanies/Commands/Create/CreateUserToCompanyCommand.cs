@@ -18,6 +18,13 @@ public class CreateUserToCompanyCommandHandler(CarServiceDbContext dbContext, IC
 {
     public async Task<Response<UserToCompanyDto>> Handle(CreateUserToCompanyCommand request, CancellationToken cancellationToken)
     {
+        var companyExist = await dbContext.Companies
+            .AsNoTracking()
+            .AnyAsync(i => i.Id == request.CompanyId, cancellationToken);
+
+        if (companyExist)
+            return Response<UserToCompanyDto>.Fail(BusinessExceptionMessages.CompanyNotFound);
+
         var isExist = await dbContext.UserToCompanies
             .AsNoTracking()
             .AnyAsync(i => i.UserId == Guid.Parse(currentUser.Id!) && i.CompanyId == request.CompanyId, cancellationToken);
