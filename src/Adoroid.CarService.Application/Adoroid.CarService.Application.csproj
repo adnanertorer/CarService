@@ -20,10 +20,6 @@
   <ItemGroup>
     <Folder Include="Features\AccountTransactions\Commands\Update\" />
     <Folder Include="Features\MainServices\ExceptionMessages\" />
-    <Folder Include="Features\UserToCompanies\Commands\" />
-    <Folder Include="Features\UserToCompanies\ExceptionMessages\" />
-    <Folder Include="Features\UserToCompanies\MappingExtensions\" />
-    <Folder Include="Features\UserToCompanies\Queries\" />
   </ItemGroup>
 
 </Project>
