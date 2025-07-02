@@ -14,7 +14,8 @@ public static class UserToCompanyMappingExtensions
             UserId = userToCompany.UserId,
             CompanyId = userToCompany.CompanyId,
             UserType = (CompanyUserTypeEnum)userToCompany.UserType,
-            Company = userToCompany.Company?.CompanyFromEntity()
+            Company = userToCompany.Company?.CompanyFromEntity(),
+            User = userToCompany.User?.UserFromEntity()
         };
     }
 
@@ -29,6 +30,18 @@ public static class UserToCompanyMappingExtensions
             CompanyEmail = company.CompanyEmail,
             CompanyName = company.CompanyName,
             CompanyPhone = company.CompanyPhone
+        };
+    }
+
+    public static UserDto UserFromEntity(this User user)
+    {
+        return new UserDto
+        {
+            Id = user.Id,
+            Surname = user.Surname,
+            Name = user.Name,
+            Email = user.Email,
+            PhoneNumber = user.PhoneNumber
         };
     }
 }

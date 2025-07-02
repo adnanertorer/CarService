@@ -18,6 +18,7 @@ public class GetByIdUserToCompanyQueryHandler(CarServiceDbContext dbContext)
     {
         var entity = await dbContext.UserToCompanies
             .Include(e => e.Company)
+            .Include(e => e.User)
             .AsNoTracking()
             .FirstOrDefaultAsync(e => e.Id == request.Id, cancellationToken);
 
