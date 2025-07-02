@@ -10,5 +10,6 @@ public class UserToCompanyDto
     public CompanyUserTypeEnum UserType { get; set; }
 
     public CompanyDto? Company { get; set; }
+    public UserDto? User { get; set; }
 
 }
