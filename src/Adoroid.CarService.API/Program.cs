@@ -152,6 +152,7 @@ app.CompanyServiceEndpoints();
 app.AccountTransactionEndpoint();
 app.MobileUserEndpoints();
 app.GeographicEndpoints();
+app.UserToCompanyEndpoints();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
