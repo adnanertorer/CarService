@@ -1,34 +1,25 @@
 ﻿using Adoroid.CarService.Application.Common.Abstractions.Auth;
 using Adoroid.CarService.Application.Common.Abstractions.Caching;
-using Adoroid.CarService.Application.Common.BusinessMessages;
 using Adoroid.CarService.Application.Common.Extensions;
 using Adoroid.CarService.Application.Features.SubServices.ExceptionMessages;
-using Adoroid.CarService.Application.Features.Users.Queries.CheckCompanyId;
 using Adoroid.CarService.Persistence;
 using Adoroid.Core.Application.Wrappers;
 using Microsoft.EntityFrameworkCore;
 using MinimalMediatR.Core;
-using MinimalMediatR.Extensions;
 
 namespace Adoroid.CarService.Application.Features.MainServices.Commands.Delete
 {
 
     public record DeleteMainServiceCommand(Guid Id) : IRequest<Response<Guid>>;
 
-    public class DeleteMainServiceCommandHandler(CarServiceDbContext dbContext, ICurrentUser currentUser, ICacheService cacheService,
-        IMediator mediator)
+    public class DeleteMainServiceCommandHandler(CarServiceDbContext dbContext, ICurrentUser currentUser, ICacheService cacheService)
         : IRequestHandler<DeleteMainServiceCommand, Response<Guid>>
     {
         const string redisKeyPrefix = "mainservice:list";
         const string redisSubServiceKeyPrefix = "subservice:list";
         public async Task<Response<Guid>> Handle(DeleteMainServiceCommand request, CancellationToken cancellationToken)
         {
-            var companyIdResponse = await mediator.Send(new GetCompanyIdCommand(), cancellationToken);
-
-            if (!companyIdResponse.Succeeded)
-                return Response<Guid>.Fail(BusinessMessages.CompanyNotFound);
-
-            var companyId = companyIdResponse.Data!.Value;
+            var companyId = currentUser.ValidCompanyId();
 
             var entity = await dbContext.MainServices.FirstOrDefaultAsync(e => e.Id == request.Id, cancellationToken);
 
