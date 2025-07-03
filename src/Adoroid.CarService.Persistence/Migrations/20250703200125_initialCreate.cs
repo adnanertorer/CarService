@@ -352,7 +352,6 @@ namespace Adoroid.CarService.Persistence.Migrations
                     FuelTypeId = table.Column<int>(type: "integer", nullable: false),
                     SerialNumber = table.Column<string>(type: "character varying(30)", maxLength: 30, nullable: true),
                     CustomerId = table.Column<Guid>(type: "uuid", nullable: true),
-                    MobileUserId = table.Column<Guid>(type: "uuid", nullable: true),
                     CreatedDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     UpdatedDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     DeletedDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
@@ -368,11 +367,6 @@ namespace Adoroid.CarService.Persistence.Migrations
                         name: "FK_Vehicles_Customers_CustomerId",
                         column: x => x.CustomerId,
                         principalTable: "Customers",
-                        principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK_Vehicles_MobileUsers_MobileUserId",
-                        column: x => x.MobileUserId,
-                        principalTable: "MobileUsers",
                         principalColumn: "Id");
                 });
 
@@ -429,11 +423,6 @@ namespace Adoroid.CarService.Persistence.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_VehiclUsers", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_VehiclUsers_MobileUsers_UserId",
-                        column: x => x.UserId,
-                        principalTable: "MobileUsers",
-                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_VehiclUsers_Vehicles_VehicleId",
                         column: x => x.VehicleId,
@@ -585,16 +574,6 @@ namespace Adoroid.CarService.Persistence.Migrations
                 column: "CustomerId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Vehicles_MobileUserId",
-                table: "Vehicles",
-                column: "MobileUserId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_VehiclUsers_UserId",
-                table: "VehiclUsers",
-                column: "UserId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_VehiclUsers_VehicleId",
                 table: "VehiclUsers",
                 column: "VehicleId");
@@ -608,6 +587,9 @@ namespace Adoroid.CarService.Persistence.Migrations
 
             migrationBuilder.DropTable(
                 name: "CompanyServices");
+
+            migrationBuilder.DropTable(
+                name: "MobileUsers");
 
             migrationBuilder.DropTable(
                 name: "SubServices");
@@ -638,9 +620,6 @@ namespace Adoroid.CarService.Persistence.Migrations
 
             migrationBuilder.DropTable(
                 name: "Customers");
-
-            migrationBuilder.DropTable(
-                name: "MobileUsers");
 
             migrationBuilder.DropTable(
                 name: "Companies");

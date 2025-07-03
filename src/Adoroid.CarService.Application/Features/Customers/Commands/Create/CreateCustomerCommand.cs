@@ -34,13 +34,15 @@ public class CreateCustomerCommandHandler(CarServiceDbContext dbContext, ICurren
             Address = request.Address,
             CompanyId = companyId,
             CreatedBy = Guid.Parse(currentUser.Id!),
+            CreatedDate = DateTime.UtcNow,
             Email = request.Email,
             IsActive = request.IsActive,
             Name = request.Name,
             Phone = request.Phone,
             Surname = request.Surname,
             TaxNumber = request.TaxNumber,
-            TaxOffice = request.TaxOffice
+            TaxOffice = request.TaxOffice,
+            IsDeleted = false
         };
 
         var entityResult = await dbContext.Customers.AddAsync(customer, cancellationToken);

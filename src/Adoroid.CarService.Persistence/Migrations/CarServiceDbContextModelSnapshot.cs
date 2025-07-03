@@ -1026,9 +1026,6 @@ namespace Adoroid.CarService.Persistence.Migrations
                     b.Property<bool?>("IsDeleted")
                         .HasColumnType("boolean");
 
-                    b.Property<Guid?>("MobileUserId")
-                        .HasColumnType("uuid");
-
                     b.Property<string>("Model")
                         .IsRequired()
                         .HasMaxLength(50)
@@ -1056,8 +1053,6 @@ namespace Adoroid.CarService.Persistence.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("CustomerId");
-
-                    b.HasIndex("MobileUserId");
 
                     b.ToTable("Vehicles");
                 });
@@ -1102,8 +1097,6 @@ namespace Adoroid.CarService.Persistence.Migrations
                         .HasColumnType("uuid");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("UserId");
 
                     b.HasIndex("VehicleId");
 
@@ -1260,27 +1253,15 @@ namespace Adoroid.CarService.Persistence.Migrations
                     b.HasOne("Adoroid.CarService.Domain.Entities.Customer", null)
                         .WithMany("Vehicles")
                         .HasForeignKey("CustomerId");
-
-                    b.HasOne("Adoroid.CarService.Domain.Entities.MobileUser", null)
-                        .WithMany("Vehicles")
-                        .HasForeignKey("MobileUserId");
                 });
 
             modelBuilder.Entity("Adoroid.CarService.Domain.Entities.VehicleUser", b =>
                 {
-                    b.HasOne("Adoroid.CarService.Domain.Entities.MobileUser", "User")
-                        .WithMany("VehicleUsers")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
                     b.HasOne("Adoroid.CarService.Domain.Entities.Vehicle", "Vehicle")
                         .WithMany("VehicleUsers")
                         .HasForeignKey("VehicleId")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
-
-                    b.Navigation("User");
 
                     b.Navigation("Vehicle");
                 });
@@ -1330,13 +1311,6 @@ namespace Adoroid.CarService.Persistence.Migrations
             modelBuilder.Entity("Adoroid.CarService.Domain.Entities.MasterService", b =>
                 {
                     b.Navigation("CompanyServices");
-                });
-
-            modelBuilder.Entity("Adoroid.CarService.Domain.Entities.MobileUser", b =>
-                {
-                    b.Navigation("VehicleUsers");
-
-                    b.Navigation("Vehicles");
                 });
 
             modelBuilder.Entity("Adoroid.CarService.Domain.Entities.Supplier", b =>
