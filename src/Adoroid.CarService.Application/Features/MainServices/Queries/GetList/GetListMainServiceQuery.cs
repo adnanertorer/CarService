@@ -29,9 +29,7 @@ public class GetListMainServiceQueryHandler(CarServiceDbContext dbContext, ICurr
             async () =>
             {
                 var query = dbContext.MainServices
-                    .Include(i => i.Vehicle)
-                        .ThenInclude(i => i!.Customer)
-                    .Include(i => i.Vehicle).ThenInclude(i => i.MobileUser)
+                    .Include(i => i.Vehicle).ThenInclude(i => i.VehicleUsers)
                     .AsNoTracking()
                     .Where(i => i.Vehicle != null && i.CompanyId == Guid.Parse(currentUser.CompanyId!));
 
