@@ -1067,6 +1067,54 @@ namespace Adoroid.CarService.Persistence.Migrations
                     b.ToTable("Vehicles");
                 });
 
+            modelBuilder.Entity("Adoroid.CarService.Domain.Entities.VehicleUser", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("CreatedBy")
+                        .HasMaxLength(64)
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("DeletedBy")
+                        .HasMaxLength(64)
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("DeletedDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool?>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<Guid>("UpdatedBy")
+                        .HasMaxLength(64)
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("UpdatedDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("UserTypeId")
+                        .HasColumnType("integer");
+
+                    b.Property<Guid>("VehicleId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.HasIndex("VehicleId");
+
+                    b.ToTable("VehiclUsers");
+                });
+
             modelBuilder.Entity("Adoroid.CarService.Domain.Entities.AccountingTransaction", b =>
                 {
                     b.HasOne("Adoroid.CarService.Domain.Entities.Company", "Company")
@@ -1225,19 +1273,32 @@ namespace Adoroid.CarService.Persistence.Migrations
 
             modelBuilder.Entity("Adoroid.CarService.Domain.Entities.Vehicle", b =>
                 {
-                    b.HasOne("Adoroid.CarService.Domain.Entities.Customer", "Customer")
+                    b.HasOne("Adoroid.CarService.Domain.Entities.Customer", null)
                         .WithMany("Vehicles")
-                        .HasForeignKey("CustomerId")
-                        .OnDelete(DeleteBehavior.NoAction);
+                        .HasForeignKey("CustomerId");
 
-                    b.HasOne("Adoroid.CarService.Domain.Entities.MobileUser", "MobileUser")
+                    b.HasOne("Adoroid.CarService.Domain.Entities.MobileUser", null)
                         .WithMany("Vehicles")
-                        .HasForeignKey("MobileUserId")
-                        .OnDelete(DeleteBehavior.NoAction);
+                        .HasForeignKey("MobileUserId");
+                });
 
-                    b.Navigation("Customer");
+            modelBuilder.Entity("Adoroid.CarService.Domain.Entities.VehicleUser", b =>
+                {
+                    b.HasOne("Adoroid.CarService.Domain.Entities.MobileUser", "User")
+                        .WithMany("VehicleUsers")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
 
-                    b.Navigation("MobileUser");
+                    b.HasOne("Adoroid.CarService.Domain.Entities.Vehicle", "Vehicle")
+                        .WithMany("VehicleUsers")
+                        .HasForeignKey("VehicleId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("User");
+
+                    b.Navigation("Vehicle");
                 });
 
             modelBuilder.Entity("Adoroid.CarService.Domain.Entities.City", b =>
@@ -1291,6 +1352,8 @@ namespace Adoroid.CarService.Persistence.Migrations
 
             modelBuilder.Entity("Adoroid.CarService.Domain.Entities.MobileUser", b =>
                 {
+                    b.Navigation("VehicleUsers");
+
                     b.Navigation("Vehicles");
                 });
 
@@ -1307,6 +1370,8 @@ namespace Adoroid.CarService.Persistence.Migrations
             modelBuilder.Entity("Adoroid.CarService.Domain.Entities.Vehicle", b =>
                 {
                     b.Navigation("MainServices");
+
+                    b.Navigation("VehicleUsers");
                 });
 #pragma warning restore 612, 618
         }

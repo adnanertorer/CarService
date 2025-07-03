@@ -9,6 +9,7 @@ using Adoroid.CarService.Domain.Entities;
 using Adoroid.CarService.Persistence;
 using Adoroid.Core.Application.Wrappers;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using MinimalMediatR.Core;
 
 namespace Adoroid.CarService.Application.Features.MainServices.Commands.Update;
@@ -16,14 +17,19 @@ namespace Adoroid.CarService.Application.Features.MainServices.Commands.Update;
 public record UpdateMainServiceCommand(Guid Id, Guid VehicleId, DateTime ServiceDate, string? Description, MainServiceStatusEnum ServiceStatus)
     : IRequest<Response<MainServiceDto>>;
 
-public class UpdateMainServiceCommandHandler(CarServiceDbContext dbContext, ICurrentUser currentUser, ICacheService cacheService)
+public class UpdateMainServiceCommandHandler(CarServiceDbContext dbContext, ICurrentUser currentUser, ICacheService cacheService,
+    ILogger<UpdateMainServiceCommandHandler> logger)
         : IRequestHandler<UpdateMainServiceCommand, Response<MainServiceDto>>
 {
     const string redisKeyPrefix = "mainservice:list";
     public async Task<Response<MainServiceDto>> Handle(UpdateMainServiceCommand request, CancellationToken cancellationToken)
     {
+        var companyId = currentUser.ValidCompanyId();
+
+        var userId = Guid.Parse(currentUser.Id!);
+
         var entity = await dbContext.MainServices
-            .Include(i => i.Vehicle)
+            .Include(i => i.Vehicle).ThenInclude(i => i.VehicleUsers)
             .FirstOrDefaultAsync(e => e.Id == request.Id, cancellationToken);
 
         if (entity is null)
@@ -34,7 +40,7 @@ public class UpdateMainServiceCommandHandler(CarServiceDbContext dbContext, ICur
         entity.VehicleId = request.VehicleId;
         entity.ServiceStatus = (int)request.ServiceStatus;
 
-        entity.UpdatedBy = Guid.Parse(currentUser.Id!);
+        entity.UpdatedBy = userId;
         entity.UpdatedDate = DateTime.UtcNow;
 
         if(request.ServiceStatus == MainServiceStatusEnum.Done)
@@ -45,29 +51,39 @@ public class UpdateMainServiceCommandHandler(CarServiceDbContext dbContext, ICur
                 return Response<MainServiceDto>.Fail(BusinessExceptionMessages.VehicleNotFound);
 
             decimal balance = 0;
+            Guid? vehicleUserId = null;
+            bool temporaryUser = false;
 
-            if (entity.Vehicle.CustomerId != null)
-                    balance = await GetBalance(entity.Vehicle!.CustomerId.Value, cancellationToken);
+            if (entity.Vehicle.VehicleUsers is null || entity.Vehicle.VehicleUsers.Count == 0)
+                return Response<MainServiceDto>.Fail(BusinessExceptionMessages.VehicleUserNotFound);
 
-            else if (entity.Vehicle.MobileUserId != null)
-                    balance = await GetBalance(entity.Vehicle!.MobileUserId.Value, cancellationToken);
+            vehicleUserId = entity.Vehicle.VehicleUsers!.FirstOrDefault(i => i.UserTypeId == (int)VehicleUserTypeEnum.Master)?.UserId;
+            if(vehicleUserId is null)
+            {
+                vehicleUserId = entity.Vehicle.VehicleUsers!.FirstOrDefault(i => i.UserTypeId == (int)VehicleUserTypeEnum.Temporary)?.UserId;
+                if(vehicleUserId is null)
+                    return Response<MainServiceDto>.Fail(BusinessExceptionMessages.VehicleUserNotFound);
+                temporaryUser = true;
+            }
+                
+
+            balance = await GetBalance(vehicleUserId!.Value, cancellationToken);
 
             var accountTransaction = new AccountingTransaction();
             accountTransaction.Balance = balance + entity.Cost;
             accountTransaction.Claim = 0;
-            accountTransaction.CompanyId = Guid.Parse(currentUser.CompanyId!);
-            accountTransaction.CreatedBy = Guid.Parse(currentUser.Id!);
+            accountTransaction.CompanyId = companyId;
+            accountTransaction.CreatedBy = userId;
             accountTransaction.CreatedDate = DateTime.UtcNow;
+            accountTransaction.AccountOwnerId = vehicleUserId.Value;
 
-            if (entity.Vehicle.CustomerId != null)
+            if (!temporaryUser)
             {
-                accountTransaction.AccountOwnerId = entity.Vehicle.CustomerId.Value;
-                accountTransaction.AccountOwnerType = (int)AccountOwnerTypeEnum.Customer;
-            }
-            else if (entity.Vehicle.MobileUserId != null)
-            {
-                accountTransaction.AccountOwnerId = entity.Vehicle.MobileUserId.Value;
                 accountTransaction.AccountOwnerType = (int)AccountOwnerTypeEnum.MobileUser;
+            }
+            else
+            {
+                accountTransaction.AccountOwnerType = (int)AccountOwnerTypeEnum.Customer;
             }
             accountTransaction.Debt = entity.Cost;
             accountTransaction.IsDeleted = false;
@@ -79,12 +95,32 @@ public class UpdateMainServiceCommandHandler(CarServiceDbContext dbContext, ICur
 
         dbContext.MainServices.Update(entity);
 
-        await dbContext.SaveChangesAsync(cancellationToken);
+        await using var transaction = await dbContext.Database.BeginTransactionAsync();
+
+        try
+        {
+            await dbContext.SaveChangesAsync(cancellationToken);
+            await transaction.CommitAsync(cancellationToken);
+        }
+        catch(Exception ex)
+        {
+            await transaction.RollbackAsync(cancellationToken);
+            const string errorMessage = "MainService güncelleme işlemi başarısız oldu. MainServiceId: {MainServiceId}";
+            logger.LogError(ex, errorMessage, request.Id);
+            return Response<MainServiceDto>.Fail(BusinessExceptionMessages.MainServiceUpdateError);
+        }
 
         var resultDto = entity.FromEntity();
 
-        await cacheService.UpdateToListAsync($"{redisKeyPrefix}:{currentUser.CompanyId!}", request.Id.ToString(), resultDto, null);
-
+        try
+        {
+            await cacheService.UpdateToListAsync($"{redisKeyPrefix}:{companyId}", request.Id.ToString(), resultDto, null);
+        }
+        catch (Exception ex) {
+            const string errorMessage = "Cache güncelleme işlemi başarısız oldu. MainServiceId: {MainServiceId}";
+            logger.LogError(ex, errorMessage, request.Id);
+        }
+       
         return Response<MainServiceDto>.Success(resultDto);
     }
 
@@ -103,14 +139,11 @@ public class UpdateMainServiceCommandHandler(CarServiceDbContext dbContext, ICur
 
     private async Task<decimal> GetTotalPrice(Guid mainServiceId, CancellationToken cancellationToken)
     {
-        var totalPrice = await dbContext.SubServices.AsNoTracking()
-            .Where(i => i.MainServiceId == mainServiceId)
-            .SumAsync(i => i.Cost, cancellationToken);
+        var costs = await dbContext.SubServices.AsNoTracking()
+             .Where(i => i.MainServiceId == mainServiceId)
+             .Select(i => i.Cost - (i.Discount ?? 0))
+             .ToListAsync(cancellationToken);
 
-        var totalDiscount = await dbContext.SubServices.AsNoTracking()
-            .Where(i => i.MainServiceId == mainServiceId && i.Discount.HasValue)
-            .SumAsync(i => i.Discount, cancellationToken);
-
-        return totalPrice - (totalDiscount ?? 0);
+        return costs.Sum();
     }
 }

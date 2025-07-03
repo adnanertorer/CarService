@@ -882,12 +882,12 @@ INSERT INTO  public."Districts"   ( "Id"  ,  "CityId"  ,  "Name"  ,  "CityName" 
 INSERT INTO  public."Districts"   ( "Id"  ,  "CityId"  ,  "Name"  ,  "CityName"  ) VALUES (775, 69, 'ADİLCEVAZ', 'BİTLİS');
 INSERT INTO  public."Districts"   ( "Id"  ,  "CityId"  ,  "Name"  ,  "CityName"  ) VALUES (776, 69, 'AHLAT', 'BİTLİS');
 INSERT INTO  public."Districts"   ( "Id"  ,  "CityId"  ,  "Name"  ,  "CityName"  ) VALUES (777, 69, 'BİTLİS', 'BİTLİS');
-INSERT INTO  public."Districts"   ( "Id"  ,  "CityId"  ,  "Name"  ,  "CityName"  ) VALUES (778, 69, 'GÜROYMAK', 'BİTLİS;');
+INSERT INTO  public."Districts"   ( "Id"  ,  "CityId"  ,  "Name"  ,  "CityName"  ) VALUES (778, 69, 'GÜROYMAK', 'BİTLİS');
 INSERT INTO  public."Districts"   ( "Id"  ,  "CityId"  ,  "Name"  ,  "CityName"  ) VALUES (779, 69, 'HİZAN', 'BİTLİS');
 INSERT INTO  public."Districts"   ( "Id"  ,  "CityId"  ,  "Name"  ,  "CityName"  ) VALUES (780, 69, 'MUTKİ', 'BİTLİS');
-INSERT INTO  public."Districts"   ( "Id"  ,  "CityId"  ,  "Name"  ,  "CityName"  ) VALUES (781, 69, 'TATVAN', 'BİTLİS';);
-INSERT INTO  public."Districts"   ( "Id"  ,  "CityId"  ,  "Name"  ,  "CityName"  ) VALUES (782, 70, 'ADAKLI', 'BİNGÖL';);
-INSERT INTO  public."Districts"   ( "Id"  ,  "CityId"  ,  "Name"  ,  "CityName"  ) VALUES (783, 70, 'BİNGÖL', 'BİNGÖL';);
+INSERT INTO  public."Districts"   ( "Id"  ,  "CityId"  ,  "Name"  ,  "CityName"  ) VALUES (781, 69, 'TATVAN', 'BİTLİS');
+INSERT INTO  public."Districts"   ( "Id"  ,  "CityId"  ,  "Name"  ,  "CityName"  ) VALUES (782, 70, 'ADAKLI', 'BİNGÖL');
+INSERT INTO  public."Districts"   ( "Id"  ,  "CityId"  ,  "Name"  ,  "CityName"  ) VALUES (783, 70, 'BİNGÖL', 'BİNGÖL');
 INSERT INTO  public."Districts"   ( "Id"  ,  "CityId"  ,  "Name"  ,  "CityName"  ) VALUES (784, 70, 'GENÇ', 'BİNGÖL');
 INSERT INTO  public."Districts"   ( "Id"  ,  "CityId"  ,  "Name"  ,  "CityName"  ) VALUES (785, 70, 'KARLIOVA', 'BİNGÖL');
 INSERT INTO  public."Districts"   ( "Id"  ,  "CityId"  ,  "Name"  ,  "CityName"  ) VALUES (786, 70, 'KİĞI', 'BİNGÖL');
@@ -909,7 +909,7 @@ INSERT INTO  public."Districts"   ( "Id"  ,  "CityId"  ,  "Name"  ,  "CityName" 
 INSERT INTO  public."Districts"   ( "Id"  ,  "CityId"  ,  "Name"  ,  "CityName"  ) VALUES (802, 72, 'BİGADİÇ', 'BALIKESİR');
 INSERT INTO  public."Districts"   ( "Id"  ,  "CityId"  ,  "Name"  ,  "CityName"  ) VALUES (803, 72, 'BURHANİYE', 'BALIKESİR');
 INSERT INTO  public."Districts"   ( "Id"  ,  "CityId"  ,  "Name"  ,  "CityName"  ) VALUES (804, 72, 'DURSUNBEY', 'BALIKESİR');
-INSERT INTO  public."Districts"   ( "Id"  ,  "CityId"  ,  "Name"  ,  "CityName"  ) VALUES (805, 72, 'EDREMİT', 'BALIKESİR';);
+INSERT INTO  public."Districts"   ( "Id"  ,  "CityId"  ,  "Name"  ,  "CityName"  ) VALUES (805, 72, 'EDREMİT', 'BALIKESİR');
 INSERT INTO  public."Districts"   ( "Id"  ,  "CityId"  ,  "Name"  ,  "CityName"  ) VALUES (806, 72, 'ERDEK', 'BALIKESİR');
 INSERT INTO  public."Districts"   ( "Id"  ,  "CityId"  ,  "Name"  ,  "CityName"  ) VALUES (807, 72, 'GÖMEÇ', 'BALIKESİR');
 INSERT INTO  public."Districts"   ( "Id"  ,  "CityId"  ,  "Name"  ,  "CityName"  ) VALUES (808, 72, 'GÖNEN', 'BALIKESİR');
@@ -919,8 +919,8 @@ INSERT INTO  public."Districts"   ( "Id"  ,  "CityId"  ,  "Name"  ,  "CityName" 
 INSERT INTO  public."Districts"   ( "Id"  ,  "CityId"  ,  "Name"  ,  "CityName"  ) VALUES (812, 72, 'MANYAS', 'BALIKESİR');
 INSERT INTO  public."Districts"   ( "Id"  ,  "CityId"  ,  "Name"  ,  "CityName"  ) VALUES (813, 72, 'MARMARA', 'BALIKESİR');
 INSERT INTO  public."Districts"   ( "Id"  ,  "CityId"  ,  "Name"  ,  "CityName"  ) VALUES (814, 72, 'SAVAŞTEPE', 'BALIKESİR');
-INSERT INTO  public."Districts"   ( "Id"  ,  "CityId"  ,  "Name"  ,  "CityName"  ) VALUES (815, 72, 'SINDIRGI', 'BALIKESİR';);
-INSERT INTO  public."Districts"   ( "Id"  ,  "CityId"  ,  "Name"  ,  "CityName"  ) VALUES (816, 72, 'SUSURLUK', 'BALIKESİR';);
+INSERT INTO  public."Districts"   ( "Id"  ,  "CityId"  ,  "Name"  ,  "CityName"  ) VALUES (815, 72, 'SINDIRGI', 'BALIKESİR');
+INSERT INTO  public."Districts"   ( "Id"  ,  "CityId"  ,  "Name"  ,  "CityName"  ) VALUES (816, 72, 'SUSURLUK', 'BALIKESİR');
 INSERT INTO  public."Districts"   ( "Id"  ,  "CityId"  ,  "Name"  ,  "CityName"  ) VALUES (817, 73, 'AYDIN', 'AYDIN');
 INSERT INTO  public."Districts"   ( "Id"  ,  "CityId"  ,  "Name"  ,  "CityName"  ) VALUES (818, 73, 'BOZDOĞAN', 'AYDIN');
 INSERT INTO  public."Districts"   ( "Id"  ,  "CityId"  ,  "Name"  ,  "CityName"  ) VALUES (819, 73, 'BUHARKENT', 'AYDIN');
@@ -989,7 +989,7 @@ INSERT INTO  public."Districts"   ( "Id"  ,  "CityId"  ,  "Name"  ,  "CityName" 
 INSERT INTO  public."Districts"   ( "Id"  ,  "CityId"  ,  "Name"  ,  "CityName"  ) VALUES (882, 76, 'PURSAKLAR', 'ANKARA');
 INSERT INTO  public."Districts"   ( "Id"  ,  "CityId"  ,  "Name"  ,  "CityName"  ) VALUES (883, 76, 'SİNCAN', 'ANKARA');
 INSERT INTO  public."Districts"   ( "Id"  ,  "CityId"  ,  "Name"  ,  "CityName"  ) VALUES (884, 76, 'ŞEREFLİKOÇHİSAR', 'ANKARA');
-INSERT INTO  public."Districts"   ( "Id"  ,  "CityId"  ,  "Name"  ,  "CityName"  ) VALUES (885, 76, 'YENİMAHALLE', 'ANKARA')
+INSERT INTO  public."Districts"   ( "Id"  ,  "CityId"  ,  "Name"  ,  "CityName"  ) VALUES (885, 76, 'YENİMAHALLE', 'ANKARA');
 INSERT INTO  public."Districts"   ( "Id"  ,  "CityId"  ,  "Name"  ,  "CityName"  ) VALUES (886, 77, 'AMASYA', 'AMASYA');
 INSERT INTO  public."Districts"   ( "Id"  ,  "CityId"  ,  "Name"  ,  "CityName"  ) VALUES (887, 77, 'GÖYNÜCEK', 'AMASYA');
 INSERT INTO  public."Districts"   ( "Id"  ,  "CityId"  ,  "Name"  ,  "CityName"  ) VALUES (888, 77, 'GÜMÜŞHACIKÖY', 'AMASYA');

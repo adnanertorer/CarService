@@ -1,4 +1,5 @@
 ﻿using Adoroid.CarService.Application.Common.Abstractions.Auth;
+using Adoroid.CarService.Application.Common.Extensions;
 using Adoroid.CarService.Application.Features.Suppliers.Dtos;
 using Adoroid.CarService.Application.Features.Suppliers.ExceptionMessages;
 using Adoroid.CarService.Application.Features.Suppliers.MapperExtensions;
@@ -17,6 +18,8 @@ public class CreateSupplierCommandHandler(CarServiceDbContext dbContext, ICurren
 {
     public async Task<Response<SupplierDto>> Handle(CreateSupplierCommand request, CancellationToken cancellationToken)
     {
+        var companyId = currentUser.ValidCompanyId();
+
         var isExist = await dbContext.Suppliers
             .AsNoTracking()
             .AnyAsync(i => i.Name == request.Name || i.ContactName == request.ContactName || i.PhoneNumber == request.PhoneNumber, cancellationToken);
@@ -27,7 +30,7 @@ public class CreateSupplierCommandHandler(CarServiceDbContext dbContext, ICurren
         var supplier = new Supplier
         {
             Address = request.Address,
-            CompanyId = Guid.Parse(currentUser.CompanyId!),
+            CompanyId = companyId,
             Name = request.Name,
             ContactName = request.ContactName,
             CreatedBy = Guid.Parse(currentUser.Id!),

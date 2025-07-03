@@ -9,7 +9,6 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
     public void Configure(EntityTypeBuilder<User> builder)
     {
         builder.HasKey(b => b.Id);
-        builder.Property(b => b.CompanyId).IsRequired();
         builder.Property(b => b.Name).IsRequired().HasMaxLength(50);
         builder.Property(b => b.Surname).IsRequired().HasMaxLength(50);
         builder.Property(b => b.Password).IsRequired().HasMaxLength(50);
@@ -25,10 +24,5 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
         builder.Property(c => c.DeletedBy).HasMaxLength(64);
 
         builder.HasQueryFilter(c => c.IsDeleted == false || c.DeletedDate == null);
-
-        builder.HasOne(b => b.Company)
-            .WithMany(c => c.Users)
-            .HasForeignKey(b => b.CompanyId)
-            .OnDelete(DeleteBehavior.NoAction);
     }
 }

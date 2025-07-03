@@ -1,4 +1,5 @@
 ﻿using Adoroid.CarService.Application.Common.Abstractions.Auth;
+using Adoroid.CarService.Application.Common.Extensions;
 using Adoroid.CarService.Application.Features.Customers.Dtos;
 using Adoroid.CarService.Application.Features.Customers.ExceptionMessages;
 using Adoroid.CarService.Application.Features.Customers.MapperExtensions;
@@ -18,10 +19,12 @@ public class CreateCustomerCommandHandler(CarServiceDbContext dbContext, ICurren
 {
     public async Task<Response<CustomerDto>> Handle(CreateCustomerCommand request, CancellationToken cancellationToken)
     {
+        var companyId = currentUser.ValidCompanyId();
+
         var isExist = await dbContext.Customers.AsNoTracking()
             .AnyAsync(i => i.Name == request.Name && 
             i.Surname == request.Surname && 
-            i.CompanyId == Guid.Parse(currentUser.CompanyId!), cancellationToken);
+            i.CompanyId == companyId, cancellationToken);
 
         if (isExist)
             return Response<CustomerDto>.Fail(BusinessExceptionMessages.NotFound);
@@ -29,7 +32,7 @@ public class CreateCustomerCommandHandler(CarServiceDbContext dbContext, ICurren
         var customer = new Customer
         {
             Address = request.Address,
-            CompanyId = Guid.Parse(currentUser.CompanyId!),
+            CompanyId = companyId,
             CreatedBy = Guid.Parse(currentUser.Id!),
             Email = request.Email,
             IsActive = request.IsActive,

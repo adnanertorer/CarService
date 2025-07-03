@@ -16,27 +16,13 @@ public static class MainServiceMappingExtension
             Vehicle = mainService.Vehicle !=null ? new VehicleDto
             {
                 Brand = mainService.Vehicle!.Brand,
-                CustomerId = mainService.Vehicle!.CustomerId,
                 Engine = mainService.Vehicle!.Engine,
                 FuelTypeId = mainService.Vehicle!.FuelTypeId,
                 Id = mainService.Vehicle!.Id,
                 Model = mainService.Vehicle!.Model,
                 Plate = mainService.Vehicle!.Plate,
                 SerialNumber = mainService.Vehicle!.SerialNumber,
-                Year = mainService.Vehicle!.Year,
-                Customer = mainService.Vehicle!.Customer != null ? new CustomerDto
-                {
-                    Id = mainService.Vehicle!.CustomerId!.Value,
-                    Name = mainService.Vehicle!.Customer!.Name,
-                    Surname = mainService.Vehicle!.Customer!.Surname,
-                } : null,
-                MobileUser = mainService.Vehicle!.MobileUser != null ? new MobileUserDto
-                {
-                    Id = mainService.Vehicle!.MobileUserId!.Value,
-                    Name = mainService.Vehicle!.MobileUser!.Name,
-                    Surname = mainService.Vehicle!.MobileUser!.Surname,
-                    Email = mainService.Vehicle!.MobileUser!.Email
-                } : null
+                Year = mainService.Vehicle!.Year
             } : null,
             VehicleId = mainService.VehicleId
         };

@@ -1,4 +1,5 @@
 ﻿using Adoroid.CarService.Application.Common.Abstractions.Auth;
+using Adoroid.CarService.Application.Common.BusinessMessages;
 using Adoroid.CarService.Application.Common.Dtos.Filters;
 using Adoroid.CarService.Application.Common.Enums;
 using Adoroid.CarService.Application.Common.Extensions;
@@ -20,6 +21,18 @@ public class GetListAccountTransactionRequestHandler(CarServiceDbContext dbConte
 
     public async Task<Response<Paginate<AccountTransactionDto>>> Handle(GetListAccountTransactionRequest request, CancellationToken cancellationToken)
     {
+        if (!string.IsNullOrEmpty(currentUser.CompanyId))
+        {
+            if (!Guid.TryParse(currentUser.CompanyId, out _))
+                return Response<Paginate<AccountTransactionDto>>.Fail(BusinessMessages.InvalidCompanyId);
+        }
+        else
+        {
+            return Response<Paginate<AccountTransactionDto>>.Fail(BusinessMessages.CompanyNotFound);
+        }
+
+        var companyId = Guid.Parse(currentUser.CompanyId!);
+
         var query = dbContext.AccountingTransactions.Select(t => new AccountTransactionDto
         {
             OwnerName = t.AccountOwnerType == (int)AccountOwnerTypeEnum.Customer
@@ -36,7 +49,7 @@ public class GetListAccountTransactionRequestHandler(CarServiceDbContext dbConte
             TransactionType = t.TransactionType
         })
             .AsNoTracking()
-            .Where(i => i.CompanyId == Guid.Parse(currentUser.CompanyId!));
+            .Where(i => i.CompanyId == companyId);
 
         if (!string.IsNullOrEmpty(request.MainFilterRequest.Search))
             query = query.Where(i => i.OwnerName.Equals(request.MainFilterRequest.Search));
