@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Adoroid.CarService.Persistence.Migrations
 {
     [DbContext(typeof(CarServiceDbContext))]
-    [Migration("20250627100706_initialCreate")]
+    [Migration("20250703155032_initialCreate")]
     partial class initialCreate
     {
         /// <inheritdoc />
@@ -93,6 +93,32 @@ namespace Adoroid.CarService.Persistence.Migrations
                     b.ToTable("AccountingTransactions");
                 });
 
+            modelBuilder.Entity("Adoroid.CarService.Domain.Entities.City", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int>("PhoneCode")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("PlateNumber")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("RowNumber")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Cities");
+                });
+
             modelBuilder.Entity("Adoroid.CarService.Domain.Entities.Company", b =>
                 {
                     b.Property<Guid>("Id")
@@ -170,6 +196,10 @@ namespace Adoroid.CarService.Persistence.Migrations
                         .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("CityId");
+
+                    b.HasIndex("DistrictId");
 
                     b.ToTable("Companies");
                 });
@@ -291,6 +321,30 @@ namespace Adoroid.CarService.Persistence.Migrations
                     b.HasIndex("CompanyId");
 
                     b.ToTable("Customers");
+                });
+
+            modelBuilder.Entity("Adoroid.CarService.Domain.Entities.District", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("CityId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("CityName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Districts");
                 });
 
             modelBuilder.Entity("Adoroid.CarService.Domain.Entities.Employee", b =>
@@ -894,6 +948,54 @@ namespace Adoroid.CarService.Persistence.Migrations
                     b.ToTable("Users");
                 });
 
+            modelBuilder.Entity("Adoroid.CarService.Domain.Entities.UserToCompany", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("CompanyId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("CreatedBy")
+                        .HasMaxLength(64)
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("DeletedBy")
+                        .HasMaxLength(64)
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("DeletedDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool?>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<Guid>("UpdatedBy")
+                        .HasMaxLength(64)
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("UpdatedDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("UserType")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CompanyId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("UserToCompanies");
+                });
+
             modelBuilder.Entity("Adoroid.CarService.Domain.Entities.Vehicle", b =>
                 {
                     b.Property<Guid>("Id")
@@ -968,6 +1070,54 @@ namespace Adoroid.CarService.Persistence.Migrations
                     b.ToTable("Vehicles");
                 });
 
+            modelBuilder.Entity("Adoroid.CarService.Domain.Entities.VehicleUser", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("CreatedBy")
+                        .HasMaxLength(64)
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("DeletedBy")
+                        .HasMaxLength(64)
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("DeletedDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool?>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<Guid>("UpdatedBy")
+                        .HasMaxLength(64)
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("UpdatedDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("UserTypeId")
+                        .HasColumnType("integer");
+
+                    b.Property<Guid>("VehicleId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.HasIndex("VehicleId");
+
+                    b.ToTable("VehiclUsers");
+                });
+
             modelBuilder.Entity("Adoroid.CarService.Domain.Entities.AccountingTransaction", b =>
                 {
                     b.HasOne("Adoroid.CarService.Domain.Entities.Company", "Company")
@@ -977,6 +1127,25 @@ namespace Adoroid.CarService.Persistence.Migrations
                         .IsRequired();
 
                     b.Navigation("Company");
+                });
+
+            modelBuilder.Entity("Adoroid.CarService.Domain.Entities.Company", b =>
+                {
+                    b.HasOne("Adoroid.CarService.Domain.Entities.City", "City")
+                        .WithMany("Companies")
+                        .HasForeignKey("CityId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("Adoroid.CarService.Domain.Entities.District", "District")
+                        .WithMany("Companies")
+                        .HasForeignKey("DistrictId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("City");
+
+                    b.Navigation("District");
                 });
 
             modelBuilder.Entity("Adoroid.CarService.Domain.Entities.CompanyService", b =>
@@ -1086,21 +1255,58 @@ namespace Adoroid.CarService.Persistence.Migrations
                     b.Navigation("Company");
                 });
 
+            modelBuilder.Entity("Adoroid.CarService.Domain.Entities.UserToCompany", b =>
+                {
+                    b.HasOne("Adoroid.CarService.Domain.Entities.Company", "Company")
+                        .WithMany("UserToCompanies")
+                        .HasForeignKey("CompanyId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("Adoroid.CarService.Domain.Entities.User", "User")
+                        .WithMany("UserToCompanies")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("Company");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("Adoroid.CarService.Domain.Entities.Vehicle", b =>
                 {
-                    b.HasOne("Adoroid.CarService.Domain.Entities.Customer", "Customer")
+                    b.HasOne("Adoroid.CarService.Domain.Entities.Customer", null)
                         .WithMany("Vehicles")
-                        .HasForeignKey("CustomerId")
-                        .OnDelete(DeleteBehavior.NoAction);
+                        .HasForeignKey("CustomerId");
 
-                    b.HasOne("Adoroid.CarService.Domain.Entities.MobileUser", "MobileUser")
+                    b.HasOne("Adoroid.CarService.Domain.Entities.MobileUser", null)
                         .WithMany("Vehicles")
-                        .HasForeignKey("MobileUserId")
-                        .OnDelete(DeleteBehavior.NoAction);
+                        .HasForeignKey("MobileUserId");
+                });
 
-                    b.Navigation("Customer");
+            modelBuilder.Entity("Adoroid.CarService.Domain.Entities.VehicleUser", b =>
+                {
+                    b.HasOne("Adoroid.CarService.Domain.Entities.MobileUser", "User")
+                        .WithMany("VehicleUsers")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
 
-                    b.Navigation("MobileUser");
+                    b.HasOne("Adoroid.CarService.Domain.Entities.Vehicle", "Vehicle")
+                        .WithMany("VehicleUsers")
+                        .HasForeignKey("VehicleId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("User");
+
+                    b.Navigation("Vehicle");
+                });
+
+            modelBuilder.Entity("Adoroid.CarService.Domain.Entities.City", b =>
+                {
+                    b.Navigation("Companies");
                 });
 
             modelBuilder.Entity("Adoroid.CarService.Domain.Entities.Company", b =>
@@ -1117,12 +1323,19 @@ namespace Adoroid.CarService.Persistence.Migrations
 
                     b.Navigation("Suppliers");
 
+                    b.Navigation("UserToCompanies");
+
                     b.Navigation("Users");
                 });
 
             modelBuilder.Entity("Adoroid.CarService.Domain.Entities.Customer", b =>
                 {
                     b.Navigation("Vehicles");
+                });
+
+            modelBuilder.Entity("Adoroid.CarService.Domain.Entities.District", b =>
+                {
+                    b.Navigation("Companies");
                 });
 
             modelBuilder.Entity("Adoroid.CarService.Domain.Entities.Employee", b =>
@@ -1142,6 +1355,8 @@ namespace Adoroid.CarService.Persistence.Migrations
 
             modelBuilder.Entity("Adoroid.CarService.Domain.Entities.MobileUser", b =>
                 {
+                    b.Navigation("VehicleUsers");
+
                     b.Navigation("Vehicles");
                 });
 
@@ -1150,9 +1365,16 @@ namespace Adoroid.CarService.Persistence.Migrations
                     b.Navigation("SubServices");
                 });
 
+            modelBuilder.Entity("Adoroid.CarService.Domain.Entities.User", b =>
+                {
+                    b.Navigation("UserToCompanies");
+                });
+
             modelBuilder.Entity("Adoroid.CarService.Domain.Entities.Vehicle", b =>
                 {
                     b.Navigation("MainServices");
+
+                    b.Navigation("VehicleUsers");
                 });
 #pragma warning restore 612, 618
         }
