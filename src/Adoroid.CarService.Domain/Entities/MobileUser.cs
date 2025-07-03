@@ -7,6 +7,7 @@ public class MobileUser : Entity<Guid>
     public MobileUser()
     {
         Vehicles = new HashSet<Vehicle>();
+        VehicleUsers = new HashSet<VehicleUser>();
     }
 
     public string Name { get; set; }
@@ -19,4 +20,5 @@ public class MobileUser : Entity<Guid>
     public DateTime? RefreshTokenExpr { get; set; }
 
     public ICollection<Vehicle>? Vehicles { get; set; }
+    public ICollection<VehicleUser> VehicleUsers { get; set; }
 }

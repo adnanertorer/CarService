@@ -41,7 +41,6 @@ public static class CustomerMappingExtension
         return new VehicleDto
         {
             Brand = vehicle.Brand,
-            CustomerId = vehicle.CustomerId,
             Engine = vehicle.Engine,
             FuelTypeId = vehicle.FuelTypeId,
             Id = vehicle.Id,

@@ -19,19 +19,19 @@ public class GetListMySubServiceQueryHandler(CarServiceDbContext dbContext, ICur
     : IRequestHandler<GetListMySubServiceQuery, Response<Paginate<MobileSubServiceDto>>>
 {
     const string redisKeyPrefix = "subservice:list";
+    private const string MobileUser = "mobileUser";
     public async Task<Response<Paginate<MobileSubServiceDto>>> Handle(GetListMySubServiceQuery request, CancellationToken cancellationToken)
     {
         var cacheKey = $"{redisKeyPrefix}:{currentUser.Id!}";
 
-        if(currentUser.UserType != "mobileUser")
+        if(currentUser.UserType != MobileUser)
             return Response<Paginate<MobileSubServiceDto>>.Fail(BusinessExceptionMessages.YouAreNotAuthorized);
 
         var list = await cacheService.GetOrSetPaginateAsync<List<MobileSubServiceDto>>(cacheKey, async () =>
         {
             var query = dbContext.SubServices
-               .Include(i => i.MainService).ThenInclude(i => i.Vehicle)
                .AsNoTracking()
-               .Where(i => i.MainServiceId == request.MainServiceId && i.MainService.Vehicle!.MobileUserId == Guid.Parse(currentUser.Id!));
+               .Where(i => i.MainServiceId == request.MainServiceId && i.MainService.Vehicle.VehicleUsers.Any(u => u.UserId == Guid.Parse(currentUser.Id!)));
 
             return await query
                 .OrderByDescending(i => i.OperationDate)

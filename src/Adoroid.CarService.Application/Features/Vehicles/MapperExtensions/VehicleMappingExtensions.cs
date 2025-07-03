@@ -10,13 +10,6 @@ public static class VehicleMappingExtensions
         return new VehicleDto
         {
             Brand = vehicle.Brand,
-            CustomerId = vehicle.CustomerId,
-            Customer = vehicle.Customer != null ? new CustomerDto
-            {
-                Id = vehicle.CustomerId!.Value,
-                Name = vehicle.Customer!.Name,
-                Surname = vehicle.Customer!.Surname,
-            } : null,
             Engine = vehicle.Engine,
             FuelTypeId = vehicle.FuelTypeId,
             Id = vehicle.Id,
@@ -24,16 +17,7 @@ public static class VehicleMappingExtensions
             Plate = vehicle.Plate,
             SerialNumber = vehicle.SerialNumber,
             Year = vehicle.Year,
-            MainServices = vehicle.ListFromEntity(),
-            MobileUserId = vehicle.MobileUserId,
-            MobileUser = vehicle.MobileUser != null ? new MobileUserDto
-            {
-                Id = vehicle.MobileUserId!.Value,
-                Name = vehicle.MobileUser!.Name,
-                Surname = vehicle.MobileUser!.Surname,
-                Email = vehicle.MobileUser!.Email,
-                PhoneNumber = vehicle.MobileUser!.PhoneNumber
-            } : null
+            MainServices = vehicle.ListFromEntity()
         };
     }
 
