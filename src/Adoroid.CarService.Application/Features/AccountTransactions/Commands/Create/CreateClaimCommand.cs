@@ -1,31 +1,24 @@
 ﻿using Adoroid.CarService.Application.Common.Abstractions.Auth;
-using Adoroid.CarService.Application.Common.BusinessMessages;
 using Adoroid.CarService.Application.Common.Enums;
+using Adoroid.CarService.Application.Common.Extensions;
 using Adoroid.CarService.Application.Features.AccountTransactions.Dtos;
 using Adoroid.CarService.Application.Features.AccountTransactions.MapperExtensions;
-using Adoroid.CarService.Application.Features.Users.Queries.CheckCompanyId;
 using Adoroid.CarService.Domain.Entities;
 using Adoroid.CarService.Persistence;
 using Adoroid.Core.Application.Wrappers;
 using Microsoft.EntityFrameworkCore;
 using MinimalMediatR.Core;
-using MinimalMediatR.Extensions;
 
 namespace Adoroid.CarService.Application.Features.AccountTransactions.Commands.Create;
 public record CreateClaimCommand(Guid CustomerId, AccountOwnerTypeEnum AccountOwnerType, decimal Claim, DateTime TransactionDate, string? Description) 
     : IRequest<Response<AccountTransactionDto>>;
 
-public class CreateClaimCommandHandler(CarServiceDbContext dbContext, ICurrentUser currentUser, IMediator mediator)
+public class CreateClaimCommandHandler(CarServiceDbContext dbContext, ICurrentUser currentUser)
     : IRequestHandler<CreateClaimCommand, Response<AccountTransactionDto>>
 {
     public async Task<Response<AccountTransactionDto>> Handle(CreateClaimCommand request, CancellationToken cancellationToken)
     {
-        var companyIdResponse = await mediator.Send(new GetCompanyIdCommand(), cancellationToken);
-
-        if (!companyIdResponse.Succeeded)
-            return Response<AccountTransactionDto>.Fail(BusinessMessages.CompanyNotFound);
-
-        var companyId = companyIdResponse.Data!.Value;
+        var companyId = currentUser.ValidCompanyId();
 
         var balance = await GetBalance(request.CustomerId, cancellationToken);
 
