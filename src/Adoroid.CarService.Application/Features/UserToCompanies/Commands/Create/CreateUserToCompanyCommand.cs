@@ -22,7 +22,7 @@ public class CreateUserToCompanyCommandHandler(CarServiceDbContext dbContext, IC
             .AsNoTracking()
             .AnyAsync(i => i.Id == request.CompanyId, cancellationToken);
 
-        if (companyExist)
+        if (!companyExist)
             return Response<UserToCompanyDto>.Fail(BusinessExceptionMessages.CompanyNotFound);
 
         var isExist = await dbContext.UserToCompanies
@@ -38,7 +38,8 @@ public class CreateUserToCompanyCommandHandler(CarServiceDbContext dbContext, IC
             IsDeleted = false,
             UserId = Guid.Parse(currentUser.Id!),
             CreatedBy = Guid.Parse(currentUser.Id!),
-            CreatedDate = DateTime.UtcNow
+            CreatedDate = DateTime.UtcNow,
+            UserType = request.CompanyUserType
         };
 
         await dbContext.AddAsync(entity, cancellationToken);
