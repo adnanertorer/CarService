@@ -1,31 +1,24 @@
 ﻿using Adoroid.CarService.Application.Common.Abstractions.Auth;
-using Adoroid.CarService.Application.Common.BusinessMessages;
+using Adoroid.CarService.Application.Common.Extensions;
 using Adoroid.CarService.Application.Features.Employees.Dtos;
 using Adoroid.CarService.Application.Features.Employees.ExecptionMessages;
 using Adoroid.CarService.Application.Features.Employees.MapperExtensions;
-using Adoroid.CarService.Application.Features.Users.Queries.CheckCompanyId;
 using Adoroid.CarService.Domain.Entities;
 using Adoroid.CarService.Persistence;
 using Adoroid.Core.Application.Wrappers;
 using Microsoft.EntityFrameworkCore;
 using MinimalMediatR.Core;
-using MinimalMediatR.Extensions;
 
 namespace Adoroid.CarService.Application.Features.Employees.Commands.Create;
 
 public record CreateEmployeeCommand(string Name, string Surname, string PhoneNumber, bool IsActive, string? Email, string? Address) 
     : IRequest<Response<EmployeeDto>>;
 
-public class CreateEmployeeCommandHandler(CarServiceDbContext dbContext, ICurrentUser currentUser, IMediator mediator) : IRequestHandler<CreateEmployeeCommand, Response<EmployeeDto>>
+public class CreateEmployeeCommandHandler(CarServiceDbContext dbContext, ICurrentUser currentUser) : IRequestHandler<CreateEmployeeCommand, Response<EmployeeDto>>
 {
     public async Task<Response<EmployeeDto>> Handle(CreateEmployeeCommand request, CancellationToken cancellationToken)
     {
-        var companyIdResponse = await mediator.Send(new GetCompanyIdCommand(), cancellationToken);
-
-        if (!companyIdResponse.Succeeded)
-            return Response<EmployeeDto>.Fail(BusinessMessages.CompanyNotFound);
-
-        var companyId = companyIdResponse.Data!.Value;
+        var companyId = currentUser.ValidCompanyId();
 
         var isExist = await dbContext.Employees
              .AsNoTracking()
