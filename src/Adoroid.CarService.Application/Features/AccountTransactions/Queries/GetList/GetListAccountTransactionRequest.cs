@@ -1,5 +1,4 @@
 ﻿using Adoroid.CarService.Application.Common.Abstractions.Auth;
-using Adoroid.CarService.Application.Common.BusinessMessages;
 using Adoroid.CarService.Application.Common.Dtos.Filters;
 using Adoroid.CarService.Application.Common.Enums;
 using Adoroid.CarService.Application.Common.Extensions;
@@ -21,57 +20,78 @@ public class GetListAccountTransactionRequestHandler(CarServiceDbContext dbConte
 
     public async Task<Response<Paginate<AccountTransactionDto>>> Handle(GetListAccountTransactionRequest request, CancellationToken cancellationToken)
     {
-        if (!string.IsNullOrEmpty(currentUser.CompanyId))
-        {
-            if (!Guid.TryParse(currentUser.CompanyId, out _))
-                return Response<Paginate<AccountTransactionDto>>.Fail(BusinessMessages.InvalidCompanyId);
-        }
-        else
-        {
-            return Response<Paginate<AccountTransactionDto>>.Fail(BusinessMessages.CompanyNotFound);
-        }
+        var companyId = currentUser.ValidCompanyId();
 
-        var companyId = Guid.Parse(currentUser.CompanyId!);
-
-        var query = dbContext.AccountingTransactions.Select(t => new AccountTransactionDto
-        {
-            OwnerName = t.AccountOwnerType == (int)AccountOwnerTypeEnum.Customer
-                                                             ? dbContext.Customers.Where(c => c.Id == t.AccountOwnerId).Select(c => c.Name + " " + c.Surname).FirstOrDefault() ?? string.Empty
-                                                             : dbContext.MobileUsers.Where(m => m.Id == t.AccountOwnerId).Select(m => m.Name + " " + m.Surname).FirstOrDefault() ?? string.Empty,
-            Id = t.Id,
-            AccountOwnerId = t.AccountOwnerId,
-            AccountOwnerType = (AccountOwnerTypeEnum)t.AccountOwnerType,
-            Debt = t.Debt,
-            Claim = t.Claim,
-            Balance = t.Balance,
-            TransactionDate = t.TransactionDate,
-            Description = t.Description,
-            TransactionType = t.TransactionType
-        })
+        var transactionsQuery = dbContext.AccountingTransactions
             .AsNoTracking()
             .Where(i => i.CompanyId == companyId);
 
-        if (!string.IsNullOrEmpty(request.MainFilterRequest.Search))
-            query = query.Where(i => i.OwnerName.Equals(request.MainFilterRequest.Search));
-
         if (request.MainFilterRequest.CustomerId != null)
-            query = query.Where(i => i.AccountOwnerId == request.MainFilterRequest.CustomerId);
+            transactionsQuery = transactionsQuery.Where(i => i.AccountOwnerId == request.MainFilterRequest.CustomerId);
 
         if (request.MainFilterRequest.StartDate.HasValue && request.MainFilterRequest.EndDate.HasValue)
         {
-            query = query.WhereTwoDateIsBetween(
+            transactionsQuery = transactionsQuery.WhereTwoDateIsBetween(
                 i => i.TransactionDate,
                 request.MainFilterRequest.StartDate.Value.Date,
                 request.MainFilterRequest.EndDate.Value.Date.AddDays(1));
         }
         else if (request.MainFilterRequest.StartDate.HasValue)
         {
-            query = query.WhereDateIsBetween(i => i.TransactionDate, request.MainFilterRequest.StartDate.Value);
+            transactionsQuery = transactionsQuery.WhereDateIsBetween(i => i.TransactionDate, request.MainFilterRequest.StartDate.Value);
         }
 
-        var result = await query
-                .OrderBy(i => i.TransactionDate)
-                .ToPaginateAsync(request.MainFilterRequest.PageRequest.PageIndex, request.MainFilterRequest.PageRequest.PageSize, cancellationToken);
+
+        var transactions = await transactionsQuery
+           .OrderBy(i => i.TransactionDate)
+           .ToPaginateAsync(
+               request.MainFilterRequest.PageRequest.PageIndex,
+               request.MainFilterRequest.PageRequest.PageSize,
+               cancellationToken);
+
+        var customerIds = transactions.Items
+            .Where(t => t.AccountOwnerType == (int)AccountOwnerTypeEnum.Customer)
+            .Select(t => t.AccountOwnerId)
+            .Distinct()
+            .ToList();
+
+        var mobileUserIds = transactions.Items
+            .Where(t => t.AccountOwnerType == (int)AccountOwnerTypeEnum.MobileUser)
+            .Select(t => t.AccountOwnerId)
+            .Distinct()
+            .ToList();
+
+        var customers = await dbContext.Customers
+            .Where(c => customerIds.Contains(c.Id))
+            .ToDictionaryAsync(c => c.Id, c => $"{c.Name} {c.Surname}", cancellationToken);
+
+        var mobileUsers = await dbContext.MobileUsers
+            .Where(m => mobileUserIds.Contains(m.Id))
+            .ToDictionaryAsync(m => m.Id, m => $"{m.Name} {m.Surname}", cancellationToken);
+
+        var dtoItems = transactions.Items.Select(t => new AccountTransactionDto
+        {
+            Id = t.Id,
+            AccountOwnerId = t.AccountOwnerId,
+            AccountOwnerType = (AccountOwnerTypeEnum)t.AccountOwnerType,
+            OwnerName = t.AccountOwnerType == (int)AccountOwnerTypeEnum.Customer
+                       ? customers.TryGetValue(t.AccountOwnerId, out var cName) ? cName : string.Empty
+                       : mobileUsers.TryGetValue(t.AccountOwnerId, out var mName) ? mName : string.Empty,
+            Debt = t.Debt,
+            Claim = t.Claim,
+            Balance = t.Balance,
+            TransactionDate = t.TransactionDate,
+            Description = t.Description,
+            TransactionType = t.TransactionType,
+            CompanyId = companyId
+        }).ToList();
+
+        if (!string.IsNullOrEmpty(request.MainFilterRequest.Search))
+            dtoItems = dtoItems.Where(i => i.OwnerName.Equals(request.MainFilterRequest.Search)).ToList();
+
+        var result = dtoItems.AsQueryable()
+            .OrderByDescending(i => i.TransactionDate)
+            .ToPaginate(request.MainFilterRequest.PageRequest.PageIndex, request.MainFilterRequest.PageRequest.PageSize);
 
         return Response<Paginate<AccountTransactionDto>>.Success(result);
     }

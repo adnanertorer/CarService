@@ -9,5 +9,4 @@ public class VehicleUser : Entity<Guid>
     public int UserTypeId { get; set; }
 
     public Vehicle Vehicle { get; set; }
-    public MobileUser User { get; set; }
 }
