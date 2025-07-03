@@ -21,6 +21,8 @@ public class CreateSubServiceCommandHandler(CarServiceDbContext dbContext, ICurr
     const string redisKeyPrefix = "subservice:list";
     public async Task<Response<SubServiceDto>> Handle(CreateSubServiceCommand request, CancellationToken cancellationToken)
     {
+        var companyId = currentUser.ValidCompanyId();
+
         var mainServiceEntity = await dbContext.MainServices.FirstOrDefaultAsync(i => i.Id == request.MainServiceId, cancellationToken);
 
         if (mainServiceEntity == null)
@@ -60,7 +62,7 @@ public class CreateSubServiceCommandHandler(CarServiceDbContext dbContext, ICurr
 
         var resultDto = model.FromEntity();
 
-        await cacheService.AppendToListAsync($"{redisKeyPrefix}:{currentUser.CompanyId!}", resultDto, null);
+        await cacheService.AppendToListAsync($"{redisKeyPrefix}:{companyId}", resultDto, null);
 
         return Response<SubServiceDto>.Success(resultDto);
     }

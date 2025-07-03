@@ -4,7 +4,7 @@ public class SubServiceDto
 {
     public Guid Id { get; set; }
     public Guid MainServiceId { get; set; }
-    public string Operation { get; set; }
+    public string Operation { get; set; } 
     public Guid EmployeeId { get; set; }
     public DateTime OperationDate { get; set; }
     public string? Description { get; set; }

@@ -1,4 +1,5 @@
 ﻿using Adoroid.CarService.Application.Common.Abstractions.Auth;
+using Adoroid.CarService.Application.Common.Extensions;
 using Adoroid.CarService.Application.Features.Customers.Dtos;
 using Adoroid.CarService.Application.Features.Customers.MapperExtensions;
 using Adoroid.CarService.Persistence;
@@ -16,10 +17,12 @@ public class GetCustomerListQueryHandler(CarServiceDbContext dbContext, ICurrent
 {
     public async Task<Response<Paginate<CustomerDto>>> Handle(GetCustomerListQuery request, CancellationToken cancellationToken)
     {
+        var companyId = currentUser.ValidCompanyId();
+
         var query = dbContext.Customers
              .AsNoTracking()
              .Include(i => i.Vehicles)
-             .Where(i => i.CompanyId == Guid.Parse(currentUser.CompanyId!));
+             .Where(i => i.CompanyId == companyId);
 
         if (!string.IsNullOrWhiteSpace(request.Search)) 
             query = query.Where(i => i.Name.Contains(request.Search) || i.Surname.Contains(request.Search) || i.Phone.Contains(request.Search));

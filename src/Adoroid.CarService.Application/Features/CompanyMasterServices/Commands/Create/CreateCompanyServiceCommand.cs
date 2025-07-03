@@ -1,4 +1,5 @@
 ﻿using Adoroid.CarService.Application.Common.Abstractions.Auth;
+using Adoroid.CarService.Application.Common.Extensions;
 using Adoroid.CarService.Application.Features.CompanyMasterServices.Dtos;
 using Adoroid.CarService.Application.Features.CompanyMasterServices.ExceptionMessages;
 using Adoroid.CarService.Application.Features.CompanyMasterServices.MapperExtensions;
@@ -19,16 +20,18 @@ public class CreateCompanyServiceCommandHandler(CarServiceDbContext dbContext, I
 {
     public async Task<Response<CompanyServiceDto>> Handle(CreateCompanyServiceCommand request, CancellationToken cancellationToken)
     {
+        var companyId = currentUser.ValidCompanyId();
+
         var isExist = await dbContext.CompanyServices
             .AsNoTracking()
-            .AnyAsync(i => i.CompanyId == Guid.Parse(currentUser.CompanyId!) && i.MasterServiceId == request.MasterServiceId, cancellationToken);
+            .AnyAsync(i => i.CompanyId == companyId && i.MasterServiceId == request.MasterServiceId, cancellationToken);
 
         if (isExist)
             return Response<CompanyServiceDto>.Fail(BusinessExceptionMessages.AlreadyExists);
 
         var entity = new CompanyService
         {
-            CompanyId = Guid.Parse(currentUser.CompanyId!),
+            CompanyId = companyId,
             IsDeleted = false,
             MasterServiceId = request.MasterServiceId,
             CreatedBy = Guid.Parse(currentUser.Id!),
