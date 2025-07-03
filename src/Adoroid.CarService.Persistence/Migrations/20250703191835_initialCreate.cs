@@ -92,6 +92,32 @@ namespace Adoroid.CarService.Persistence.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Users",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    Name = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
+                    Surname = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
+                    Password = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
+                    Email = table.Column<string>(type: "character varying(60)", maxLength: 60, nullable: false),
+                    PhoneNumber = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: false),
+                    RefreshToken = table.Column<string>(type: "character varying(150)", maxLength: 150, nullable: true),
+                    OtpCode = table.Column<string>(type: "character varying(6)", maxLength: 6, nullable: true),
+                    RefreshTokenExpr = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    CreatedDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    UpdatedDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    DeletedDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    CreatedBy = table.Column<Guid>(type: "uuid", maxLength: 64, nullable: false),
+                    UpdatedBy = table.Column<Guid>(type: "uuid", maxLength: 64, nullable: false),
+                    DeletedBy = table.Column<Guid>(type: "uuid", maxLength: 64, nullable: false),
+                    IsDeleted = table.Column<bool>(type: "boolean", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Users", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Companies",
                 columns: table => new
                 {
@@ -283,19 +309,13 @@ namespace Adoroid.CarService.Persistence.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Users",
+                name: "UserToCompanies",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    UserId = table.Column<Guid>(type: "uuid", nullable: false),
                     CompanyId = table.Column<Guid>(type: "uuid", nullable: false),
-                    Name = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
-                    Surname = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
-                    Password = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
-                    Email = table.Column<string>(type: "character varying(60)", maxLength: 60, nullable: false),
-                    PhoneNumber = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: false),
-                    RefreshToken = table.Column<string>(type: "character varying(150)", maxLength: 150, nullable: true),
-                    OtpCode = table.Column<string>(type: "character varying(6)", maxLength: 6, nullable: true),
-                    RefreshTokenExpr = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    UserType = table.Column<int>(type: "integer", nullable: false),
                     CreatedDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     UpdatedDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     DeletedDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
@@ -306,11 +326,16 @@ namespace Adoroid.CarService.Persistence.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Users", x => x.Id);
+                    table.PrimaryKey("PK_UserToCompanies", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Users_Companies_CompanyId",
+                        name: "FK_UserToCompanies_Companies_CompanyId",
                         column: x => x.CompanyId,
                         principalTable: "Companies",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_UserToCompanies_Users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Users",
                         principalColumn: "Id");
                 });
 
@@ -348,37 +373,6 @@ namespace Adoroid.CarService.Persistence.Migrations
                         name: "FK_Vehicles_MobileUsers_MobileUserId",
                         column: x => x.MobileUserId,
                         principalTable: "MobileUsers",
-                        principalColumn: "Id");
-                });
-
-            migrationBuilder.CreateTable(
-                name: "UserToCompanies",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    UserId = table.Column<Guid>(type: "uuid", nullable: false),
-                    CompanyId = table.Column<Guid>(type: "uuid", nullable: false),
-                    UserType = table.Column<int>(type: "integer", nullable: false),
-                    CreatedDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    UpdatedDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    DeletedDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    CreatedBy = table.Column<Guid>(type: "uuid", maxLength: 64, nullable: false),
-                    UpdatedBy = table.Column<Guid>(type: "uuid", maxLength: 64, nullable: false),
-                    DeletedBy = table.Column<Guid>(type: "uuid", maxLength: 64, nullable: false),
-                    IsDeleted = table.Column<bool>(type: "boolean", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_UserToCompanies", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_UserToCompanies_Companies_CompanyId",
-                        column: x => x.CompanyId,
-                        principalTable: "Companies",
-                        principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK_UserToCompanies_Users_UserId",
-                        column: x => x.UserId,
-                        principalTable: "Users",
                         principalColumn: "Id");
                 });
 
@@ -573,11 +567,6 @@ namespace Adoroid.CarService.Persistence.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_Suppliers_CompanyId",
                 table: "Suppliers",
-                column: "CompanyId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Users_CompanyId",
-                table: "Users",
                 column: "CompanyId");
 
             migrationBuilder.CreateIndex(
