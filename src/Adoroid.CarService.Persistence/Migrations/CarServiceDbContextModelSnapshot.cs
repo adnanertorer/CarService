@@ -875,9 +875,6 @@ namespace Adoroid.CarService.Persistence.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<Guid>("CompanyId")
-                        .HasColumnType("uuid");
-
                     b.Property<Guid>("CreatedBy")
                         .HasMaxLength(64)
                         .HasColumnType("uuid");
@@ -939,8 +936,6 @@ namespace Adoroid.CarService.Persistence.Migrations
                         .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("CompanyId");
 
                     b.ToTable("Users");
                 });
@@ -1241,17 +1236,6 @@ namespace Adoroid.CarService.Persistence.Migrations
                     b.Navigation("Company");
                 });
 
-            modelBuilder.Entity("Adoroid.CarService.Domain.Entities.User", b =>
-                {
-                    b.HasOne("Adoroid.CarService.Domain.Entities.Company", "Company")
-                        .WithMany("Users")
-                        .HasForeignKey("CompanyId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
-                    b.Navigation("Company");
-                });
-
             modelBuilder.Entity("Adoroid.CarService.Domain.Entities.UserToCompany", b =>
                 {
                     b.HasOne("Adoroid.CarService.Domain.Entities.Company", "Company")
@@ -1321,8 +1305,6 @@ namespace Adoroid.CarService.Persistence.Migrations
                     b.Navigation("Suppliers");
 
                     b.Navigation("UserToCompanies");
-
-                    b.Navigation("Users");
                 });
 
             modelBuilder.Entity("Adoroid.CarService.Domain.Entities.Customer", b =>
