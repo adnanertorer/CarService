@@ -1,29 +1,39 @@
 ﻿using Adoroid.CarService.Application.Common.Abstractions.Auth;
 using Adoroid.CarService.Application.Common.Abstractions.Caching;
+using Adoroid.CarService.Application.Common.BusinessMessages;
 using Adoroid.CarService.Application.Common.Enums;
 using Adoroid.CarService.Application.Common.Extensions;
 using Adoroid.CarService.Application.Features.MainServices.Dtos;
 using Adoroid.CarService.Application.Features.MainServices.ExceptionMessages;
 using Adoroid.CarService.Application.Features.MainServices.MapperExtensions;
+using Adoroid.CarService.Application.Features.Users.Queries.CheckCompanyId;
 using Adoroid.CarService.Domain.Entities;
 using Adoroid.CarService.Persistence;
 using Adoroid.Core.Application.Wrappers;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using MinimalMediatR.Core;
+using MinimalMediatR.Extensions;
 
 namespace Adoroid.CarService.Application.Features.MainServices.Commands.Update;
 
 public record UpdateMainServiceCommand(Guid Id, Guid VehicleId, DateTime ServiceDate, string? Description, MainServiceStatusEnum ServiceStatus)
     : IRequest<Response<MainServiceDto>>;
 
-public class UpdateMainServiceCommandHandler(CarServiceDbContext dbContext, ICurrentUser currentUser, ICacheService cacheService, ILogger<UpdateMainServiceCommandHandler> logger)
+public class UpdateMainServiceCommandHandler(CarServiceDbContext dbContext, ICurrentUser currentUser, ICacheService cacheService,
+    ILogger<UpdateMainServiceCommandHandler> logger, IMediator mediator)
         : IRequestHandler<UpdateMainServiceCommand, Response<MainServiceDto>>
 {
     const string redisKeyPrefix = "mainservice:list";
     public async Task<Response<MainServiceDto>> Handle(UpdateMainServiceCommand request, CancellationToken cancellationToken)
     {
-        var companyId = Guid.Parse(currentUser.CompanyId!);
+        var companyIdResponse = await mediator.Send(new GetCompanyIdCommand(), cancellationToken);
+
+        if (!companyIdResponse.Succeeded)
+            return Response<MainServiceDto>.Fail(BusinessMessages.CompanyNotFound);
+
+        var companyId = companyIdResponse.Data!.Value;
+
         var userId = Guid.Parse(currentUser.Id!);
 
         var entity = await dbContext.MainServices
@@ -112,7 +122,7 @@ public class UpdateMainServiceCommandHandler(CarServiceDbContext dbContext, ICur
 
         try
         {
-            await cacheService.UpdateToListAsync($"{redisKeyPrefix}:{currentUser.CompanyId!}", request.Id.ToString(), resultDto, null);
+            await cacheService.UpdateToListAsync($"{redisKeyPrefix}:{companyId}", request.Id.ToString(), resultDto, null);
         }
         catch (Exception ex) {
             const string errorMessage = "Cache güncelleme işlemi başarısız oldu. MainServiceId: {MainServiceId}";

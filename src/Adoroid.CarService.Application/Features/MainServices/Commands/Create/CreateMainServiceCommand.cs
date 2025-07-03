@@ -1,27 +1,39 @@
 ﻿using Adoroid.CarService.Application.Common.Abstractions.Auth;
 using Adoroid.CarService.Application.Common.Abstractions.Caching;
+using Adoroid.CarService.Application.Common.BusinessMessages;
 using Adoroid.CarService.Application.Common.Enums;
 using Adoroid.CarService.Application.Common.Extensions;
 using Adoroid.CarService.Application.Features.MainServices.Dtos;
 using Adoroid.CarService.Application.Features.MainServices.ExceptionMessages;
 using Adoroid.CarService.Application.Features.MainServices.MapperExtensions;
+using Adoroid.CarService.Application.Features.Users.Queries.CheckCompanyId;
 using Adoroid.CarService.Domain.Entities;
 using Adoroid.CarService.Persistence;
 using Adoroid.Core.Application.Wrappers;
+using Adoroid.Core.Repository.Paging;
 using Microsoft.EntityFrameworkCore;
 using MinimalMediatR.Core;
+using MinimalMediatR.Extensions;
 
 namespace Adoroid.CarService.Application.Features.MainServices.Commands.Create;
 
 public record CreateMainServiceCommand(Guid VehicleId, DateTime ServiceDate, string? Description) : IRequest<Response<MainServiceDto>>;
 
 
-public class CreateMainServiceCommandHandler(CarServiceDbContext dbContext, ICurrentUser currentUser, ICacheService cacheService) 
+public class CreateMainServiceCommandHandler(CarServiceDbContext dbContext, ICurrentUser currentUser, 
+    ICacheService cacheService, IMediator mediator) 
     : IRequestHandler<CreateMainServiceCommand, Response<MainServiceDto>>
 {
     const string redisKeyPrefix = "mainservice:list";
     public async Task<Response<MainServiceDto>> Handle(CreateMainServiceCommand request, CancellationToken cancellationToken)
     {
+        var companyIdResponse = await mediator.Send(new GetCompanyIdCommand(), cancellationToken);
+
+        if (!companyIdResponse.Succeeded)
+            return Response<MainServiceDto>.Fail(BusinessMessages.CompanyNotFound);
+
+        var companyId = companyIdResponse.Data!.Value;
+
         var vehicle = await dbContext.Vehicles.AsNoTracking()
             .FirstOrDefaultAsync(i => i.Id == request.VehicleId, cancellationToken);
 
@@ -37,7 +49,7 @@ public class CreateMainServiceCommandHandler(CarServiceDbContext dbContext, ICur
             ServiceDate = request.ServiceDate,
             VehicleId = request.VehicleId,
             ServiceStatus = (int)MainServiceStatusEnum.Opened,
-            CompanyId = Guid.Parse(currentUser.CompanyId!)
+            CompanyId = companyId
         };
 
         var result = await dbContext.AddAsync(entity, cancellationToken);
@@ -47,7 +59,7 @@ public class CreateMainServiceCommandHandler(CarServiceDbContext dbContext, ICur
 
         var resultDto = result.Entity.FromEntity();
 
-        await cacheService.AppendToListAsync($"{redisKeyPrefix}:{currentUser.CompanyId!}", resultDto, null);
+        await cacheService.AppendToListAsync($"{redisKeyPrefix}:{companyId}", resultDto, null);
 
         return Response<MainServiceDto>.Success(resultDto);
     }
