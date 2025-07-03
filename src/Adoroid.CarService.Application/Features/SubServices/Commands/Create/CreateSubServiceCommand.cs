@@ -1,26 +1,37 @@
 ﻿using Adoroid.CarService.Application.Common.Abstractions.Auth;
 using Adoroid.CarService.Application.Common.Abstractions.Caching;
+using Adoroid.CarService.Application.Common.BusinessMessages;
 using Adoroid.CarService.Application.Common.Extensions;
 using Adoroid.CarService.Application.Features.SubServices.Dtos;
 using Adoroid.CarService.Application.Features.SubServices.ExceptionMessages;
 using Adoroid.CarService.Application.Features.SubServices.MapperExtensions;
+using Adoroid.CarService.Application.Features.Users.Queries.CheckCompanyId;
 using Adoroid.CarService.Domain.Entities;
 using Adoroid.CarService.Persistence;
 using Adoroid.Core.Application.Wrappers;
+using Adoroid.Core.Repository.Paging;
 using Microsoft.EntityFrameworkCore;
 using MinimalMediatR.Core;
+using MinimalMediatR.Extensions;
 
 namespace Adoroid.CarService.Application.Features.SubServices.Commands.Create;
 
 public record CreateSubServiceCommand(Guid MainServiceId, string Operation, Guid EmployeeId, DateTime OperationDate, string? Description,
     string? Material, string? MaterialBrand, Guid? SupplierId, decimal? Discount, decimal Cost) : IRequest<Response<SubServiceDto>>;
 
-public class CreateSubServiceCommandHandler(CarServiceDbContext dbContext, ICurrentUser currentUser, ICacheService cacheService)
+public class CreateSubServiceCommandHandler(CarServiceDbContext dbContext, ICurrentUser currentUser, ICacheService cacheService, IMediator mediator)
     : IRequestHandler<CreateSubServiceCommand, Response<SubServiceDto>>
 {
     const string redisKeyPrefix = "subservice:list";
     public async Task<Response<SubServiceDto>> Handle(CreateSubServiceCommand request, CancellationToken cancellationToken)
     {
+        var companyIdResponse = await mediator.Send(new GetCompanyIdCommand(), cancellationToken);
+
+        if (!companyIdResponse.Succeeded)
+            return Response<SubServiceDto>.Fail(BusinessMessages.CompanyNotFound);
+
+        var companyId = companyIdResponse.Data!.Value;
+
         var mainServiceEntity = await dbContext.MainServices.FirstOrDefaultAsync(i => i.Id == request.MainServiceId, cancellationToken);
 
         if (mainServiceEntity == null)
@@ -60,7 +71,7 @@ public class CreateSubServiceCommandHandler(CarServiceDbContext dbContext, ICurr
 
         var resultDto = model.FromEntity();
 
-        await cacheService.AppendToListAsync($"{redisKeyPrefix}:{currentUser.CompanyId!}", resultDto, null);
+        await cacheService.AppendToListAsync($"{redisKeyPrefix}:{companyIdResponse}", resultDto, null);
 
         return Response<SubServiceDto>.Success(resultDto);
     }
