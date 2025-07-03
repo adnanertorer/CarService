@@ -29,7 +29,6 @@ public class UserLoginQueryHandler(CarServiceDbContext dbContext, ITokenHandler 
             Name = user.Name,
             Surname = user.Surname,
             Email = user.Email,
-            CompanyId = user.CompanyId
         }, cancellationToken);
 
         if (accessToken is not { Succeeded: true, Data: not null})

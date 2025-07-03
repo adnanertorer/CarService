@@ -16,12 +16,15 @@ namespace Adoroid.CarService.Application.Features.MainServices.Commands.Create;
 public record CreateMainServiceCommand(Guid VehicleId, DateTime ServiceDate, string? Description) : IRequest<Response<MainServiceDto>>;
 
 
-public class CreateMainServiceCommandHandler(CarServiceDbContext dbContext, ICurrentUser currentUser, ICacheService cacheService) 
+public class CreateMainServiceCommandHandler(CarServiceDbContext dbContext, ICurrentUser currentUser, 
+    ICacheService cacheService) 
     : IRequestHandler<CreateMainServiceCommand, Response<MainServiceDto>>
 {
     const string redisKeyPrefix = "mainservice:list";
     public async Task<Response<MainServiceDto>> Handle(CreateMainServiceCommand request, CancellationToken cancellationToken)
     {
+        var companyId = currentUser.ValidCompanyId();
+
         var vehicle = await dbContext.Vehicles.AsNoTracking()
             .FirstOrDefaultAsync(i => i.Id == request.VehicleId, cancellationToken);
 
@@ -37,7 +40,7 @@ public class CreateMainServiceCommandHandler(CarServiceDbContext dbContext, ICur
             ServiceDate = request.ServiceDate,
             VehicleId = request.VehicleId,
             ServiceStatus = (int)MainServiceStatusEnum.Opened,
-            CompanyId = Guid.Parse(currentUser.CompanyId!)
+            CompanyId = companyId
         };
 
         var result = await dbContext.AddAsync(entity, cancellationToken);
@@ -47,7 +50,7 @@ public class CreateMainServiceCommandHandler(CarServiceDbContext dbContext, ICur
 
         var resultDto = result.Entity.FromEntity();
 
-        await cacheService.AppendToListAsync($"{redisKeyPrefix}:{currentUser.CompanyId!}", resultDto, null);
+        await cacheService.AppendToListAsync($"{redisKeyPrefix}:{companyId}", resultDto, null);
 
         return Response<MainServiceDto>.Success(resultDto);
     }

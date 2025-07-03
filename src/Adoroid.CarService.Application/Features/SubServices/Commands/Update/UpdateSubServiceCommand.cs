@@ -20,6 +20,8 @@ public class UpdateSubServiceCommandHandler(CarServiceDbContext dbContext, ICurr
     const string redisKeyPrefix = "subservice:list";
     public async Task<Response<SubServiceDto>> Handle(UpdateSubServiceCommand request, CancellationToken cancellationToken)
     {
+        var companyId = currentUser.ValidCompanyId();
+
         var entity = await dbContext.SubServices.FirstOrDefaultAsync(e => e.Id == request.Id, cancellationToken);
 
         if (entity is null)
@@ -32,6 +34,7 @@ public class UpdateSubServiceCommandHandler(CarServiceDbContext dbContext, ICurr
         var employee = await dbContext.Employees
             .AsNoTracking()
             .FirstOrDefaultAsync(i => i.Id == request.EmployeeId, cancellationToken);
+
         if (employee == null)
             return Response<SubServiceDto>.Fail(BusinessExceptionMessages.EmployeeNotFound);
 
@@ -56,7 +59,7 @@ public class UpdateSubServiceCommandHandler(CarServiceDbContext dbContext, ICurr
 
         var resultDto = entity.FromEntity();
 
-        await cacheService.UpdateToListAsync($"{redisKeyPrefix}:{currentUser.CompanyId!}", request.Id.ToString(), resultDto, null);
+        await cacheService.UpdateToListAsync($"{redisKeyPrefix}:{companyId}", request.Id.ToString(), resultDto, null);
 
         return Response<SubServiceDto>.Success(entity.FromEntity());
     }

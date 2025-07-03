@@ -15,8 +15,7 @@ public class GetByIdVehicleRequestHandler(CarServiceDbContext dbContext) : IRequ
     public async Task<Response<VehicleDto>> Handle(GetByIdVehicleRequest request, CancellationToken cancellationToken)
     {
         var vehicle = await dbContext.Vehicles
-            .Include(i => i.Customer)
-            .Include(i => i.MobileUser)
+            .Include(i => i.VehicleUsers)
            .AsNoTracking()
            .FirstOrDefaultAsync(i => i.Id == request.Id, cancellationToken);
 

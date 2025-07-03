@@ -16,24 +16,23 @@ namespace Adoroid.CarService.Application.Features.MainServices.Queries.GetList;
 public record GetListMainServiceQuery(MainFilterRequestModel FilterRequest)
     : IRequest<Response<Paginate<MainServiceDto>>>;
 
-public class GetListMainServiceQueryHandler(CarServiceDbContext dbContext, ICurrentUser currentUser, ICacheService cacheService)
+public class GetListMainServiceQueryHandler(CarServiceDbContext dbContext, ICacheService cacheService, ICurrentUser currentUser)
     : IRequestHandler<GetListMainServiceQuery, Response<Paginate<MainServiceDto>>>
 {
     const string redisKeyPrefix = "mainservice:list";
     public async Task<Response<Paginate<MainServiceDto>>> Handle(GetListMainServiceQuery request, CancellationToken cancellationToken)
     {
+        var companyId = currentUser.ValidCompanyId();
 
-        var cacheKey = $"{redisKeyPrefix}:{currentUser.CompanyId!}";
+        var cacheKey = $"{redisKeyPrefix}:{companyId}";
 
         var list = await cacheService.GetOrSetPaginateAsync<List<MainServiceDto>>(cacheKey,
             async () =>
             {
                 var query = dbContext.MainServices
-                    .Include(i => i.Vehicle)
-                        .ThenInclude(i => i!.Customer)
-                    .Include(i => i.Vehicle).ThenInclude(i => i.MobileUser)
+                    .Include(i => i.Vehicle).ThenInclude(i => i.VehicleUsers)
                     .AsNoTracking()
-                    .Where(i => i.Vehicle != null && i.CompanyId == Guid.Parse(currentUser.CompanyId!));
+                    .Where(i => i.Vehicle != null && i.CompanyId == companyId);
 
                 if (request.FilterRequest.StartDate.HasValue && request.FilterRequest.EndDate.HasValue)
                 {

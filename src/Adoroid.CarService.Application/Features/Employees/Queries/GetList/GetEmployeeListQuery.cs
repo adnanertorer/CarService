@@ -1,4 +1,5 @@
 ﻿using Adoroid.CarService.Application.Common.Abstractions.Auth;
+using Adoroid.CarService.Application.Common.Extensions;
 using Adoroid.CarService.Application.Features.Employees.Dtos;
 using Adoroid.CarService.Application.Features.Employees.MapperExtensions;
 using Adoroid.CarService.Persistence;
@@ -16,9 +17,11 @@ public class GetEmployeeListQueryHandler(CarServiceDbContext dbContext, ICurrent
 {
     public async Task<Response<Paginate<EmployeeDto>>> Handle(GetEmployeeListQuery request, CancellationToken cancellationToken)
     {
+        var companyId = currentUser.ValidCompanyId();
+
         var query = dbContext.Employees
              .AsNoTracking()
-             .Where(i => i.CompanyId == Guid.Parse(currentUser.CompanyId!));
+             .Where(i => i.CompanyId == companyId);
 
         if(!string.IsNullOrEmpty(request.Search))
             query = query.Where(i => i.Name.Contains(request.Search) || i.Surname.Contains(request.Search)

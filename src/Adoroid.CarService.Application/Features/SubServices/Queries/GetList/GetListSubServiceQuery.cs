@@ -17,13 +17,15 @@ public record GetListSubServiceQuery(PageRequest PageRequest, Guid MainServiceId
 public record GetListSubServiceQueryHandler(PageRequest PageRequest, string? Search)
     : IRequest<Response<Paginate<SubServiceDto>>>;
 
-public class GetEntityListQueryHandler(CarServiceDbContext dbContext, ICurrentUser currentUser, ICacheService cacheService)
+public class GetEntityListQueryHandler(CarServiceDbContext dbContext, ICacheService cacheService, ICurrentUser currentUser)
     : IRequestHandler<GetListSubServiceQuery, Response<Paginate<SubServiceDto>>>
 {
     const string redisKeyPrefix = "subservice:list";
     public async Task<Response<Paginate<SubServiceDto>>> Handle(GetListSubServiceQuery request, CancellationToken cancellationToken)
     {
-        var cacheKey = $"{redisKeyPrefix}:{currentUser.CompanyId!}";
+        var companyId = currentUser.ValidCompanyId();
+
+        var cacheKey = $"{redisKeyPrefix}:{companyId}";
 
         var list = await cacheService.GetOrSetPaginateAsync<List<SubServiceDto>>(cacheKey, async () =>
         {
