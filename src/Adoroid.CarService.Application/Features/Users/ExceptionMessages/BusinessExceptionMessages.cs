@@ -17,4 +17,5 @@ public static class BusinessExceptionMessages
     public const string OtpAlreadySent = "OTP kodu zaten gönderildi. Lütfen bekleyin ve tekrar deneyin.";
     public const string OtpNotSent = "OTP kodu gönderilemedi. Lütfen tekrar deneyin.";
     public const string OtpLimitExceeded = "OTP gönderim limiti aşıldı. Lütfen daha sonra tekrar deneyin.";
+    public const string CompanyNotFound = "Şirket bulunamadı.";
 }
