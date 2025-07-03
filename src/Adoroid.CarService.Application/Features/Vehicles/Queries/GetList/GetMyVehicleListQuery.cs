@@ -19,10 +19,9 @@ public class GetMyVehicleListQueryHandler(CarServiceDbContext dbContext, ICurren
     public async Task<Response<Paginate<VehicleDto>>> Handle(GetMyVehicleListQuery request, CancellationToken cancellationToken)
     {
         var query = dbContext.Vehicles
-           .Include(i => i.MobileUser)
            .Include(i => i.MainServices).ThenInclude(i => i.SubServices)
            .Include(i => i.MainServices).ThenInclude(i => i.Company)
-           .Where(i => i.MobileUserId == Guid.Parse(currentUser.Id!))
+           .Where(i => i.VehicleUsers.Any(i => i.UserId == Guid.Parse(currentUser.Id!)))
            .AsNoTracking();
 
         if (!string.IsNullOrWhiteSpace(request.Search))

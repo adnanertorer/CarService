@@ -1,4 +1,5 @@
 ﻿using Adoroid.CarService.Application.Common.Abstractions.Auth;
+using Adoroid.CarService.Application.Common.Extensions;
 using Adoroid.CarService.Application.Features.UserToCompanies.Dtos;
 using Adoroid.CarService.Application.Features.UserToCompanies.MappingExtensions;
 using Adoroid.CarService.Persistence;
@@ -18,11 +19,13 @@ public class GetListUserToCompanyQueryHandler(CarServiceDbContext dbContext, ICu
 {
     public async Task<Response<Paginate<UserToCompanyDto>>> Handle(GetListUserToCompanyQuery request, CancellationToken cancellationToken)
     {
+        var companyId = currentUser.ValidCompanyId();
+
         var query = dbContext.UserToCompanies
             .Include(i => i.Company)
             .Include(i => i.User)
             .AsNoTracking()
-            .Where(i => i.CompanyId == Guid.Parse(currentUser.CompanyId!));
+            .Where(i => i.CompanyId == companyId);
 
             var result = await query
                 .OrderByDescending(i => i.CreatedDate)

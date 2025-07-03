@@ -1,5 +1,6 @@
 ﻿using Adoroid.CarService.Application.Common.Abstractions.Auth;
 using Adoroid.CarService.Application.Common.Enums;
+using Adoroid.CarService.Application.Common.Extensions;
 using Adoroid.CarService.Application.Features.AccountTransactions.Dtos;
 using Adoroid.CarService.Application.Features.AccountTransactions.MapperExtensions;
 using Adoroid.CarService.Domain.Entities;
@@ -17,6 +18,8 @@ public class CreateClaimCommandHandler(CarServiceDbContext dbContext, ICurrentUs
 {
     public async Task<Response<AccountTransactionDto>> Handle(CreateClaimCommand request, CancellationToken cancellationToken)
     {
+        var companyId = currentUser.ValidCompanyId();
+
         var balance = await GetBalance(request.CustomerId, cancellationToken);
 
         var entity = new AccountingTransaction
@@ -30,7 +33,7 @@ public class CreateClaimCommandHandler(CarServiceDbContext dbContext, ICurrentUs
             Balance = balance - request.Claim,
             AccountOwnerId = request.CustomerId,
             AccountOwnerType = (int)request.AccountOwnerType,
-            CompanyId = Guid.Parse(currentUser.CompanyId!),
+            CompanyId = companyId,
             TransactionType = (int)TransactionTypeEnum.Receivable,
             Description = request.Description
         };

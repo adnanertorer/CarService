@@ -1,4 +1,5 @@
 ﻿using Adoroid.CarService.Application.Common.Abstractions.Auth;
+using Adoroid.CarService.Application.Common.Extensions;
 using Adoroid.CarService.Application.Features.Employees.Dtos;
 using Adoroid.CarService.Application.Features.Employees.ExecptionMessages;
 using Adoroid.CarService.Application.Features.Employees.MapperExtensions;
@@ -17,6 +18,8 @@ public class CreateEmployeeCommandHandler(CarServiceDbContext dbContext, ICurren
 {
     public async Task<Response<EmployeeDto>> Handle(CreateEmployeeCommand request, CancellationToken cancellationToken)
     {
+        var companyId = currentUser.ValidCompanyId();
+
         var isExist = await dbContext.Employees
              .AsNoTracking()
              .AnyAsync(i => i.Name == request.Name && i.Surname == request.Surname, cancellationToken);
@@ -27,7 +30,7 @@ public class CreateEmployeeCommandHandler(CarServiceDbContext dbContext, ICurren
         var employeeEntity = new Employee
         {
             Address = request.Address,
-            CompanyId = Guid.Parse(currentUser.CompanyId!),
+            CompanyId = companyId,
             CreatedBy = Guid.Parse(currentUser.Id!),
             Email = request.Email,
             IsActive = request.IsActive,

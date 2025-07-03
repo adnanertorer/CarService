@@ -6,7 +6,6 @@ public class Company : Entity<Guid>
 {
     public Company()
     {
-        Users = new HashSet<User>();
         Customers = new HashSet<Customer>();
         Employees = new HashSet<Employee>();
         Suppliers = new HashSet<Supplier>();
@@ -27,7 +26,6 @@ public class Company : Entity<Guid>
     public string CompanyPhone { get; set; }
     public string CompanyEmail { get; set; }
 
-    public ICollection<User>? Users { get; set; }
     public ICollection<Customer>? Customers { get; set; }
     public ICollection<Employee>? Employees { get; set; }
     public ICollection<Supplier>? Suppliers { get; set; }
