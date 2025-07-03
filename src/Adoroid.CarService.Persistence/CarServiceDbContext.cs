@@ -21,6 +21,7 @@ public class CarServiceDbContext(DbContextOptions<CarServiceDbContext> options):
     public DbSet<City> Cities { get; set; }
     public DbSet<District> Districts { get; set; }
     public DbSet<UserToCompany> UserToCompanies { get; set; }
+    public DbSet<VehicleUser> VehiclUsers { get; set; }
 
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
