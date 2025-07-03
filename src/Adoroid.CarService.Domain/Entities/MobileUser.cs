@@ -4,11 +4,6 @@ namespace Adoroid.CarService.Domain.Entities;
 
 public class MobileUser : Entity<Guid>
 {
-    public MobileUser()
-    {
-        Vehicles = new HashSet<Vehicle>();
-        VehicleUsers = new HashSet<VehicleUser>();
-    }
 
     public string Name { get; set; }
     public string Surname { get; set; }
@@ -18,7 +13,4 @@ public class MobileUser : Entity<Guid>
     public string? RefreshToken { get; set; }
     public string? OtpCode { get; init; }
     public DateTime? RefreshTokenExpr { get; set; }
-
-    public ICollection<Vehicle>? Vehicles { get; set; }
-    public ICollection<VehicleUser> VehicleUsers { get; set; }
 }

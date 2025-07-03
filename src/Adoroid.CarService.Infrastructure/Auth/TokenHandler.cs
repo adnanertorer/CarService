@@ -24,6 +24,13 @@ public class TokenHandler : ITokenHandler
 
     public async Task<Response<AccesTokenDto>> CreateAccessToken(UserDto user, CancellationToken cancellationToken)
     {
+        var userToCompany = await _dbContext.UserToCompanies
+           .AsNoTracking()
+           .FirstOrDefaultAsync(i => i.UserId == user.Id, cancellationToken);
+
+        if (userToCompany is not null)
+            user.CompanyId = userToCompany.CompanyId;
+
         var accessTokenExpiration = DateTime.UtcNow.AddMinutes(_tokenOptions.AccessTokenExpiration);
         var securityKey = SignHandler.GetSecurityKey(_tokenOptions.SecurityKey);
         var signingCredentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256Signature);
@@ -38,7 +45,8 @@ public class TokenHandler : ITokenHandler
             RefreshToken = CreateRefreshToken(),
             Expiration = accessTokenExpiration,
             FullName = user.Name + " " + user.Surname,
-            UserId = user.Id
+            UserId = user.Id,
+            CompanyId = user.CompanyId
         };
         user.RefreshToken = accessToken.RefreshToken;
         user.RefreshTokenEndDate = accessToken.Expiration;
@@ -49,13 +57,6 @@ public class TokenHandler : ITokenHandler
 
         userEntity.RefreshToken = accessToken.RefreshToken;
         userEntity.RefreshTokenExpr = accessToken.Expiration;
-
-        var userToCompany = await _dbContext.UserToCompanies
-            .AsNoTracking()
-            .FirstOrDefaultAsync(i => i.UserId == user.Id, cancellationToken);
-
-        if (userToCompany is not null)
-            accessToken.CompanyId = userToCompany.CompanyId;
 
         _dbContext.Entry(userEntity).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
         _dbContext.Users.Update(userEntity);

@@ -24,10 +24,5 @@ public class VehicleUserConfiguration : IEntityTypeConfiguration<VehicleUser>
             .WithMany(b => b.VehicleUsers)
             .HasForeignKey(b => b.VehicleId)
             .OnDelete(DeleteBehavior.NoAction);
-
-        builder.HasOne(b => b.User)
-            .WithMany(b => b.VehicleUsers)
-                .HasForeignKey(b => b.UserId)
-                .OnDelete(DeleteBehavior.NoAction);
     }
 }
