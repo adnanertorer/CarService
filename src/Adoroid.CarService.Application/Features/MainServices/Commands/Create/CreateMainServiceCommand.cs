@@ -1,19 +1,15 @@
 ﻿using Adoroid.CarService.Application.Common.Abstractions.Auth;
 using Adoroid.CarService.Application.Common.Abstractions.Caching;
-using Adoroid.CarService.Application.Common.BusinessMessages;
 using Adoroid.CarService.Application.Common.Enums;
 using Adoroid.CarService.Application.Common.Extensions;
 using Adoroid.CarService.Application.Features.MainServices.Dtos;
 using Adoroid.CarService.Application.Features.MainServices.ExceptionMessages;
 using Adoroid.CarService.Application.Features.MainServices.MapperExtensions;
-using Adoroid.CarService.Application.Features.Users.Queries.CheckCompanyId;
 using Adoroid.CarService.Domain.Entities;
 using Adoroid.CarService.Persistence;
 using Adoroid.Core.Application.Wrappers;
-using Adoroid.Core.Repository.Paging;
 using Microsoft.EntityFrameworkCore;
 using MinimalMediatR.Core;
-using MinimalMediatR.Extensions;
 
 namespace Adoroid.CarService.Application.Features.MainServices.Commands.Create;
 
@@ -21,18 +17,13 @@ public record CreateMainServiceCommand(Guid VehicleId, DateTime ServiceDate, str
 
 
 public class CreateMainServiceCommandHandler(CarServiceDbContext dbContext, ICurrentUser currentUser, 
-    ICacheService cacheService, IMediator mediator) 
+    ICacheService cacheService) 
     : IRequestHandler<CreateMainServiceCommand, Response<MainServiceDto>>
 {
     const string redisKeyPrefix = "mainservice:list";
     public async Task<Response<MainServiceDto>> Handle(CreateMainServiceCommand request, CancellationToken cancellationToken)
     {
-        var companyIdResponse = await mediator.Send(new GetCompanyIdCommand(), cancellationToken);
-
-        if (!companyIdResponse.Succeeded)
-            return Response<MainServiceDto>.Fail(BusinessMessages.CompanyNotFound);
-
-        var companyId = companyIdResponse.Data!.Value;
+        var companyId = currentUser.ValidCompanyId();
 
         var vehicle = await dbContext.Vehicles.AsNoTracking()
             .FirstOrDefaultAsync(i => i.Id == request.VehicleId, cancellationToken);
