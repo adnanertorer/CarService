@@ -48,6 +48,8 @@ public class CreateVehicleCommandHandler(CarServiceDbContext dbContext, ICurrent
                 VehicleId = resultEntity.Entity.Id,
                 UserId = request.CustomerId.Value,
                 UserTypeId = (int)VehicleUserTypeEnum.Temporary, // Geçici kullanıcı olarak işaretleniyor
+                CreatedDate = DateTime.UtcNow,
+                CreatedBy = Guid.Parse(currentUser.Id!)
             };
             await dbContext.VehiclUsers.AddAsync(vehicleUser, cancellationToken);
         }
