@@ -1,27 +1,3 @@
--- Türkiye'nin il, ilçe, mahalle ve ülke bilgilerini içeren tablo yapıları
-
--- Şehirler tablosu
-CREATE TABLE "Cities" (
-    "Id" INTEGER NOT NULL, -- Şehir ID
-    "Name" TEXT NOT NULL, -- Şehir Adı
-    "PlateNumber" INTEGER NOT NULL, -- Plaka Numarası
-    "PhoneCode" INTEGER NOT NULL, -- Telefon Kodu
-    "RowNumber" INTEGER NOT NULL, -- Sıra Numarası (veri sıralaması için)
-
-    CONSTRAINT "city_pkey" PRIMARY KEY ("Id")
-);
-
--- İlçeler tablosu
-CREATE TABLE "Districts" (
-    "Id" INTEGER NOT NULL, -- İlçe ID
-    "CityId" INTEGER NOT NULL, -- Şehir ID (foreign key)
-    "Name" TEXT NOT NULL, -- İlçe Adı
-    "CityName" TEXT NOT NULL,
-
-    CONSTRAINT "district_pkey" PRIMARY KEY ("Id")
-);
-
-
 INSERT INTO public."Cities"  ( "Id"  ,  "Name"  ,  "PlateNumber"  ,  "PhoneCode"  ,  "RowNumber"  ) VALUES (1, 'DÜZCE', 81, 380, 82);
 INSERT INTO public."Cities"  ( "Id"  ,  "Name"  ,  "PlateNumber"  ,  "PhoneCode"  ,  "RowNumber"  ) VALUES (2, 'OSMANİYE', 80, 328, 81);
 INSERT INTO public."Cities"  ( "Id"  ,  "Name"  ,  "PlateNumber"  ,  "PhoneCode"  ,  "RowNumber"  ) VALUES (3, 'KİLİS', 79, 348, 80);
