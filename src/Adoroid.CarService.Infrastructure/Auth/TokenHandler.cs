@@ -38,8 +38,7 @@ public class TokenHandler : ITokenHandler
             RefreshToken = CreateRefreshToken(),
             Expiration = accessTokenExpiration,
             FullName = user.Name + " " + user.Surname,
-            UserId = user.Id,
-            CompanyId = user.CompanyId
+            UserId = user.Id
         };
         user.RefreshToken = accessToken.RefreshToken;
         user.RefreshTokenEndDate = accessToken.Expiration;
@@ -50,6 +49,13 @@ public class TokenHandler : ITokenHandler
 
         userEntity.RefreshToken = accessToken.RefreshToken;
         userEntity.RefreshTokenExpr = accessToken.Expiration;
+
+        var userToCompany = await _dbContext.UserToCompanies
+            .AsNoTracking()
+            .FirstOrDefaultAsync(i => i.UserId == user.Id, cancellationToken);
+
+        if (userToCompany is not null)
+            accessToken.CompanyId = userToCompany.CompanyId;
 
         _dbContext.Entry(userEntity).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
         _dbContext.Users.Update(userEntity);
@@ -104,7 +110,7 @@ public class TokenHandler : ITokenHandler
             new(ClaimTypes.NameIdentifier, user.Id.ToString()),
             new(JwtRegisteredClaimNames.Email, user.Email),
             new(ClaimTypes.Name, $"{ user.Name} { user.Surname }"),
-            new(type: ClaimTypes.UserData, value: user.CompanyId.ToString()),
+            new(type: ClaimTypes.UserData, value: user.CompanyId.HasValue ? user.CompanyId.Value.ToString() : string.Empty),
             new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
             new("user_type", "company")
         };

@@ -9,7 +9,7 @@ using MinimalMediatR.Core;
 
 namespace Adoroid.CarService.Application.Features.Users.Commands.Create;
 
-public record CreateUserCommand(string Name, string Surname, string Email, string Password, Guid CompanyId, string PhoneNumber) :
+public record CreateUserCommand(string Name, string Surname, string Email, string Password, string PhoneNumber) :
     IRequest<Response<UserDto>>;
 
 public class CreateUserCommandHandler(CarServiceDbContext dbContext, IAesEncryptionHelper aesEncryptionHelper) : IRequestHandler<CreateUserCommand, Response<UserDto>>
@@ -17,7 +17,7 @@ public class CreateUserCommandHandler(CarServiceDbContext dbContext, IAesEncrypt
     public async Task<Response<UserDto>> Handle(CreateUserCommand request, CancellationToken cancellationToken)
     {
         var userExist = await dbContext.Users.AsNoTracking()
-            .AnyAsync(i => i.Email == request.Email, cancellationToken);
+            .AnyAsync(i => i.Email == request.Email || i.PhoneNumber == request.PhoneNumber, cancellationToken);
 
         if(userExist )
             return Response<UserDto>.Fail(BusinessExceptionMessages.UserAlreadyExists);
@@ -29,7 +29,6 @@ public class CreateUserCommandHandler(CarServiceDbContext dbContext, IAesEncrypt
             Surname = request.Surname,
             Email = request.Email,
             Password = encryptedPassword,
-            CompanyId = request.CompanyId,
             PhoneNumber = request.PhoneNumber,
             CreatedBy = new Guid(),
             CreatedDate = DateTime.UtcNow,
@@ -45,7 +44,6 @@ public class CreateUserCommandHandler(CarServiceDbContext dbContext, IAesEncrypt
             Name = user.Name,
             Surname = user.Surname,
             Email = user.Email,
-            CompanyId = user.CompanyId,
             PhoneNumber = user.PhoneNumber
         });
     }

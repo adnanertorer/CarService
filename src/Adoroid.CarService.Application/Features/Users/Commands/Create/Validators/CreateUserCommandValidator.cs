@@ -13,8 +13,6 @@ public class CreateUserCommandValidator : AbstractValidator<CreateUserCommand>
                .EmailAddress()
                .WithMessage(string.Format(ValidationMessages.Email, "E-Posta"));
 
-        RuleFor(x => x.CompanyId).NotNull().WithMessage(string.Format(ValidationMessages.Required, "Firma"));
-
         RuleFor(x => x.Name)
              .NotEmpty()
              .WithMessage(string.Format(ValidationMessages.Required, "Adı"))

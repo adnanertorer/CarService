@@ -21,7 +21,14 @@ public class CreateAccessTokenByRefreshTokenQueryHandler(CarServiceDbContext dbC
         if (user is null)
             return Response<AccesTokenDto>.Fail(BusinessExceptionMessages.InvalidRefreshToken);
 
-        if(user.RefreshTokenExpr.HasValue && user.RefreshTokenExpr.Value < DateTime.UtcNow)
+        var userToCompany = await dbContext.UserToCompanies
+            .AsNoTracking()
+            .FirstOrDefaultAsync(i => i.UserId == user.Id, cancellationToken);
+
+        if (userToCompany is null)
+            return Response<AccesTokenDto>.Fail(BusinessExceptionMessages.CompanyNotFound);
+
+        if (user.RefreshTokenExpr.HasValue && user.RefreshTokenExpr.Value < DateTime.UtcNow)
         {
             user.RefreshTokenExpr = null;
             user.RefreshToken = null; 
@@ -42,7 +49,7 @@ public class CreateAccessTokenByRefreshTokenQueryHandler(CarServiceDbContext dbC
             Id = user.Id,
             Name = user.Name,
             Surname = user.Surname,
-            CompanyId = user.CompanyId
+            CompanyId = userToCompany.CompanyId
         });
 
         return accessTokenResponse is { Succeeded: true, Data: not null }
