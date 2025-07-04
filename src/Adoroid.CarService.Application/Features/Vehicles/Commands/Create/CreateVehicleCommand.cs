@@ -51,7 +51,7 @@ public class CreateVehicleCommandHandler(CarServiceDbContext dbContext, ICurrent
                 CreatedDate = DateTime.UtcNow,
                 CreatedBy = Guid.Parse(currentUser.Id!)
             };
-            await dbContext.VehiclUsers.AddAsync(vehicleUser, cancellationToken);
+            await dbContext.VehicleUsers.AddAsync(vehicleUser, cancellationToken);
         }
 
         await dbContext.SaveChangesAsync(cancellationToken);
