@@ -13,5 +13,6 @@ public class CustomerDto
     public string? TaxNumber { get; set; }
     public string? TaxOffice { get; set; }
 
-    public List<VehicleDto>? VehicleDtos { get; set; }
+    public List<VehicleDto> Vehicles { get; set; }
+    public List<VehicleUserDto>? VehicleUsers { get; set; }
 }
