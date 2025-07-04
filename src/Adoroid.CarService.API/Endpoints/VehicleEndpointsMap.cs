@@ -4,6 +4,7 @@ using Adoroid.CarService.Application.Features.Vehicles.Commands.Delete;
 using Adoroid.CarService.Application.Features.Vehicles.Commands.Update;
 using Adoroid.CarService.Application.Features.Vehicles.Dtos;
 using Adoroid.CarService.Application.Features.Vehicles.Queries.GetById;
+using Adoroid.CarService.Application.Features.Vehicles.Queries.GetBySerialNumber;
 using Adoroid.CarService.Application.Features.Vehicles.Queries.GetList;
 using Adoroid.Core.Application.Requests;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -21,8 +22,13 @@ public static class VehicleEndpointsMap
         var schemes = new[] { JwtBearerDefaults.AuthenticationScheme, "MobileUser" };
 
         builder.MinimalMediatrMapCommand<CreateVehicleCommand, VehicleDto>(apiPath)
-            .RequireAuthorization(policy => 
+            .RequireAuthorization(policy =>
                 policy.AddAuthenticationSchemes(schemes).RequireAuthenticatedUser()
+            );
+
+        builder.MinimalMediatrMapCommand<AssignVehicleToUserCommand, VehicleDto>(apiPath + "/assing-vehicle", "POST")
+            .RequireAuthorization(policy =>
+                policy.AddAuthenticationSchemes(["MobileUser"]).RequireAuthenticatedUser()
             );
 
         builder.MinimalMediatrMapCommand<UpdateVehicleCommand, VehicleDto>(apiPath, "PUT").RequireAuthorization(policy =>
@@ -57,6 +63,13 @@ public static class VehicleEndpointsMap
             return result.ToResult();
         }).RequireAuthorization(policy =>
         policy.AddAuthenticationSchemes(["MobileUser"]).RequireAuthenticatedUser());
+
+        builder.MapGet(apiPath + "/getby-serialnumber", async (string plateNumber, string serialNumber, IMediator mediator, CancellationToken cancellationToken) =>
+        {
+            var result = await mediator.Send(new GetBySerialNumberQuery(plateNumber, serialNumber), cancellationToken);
+            return result.ToResult();
+        }).RequireAuthorization(policy =>
+        policy.AddAuthenticationSchemes(schemes).RequireAuthenticatedUser());
 
         return builder;
     }

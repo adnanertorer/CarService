@@ -12,7 +12,7 @@ using MinimalMediatR.Core;
 namespace Adoroid.CarService.Application.Features.Customers.Commands.Create;
 
 public record CreateCustomerCommand(string Name, string Surname, string? Email, string Phone, string? Address,
-    string? TaxNumber, string? TaxOffice, bool IsActive) : IRequest<Response<CustomerDto>>;
+    string? TaxNumber, string? TaxOffice, bool IsActive, int CityId, int DistrictId) : IRequest<Response<CustomerDto>>;
 
 public class CreateCustomerCommandHandler(CarServiceDbContext dbContext, ICurrentUser currentUser) : IRequestHandler<CreateCustomerCommand,
     Response<CustomerDto>>
@@ -42,7 +42,9 @@ public class CreateCustomerCommandHandler(CarServiceDbContext dbContext, ICurren
             Surname = request.Surname,
             TaxNumber = request.TaxNumber,
             TaxOffice = request.TaxOffice,
-            IsDeleted = false
+            IsDeleted = false,
+            CityId = request.CityId,
+            DistrictId = request.DistrictId
         };
 
         var entityResult = await dbContext.Customers.AddAsync(customer, cancellationToken);
