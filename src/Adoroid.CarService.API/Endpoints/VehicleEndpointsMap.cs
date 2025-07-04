@@ -26,6 +26,11 @@ public static class VehicleEndpointsMap
                 policy.AddAuthenticationSchemes(schemes).RequireAuthenticatedUser()
             );
 
+        builder.MinimalMediatrMapCommand<AssingVehicleToUserCommand, VehicleDto>(apiPath, "POST")
+            .RequireAuthorization(policy =>
+                policy.AddAuthenticationSchemes(["MobileUser"]).RequireAuthenticatedUser()
+            );
+
         builder.MinimalMediatrMapCommand<UpdateVehicleCommand, VehicleDto>(apiPath, "PUT").RequireAuthorization(policy =>
         policy.AddAuthenticationSchemes(schemes).RequireAuthenticatedUser());
 
