@@ -50,5 +50,17 @@ public class CreateCustomerCommandValidators : AbstractValidator<CreateCustomerC
          .MaximumLength(150)
          .WithMessage(string.Format(ValidationMessages.MaxLength, "Vergi Dairesi", "150"))
          .When(x => !string.IsNullOrEmpty(x.TaxNumber));
+
+        RuleFor(x => x.CityId)
+            .GreaterThan(0)
+            .WithMessage(string.Format(ValidationMessages.GreaterThanZero, "CityId"))
+            .NotNull()
+            .WithMessage(string.Format(ValidationMessages.Required, "CityId"));
+
+        RuleFor(x => x.DistrictId)
+          .GreaterThan(0)
+          .WithMessage(string.Format(ValidationMessages.GreaterThanZero, "DistrictId"))
+          .NotNull()
+          .WithMessage(string.Format(ValidationMessages.Required, "DistrictId"));
     }
 }

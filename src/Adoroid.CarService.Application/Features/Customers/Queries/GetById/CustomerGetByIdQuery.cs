@@ -15,13 +15,23 @@ public class CustomerGetByIdQueryHandler(CarServiceDbContext dbContext) : IReque
     public async Task<Response<CustomerDto>> Handle(CustomerGetByIdQuery request, CancellationToken cancellationToken)
     {
         var customer = await dbContext.Customers
-            .Include(i => i.Vehicles)
+             .Select(i => new
+             {
+                 Customer = i,
+                 VehicleUsers = i.VehicleUsers
+                     .Where(j => (i.MobileUserId != null && j.UserId == i.MobileUserId) || j.UserId == i.Id)
+                     .Select(vu => new
+                     {
+                         VehicleUser = vu,
+                         Vehicle = vu.Vehicle
+                     })
+             })
             .AsNoTracking()
-            .FirstOrDefaultAsync(i => i.Id == request.Id, cancellationToken);
+            .FirstOrDefaultAsync(i => i.Customer.Id == request.Id, cancellationToken);
 
         if (customer is null)
             return Response<CustomerDto>.Fail(BusinessExceptionMessages.NotFound);
 
-        return Response<CustomerDto>.Success(customer.FromEntity());
+        return Response<CustomerDto>.Success(customer.Customer.FromEntity());
     }
 }
