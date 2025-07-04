@@ -5,6 +5,7 @@ public class District
     public District()
     {
         Companies = new HashSet<Company>();
+        MobileUsers = new HashSet<MobileUser>();
     }
     public int Id { get; set; }
     public int CityId { get; set; }
@@ -12,4 +13,5 @@ public class District
     public string CityName { get; set; }
 
     public ICollection<Company>? Companies { get; set; }
+    public ICollection<MobileUser>? MobileUsers { get; set; }
 }

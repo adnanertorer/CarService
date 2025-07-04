@@ -22,11 +22,11 @@ public static class VehicleEndpointsMap
         var schemes = new[] { JwtBearerDefaults.AuthenticationScheme, "MobileUser" };
 
         builder.MinimalMediatrMapCommand<CreateVehicleCommand, VehicleDto>(apiPath)
-            .RequireAuthorization(policy => 
+            .RequireAuthorization(policy =>
                 policy.AddAuthenticationSchemes(schemes).RequireAuthenticatedUser()
             );
 
-        builder.MinimalMediatrMapCommand<AssingVehicleToUserCommand, VehicleDto>(apiPath+"/assing-vehicle", "POST")
+        builder.MinimalMediatrMapCommand<AssignVehicleToUserCommand, VehicleDto>(apiPath + "/assing-vehicle", "POST")
             .RequireAuthorization(policy =>
                 policy.AddAuthenticationSchemes(["MobileUser"]).RequireAuthenticatedUser()
             );
@@ -64,7 +64,7 @@ public static class VehicleEndpointsMap
         }).RequireAuthorization(policy =>
         policy.AddAuthenticationSchemes(["MobileUser"]).RequireAuthenticatedUser());
 
-        builder.MapGet(apiPath + "/getby-serialnumber", async ([AsParameters] string plateNumber, string serialNumber, IMediator mediator, CancellationToken cancellationToken) =>
+        builder.MapGet(apiPath + "/getby-serialnumber", async (string plateNumber, string serialNumber, IMediator mediator, CancellationToken cancellationToken) =>
         {
             var result = await mediator.Send(new GetBySerialNumberQuery(plateNumber, serialNumber), cancellationToken);
             return result.ToResult();
