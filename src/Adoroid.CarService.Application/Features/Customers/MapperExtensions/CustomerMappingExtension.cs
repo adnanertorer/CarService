@@ -19,21 +19,20 @@ public static class CustomerMappingExtension
             Surname = customer.Surname,
             TaxNumber = customer.TaxNumber,
             TaxOffice = customer.TaxOffice,
-            VehicleDtos = customer.ListFromEntity()
+            VehicleUsers = customer.VehicleUsers?.Select(vu => vu.VehicleUserFromEntity()).ToList()
         };
     }
 
-    public static List<VehicleDto>? ListFromEntity(this Customer customer)
+    public static VehicleUserDto VehicleUserFromEntity(this VehicleUser vehicleUser)
     {
-        var list = new List<VehicleDto>();
-        if (customer.Vehicles != null)
+        return new VehicleUserDto
         {
-            foreach (var vehicle in customer.Vehicles)
-            {
-                list.Add(vehicle.VehicleFromEntity());
-            }
-        }
-        return list;
+            Id = vehicleUser.Id,
+            UserId = vehicleUser.UserId,
+            UserTypeId = vehicleUser.UserTypeId,
+            VehicleId = vehicleUser.VehicleId,
+            Vehicle = vehicleUser.Vehicle.VehicleFromEntity()
+        };
     }
 
     public static VehicleDto VehicleFromEntity(this Vehicle vehicle)

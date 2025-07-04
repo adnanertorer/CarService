@@ -13,4 +13,11 @@ public class MobileUser : Entity<Guid>
     public string? RefreshToken { get; set; }
     public string? OtpCode { get; init; }
     public DateTime? RefreshTokenExpr { get; set; }
+    public string? Address { get; set; }
+    public string? ProfilePicture { get; set; }
+    public int CityId { get; set; }
+    public int DistrictId { get; set; }
+
+    public City City { get; set; }
+    public District District { get; set; }
 }

@@ -9,7 +9,8 @@ using MinimalMediatR.Core;
 
 namespace Adoroid.CarService.Application.Features.MobileUsers.Commands.Create;
 
-public record CreateMobilUserCommand(string Name, string Surname, string Email, string Password, string PhoneNumber) 
+public record CreateMobilUserCommand(string Name, string Surname, string Email, string Password, string PhoneNumber, int CityId, int DistrictId,
+    string? Address) 
     : IRequest<Response<MobileUserDto>>;
 
 public class CreateMobilUserCommandHandler(CarServiceDbContext dbContext, IAesEncryptionHelper aesEncryptionHelper)
@@ -35,7 +36,10 @@ public class CreateMobilUserCommandHandler(CarServiceDbContext dbContext, IAesEn
             PhoneNumber = request.PhoneNumber,
             CreatedBy = new Guid(),
             CreatedDate = DateTime.UtcNow,
-            IsDeleted = false
+            IsDeleted = false,
+            CityId = request.CityId,
+            DistrictId = request.DistrictId,
+            Address = request.Address
         };
 
         await dbContext.MobileUsers.AddAsync(user, cancellationToken);
