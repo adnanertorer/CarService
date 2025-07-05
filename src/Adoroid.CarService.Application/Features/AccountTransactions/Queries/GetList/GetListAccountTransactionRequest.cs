@@ -73,7 +73,7 @@ public class GetListAccountTransactionRequestHandler(CarServiceDbContext dbConte
         {
             Id = t.Id,
             AccountOwnerId = t.AccountOwnerId,
-            AccountOwnerType = (AccountOwnerTypeEnum)t.AccountOwnerType,
+            AccountOwnerType = t.AccountOwnerType,
             OwnerName = t.AccountOwnerType == (int)AccountOwnerTypeEnum.Customer
                        ? customers.TryGetValue(t.AccountOwnerId, out var cName) ? cName : string.Empty
                        : mobileUsers.TryGetValue(t.AccountOwnerId, out var mName) ? mName : string.Empty,
