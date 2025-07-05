@@ -9,6 +9,7 @@ using Adoroid.CarService.Domain.Entities;
 using Adoroid.CarService.Persistence;
 using Adoroid.Core.Application.Wrappers;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using MinimalMediatR.Core;
 
 namespace Adoroid.CarService.Application.Features.MainServices.Commands.Create;
@@ -17,7 +18,7 @@ public record CreateMainServiceCommand(Guid VehicleId, DateTime ServiceDate, str
 
 
 public class CreateMainServiceCommandHandler(CarServiceDbContext dbContext, ICurrentUser currentUser, 
-    ICacheService cacheService) 
+    ICacheService cacheService, ILogger<CreateMainServiceCommandHandler> logger) 
     : IRequestHandler<CreateMainServiceCommand, Response<MainServiceDto>>
 {
     const string redisKeyPrefix = "mainservice:list";
@@ -50,7 +51,14 @@ public class CreateMainServiceCommandHandler(CarServiceDbContext dbContext, ICur
 
         var resultDto = result.Entity.FromEntity();
 
-        await cacheService.AppendToListAsync($"{redisKeyPrefix}:{companyId}", resultDto, null);
+        try
+        {
+            await cacheService.AppendToListAsync($"{redisKeyPrefix}:{companyId}", resultDto, null);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Error while appending to cache for main service creation.");
+        }
 
         return Response<MainServiceDto>.Success(resultDto);
     }
