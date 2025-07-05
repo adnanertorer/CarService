@@ -5,6 +5,7 @@ using Adoroid.CarService.Application.Features.SubServices.ExceptionMessages;
 using Adoroid.CarService.Persistence;
 using Adoroid.Core.Application.Wrappers;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using MinimalMediatR.Core;
 
 namespace Adoroid.CarService.Application.Features.MainServices.Commands.Delete
@@ -12,7 +13,7 @@ namespace Adoroid.CarService.Application.Features.MainServices.Commands.Delete
 
     public record DeleteMainServiceCommand(Guid Id) : IRequest<Response<Guid>>;
 
-    public class DeleteMainServiceCommandHandler(CarServiceDbContext dbContext, ICurrentUser currentUser, ICacheService cacheService)
+    public class DeleteMainServiceCommandHandler(CarServiceDbContext dbContext, ICurrentUser currentUser, ICacheService cacheService, ILogger<DeleteMainServiceCommandHandler> logger)
         : IRequestHandler<DeleteMainServiceCommand, Response<Guid>>
     {
         const string redisKeyPrefix = "mainservice:list";
@@ -46,8 +47,16 @@ namespace Adoroid.CarService.Application.Features.MainServices.Commands.Delete
 
             await dbContext.SaveChangesAsync(cancellationToken);
 
-            var cacheListKey = $"{redisKeyPrefix}:{companyId}";
-            await cacheService.RemoveFromListAsync<dynamic>(cacheListKey, request.Id.ToString());
+            try
+            {
+                var cacheListKey = $"{redisKeyPrefix}:{companyId}";
+                await cacheService.RemoveFromListAsync<dynamic>(cacheListKey, request.Id.ToString());
+            }
+            catch(Exception ex)
+            {
+                logger.LogError(ex, "Error while deleting to cache for main service delete.");
+            }
+           
 
             return Response<Guid>.Success(entity.Id);
         }

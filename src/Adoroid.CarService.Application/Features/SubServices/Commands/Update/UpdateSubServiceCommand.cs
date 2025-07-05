@@ -7,6 +7,7 @@ using Adoroid.CarService.Application.Features.SubServices.MapperExtensions;
 using Adoroid.CarService.Persistence;
 using Adoroid.Core.Application.Wrappers;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using MinimalMediatR.Core;
 
 namespace Adoroid.CarService.Application.Features.SubServices.Commands.Update;
@@ -14,7 +15,7 @@ namespace Adoroid.CarService.Application.Features.SubServices.Commands.Update;
 public record UpdateSubServiceCommand(Guid Id, string Operation, Guid EmployeeId, DateTime OperationDate, string? Description,
     string? Material, string? MaterialBrand, Guid? SupplierId, decimal? Discount, decimal Cost) : IRequest<Response<SubServiceDto>>;
 
-public class UpdateSubServiceCommandHandler(CarServiceDbContext dbContext, ICurrentUser currentUser, ICacheService cacheService)
+public class UpdateSubServiceCommandHandler(CarServiceDbContext dbContext, ICurrentUser currentUser, ICacheService cacheService, ILogger<UpdateSubServiceCommandHandler> logger)
     : IRequestHandler<UpdateSubServiceCommand, Response<SubServiceDto>>
 {
     const string redisKeyPrefix = "subservice:list";
@@ -59,7 +60,14 @@ public class UpdateSubServiceCommandHandler(CarServiceDbContext dbContext, ICurr
 
         var resultDto = entity.FromEntity();
 
-        await cacheService.UpdateToListAsync($"{redisKeyPrefix}:{companyId}", request.Id.ToString(), resultDto, null);
+        try
+        {
+            await cacheService.UpdateToListAsync($"{redisKeyPrefix}:{companyId}", request.Id.ToString(), resultDto, null);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Error while updating to cache for sub service update.");
+        }
 
         return Response<SubServiceDto>.Success(entity.FromEntity());
     }
