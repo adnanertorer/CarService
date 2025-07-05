@@ -16,8 +16,7 @@ public static class VehicleMappingExtensions
             Model = vehicle.Model,
             Plate = vehicle.Plate,
             SerialNumber = vehicle.SerialNumber,
-            Year = vehicle.Year,
-            MainServices = vehicle.ListFromEntity()
+            Year = vehicle.Year
         };
     }
 

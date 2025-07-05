@@ -18,8 +18,7 @@ public static class CustomerMappingExtension
             Phone = customer.Phone,
             Surname = customer.Surname,
             TaxNumber = customer.TaxNumber,
-            TaxOffice = customer.TaxOffice,
-            VehicleUsers = customer.VehicleUsers?.Select(vu => vu.VehicleUserFromEntity()).ToList()
+            TaxOffice = customer.TaxOffice
         };
     }
 

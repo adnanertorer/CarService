@@ -12,7 +12,4 @@ public class CustomerDto
     public bool IsActive { get; set; }
     public string? TaxNumber { get; set; }
     public string? TaxOffice { get; set; }
-
-    public List<VehicleDto> Vehicles { get; set; }
-    public List<VehicleUserDto>? VehicleUsers { get; set; }
 }
