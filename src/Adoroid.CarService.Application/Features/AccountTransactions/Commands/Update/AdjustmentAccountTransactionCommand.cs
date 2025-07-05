@@ -79,31 +79,15 @@ public class AdjustmentAccountTransactionCommandHandler(CarServiceDbContext dbCo
 
         await dbContext.SaveChangesAsync(cancellationToken);
 
-        if (accountOwnerType == AccountOwnerTypeEnum.Customer)
+        var customer = await dbContext.Customers.FirstOrDefaultAsync(c => c.Id == accountOwnerId, cancellationToken);
+        if (customer != null)
         {
-            var customer = await dbContext.Customers.FirstOrDefaultAsync(c => c.Id == accountOwnerId, cancellationToken);
-            if (customer != null)
-            {
-                ownerName = $"{customer.Name} {customer.Surname}";
-            }
-            else
-            {
-                logger.LogWarning("Customer with ID {AccountOwnerId} not found.", accountOwnerId);
-                return Response<AccountTransactionDto>.Fail(BusinessExceptionMessages.CustomerNotFound);
-            }
+            ownerName = $"{customer.Name} {customer.Surname}";
         }
-        else if (accountOwnerType == AccountOwnerTypeEnum.MobileUser)
+        else
         {
-            var mobileUser = await dbContext.MobileUsers.FirstOrDefaultAsync(m => m.Id == accountOwnerId, cancellationToken);
-            if( mobileUser != null)
-            {
-                ownerName = $"{mobileUser.Name} {mobileUser.Surname}";
-            }
-            else
-            {
-                logger.LogWarning("Mobile User with ID {AccountOwnerId} not found.", accountOwnerId);
-                return Response<AccountTransactionDto>.Fail(BusinessExceptionMessages.CustomerNotFound);
-            }
+            logger.LogWarning("Customer with ID {AccountOwnerId} not found.", accountOwnerId);
+            return Response<AccountTransactionDto>.Fail(BusinessExceptionMessages.CustomerNotFound);
         }
 
         logger.LogInformation("Adjustment transaction created successfully for MainServiceId: {MainServiceId}", mainService.Id);
