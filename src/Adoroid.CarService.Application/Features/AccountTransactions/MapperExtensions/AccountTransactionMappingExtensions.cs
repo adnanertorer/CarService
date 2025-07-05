@@ -14,7 +14,10 @@ public static class AccountTransactionMappingExtensions
             Debt = accountingTransaction.Debt,
             TransactionDate = accountingTransaction.TransactionDate,
             TransactionType = accountingTransaction.TransactionType,
-            Description = accountingTransaction.Description
+            Description = accountingTransaction.Description,
+            AccountOwnerId = accountingTransaction.AccountOwnerId,
+            AccountOwnerType = accountingTransaction.AccountOwnerType,
+            Id = accountingTransaction.Id
         };
     }
 }

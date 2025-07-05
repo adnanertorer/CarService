@@ -90,8 +90,26 @@ public class AssingVehicleToUserCommandHandler(CarServiceDbContext dbContext, IC
         };
 
         await dbContext.Customers.AddAsync(customer, cancellationToken);
+        await dbContext.SaveChangesAsync(cancellationToken);
+
+        var newCustomerId = customer.Id;
+
+        var accountTransactions = await dbContext.AccountingTransactions
+            .Where(i => i.AccountOwnerId == oldCustomer.Id && i.IsDeleted == false)
+            .ToListAsync(cancellationToken);
+
+        foreach (var transaction in accountTransactions)
+        {
+            transaction.AccountOwnerId = newCustomerId;
+            transaction.AccountOwnerType = (int)AccountOwnerTypeEnum.MobileUser;
+            transaction.UpdatedBy = userId;
+            transaction.UpdatedDate = DateTime.UtcNow;
+            dbContext.AccountingTransactions.Update(transaction);
+        }
 
         await dbContext.SaveChangesAsync(cancellationToken);
+
+
         logger.LogInformation("Vehicle {VehicleId} assigned to user {UserId}", request.VehicleId, userId);
 
         return Response<VehicleDto>.Success(vehicle.FromEntity());
