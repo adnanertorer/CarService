@@ -25,7 +25,7 @@ public class GetByIdAccountTransactionRequestHandler(CarServiceDbContext dbConte
                      : dbContext.MobileUsers.Where(m => m.Id == t.AccountOwnerId).Select(m => m.Name + " " + m.Surname).FirstOrDefault() ?? string.Empty,
                  Id = t.Id,
                  AccountOwnerId = t.AccountOwnerId,
-                 AccountOwnerType = (AccountOwnerTypeEnum)t.AccountOwnerType,
+                 AccountOwnerType =t.AccountOwnerType,
                  Debt = t.Debt,
                  Claim = t.Claim,
                  Balance = t.Balance,
