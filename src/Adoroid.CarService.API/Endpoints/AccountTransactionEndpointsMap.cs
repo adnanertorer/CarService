@@ -1,6 +1,7 @@
 ﻿using Adoroid.CarService.API.Extensions;
 using Adoroid.CarService.Application.Common.Dtos.Filters;
 using Adoroid.CarService.Application.Features.AccountTransactions.Commands.Create;
+using Adoroid.CarService.Application.Features.AccountTransactions.Commands.Update;
 using Adoroid.CarService.Application.Features.AccountTransactions.Dtos;
 using Adoroid.CarService.Application.Features.AccountTransactions.Queries.GetById;
 using Adoroid.CarService.Application.Features.AccountTransactions.Queries.GetList;
@@ -10,7 +11,7 @@ using MinimalMediatR.Extensions;
 
 namespace Adoroid.CarService.API.Endpoints;
 
-public static class AccounTransactionEndpointsMap
+public static class AccountTransactionEndpointsMap
 {
     private const string apiPath = "/api/accounttransaction";
 
@@ -23,6 +24,14 @@ public static class AccounTransactionEndpointsMap
                 return Results.BadRequest("Invalid transaction id.");
 
             var result = await mediator.Send(new GetByIdAccountTransactionRequest(guid), cancellationToken);
+            return result.ToResult();
+        }).RequireAuthorization();
+        builder.MapGet(apiPath + "/adjustment/{id}", async (string id, IMediator mediator, CancellationToken cancellationToken) =>
+        {
+            if (!Guid.TryParse(id, out var guid))
+                return Results.BadRequest("Invalid transaction id.");
+
+            var result = await mediator.Send(new AdjustmentAccountTransactionCommand(guid), cancellationToken);
             return result.ToResult();
         }).RequireAuthorization();
         builder.MapGet(apiPath + "/list", async ([AsParameters] PageRequest pageRequest, string? search, DateTime? startDate, DateTime? endDate, string? customerId, IMediator mediator, CancellationToken cancellationToken) =>
