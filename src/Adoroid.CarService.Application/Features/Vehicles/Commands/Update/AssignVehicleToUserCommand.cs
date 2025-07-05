@@ -95,7 +95,7 @@ public class AssingVehicleToUserCommandHandler(CarServiceDbContext dbContext, IC
         var newCustomerId = customer.Id;
 
         var accountTransactions = await dbContext.AccountingTransactions
-            .Where(i => i.AccountOwnerId == oldCustomer.Id && i.IsDeleted == false)
+            .Where(i => i.AccountOwnerId == oldCustomer.Id)
             .ToListAsync(cancellationToken);
 
         foreach (var transaction in accountTransactions)
