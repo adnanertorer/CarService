@@ -5,13 +5,14 @@ using Adoroid.CarService.Application.Features.SubServices.ExceptionMessages;
 using Adoroid.CarService.Persistence;
 using Adoroid.Core.Application.Wrappers;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using MinimalMediatR.Core;
 
 namespace Adoroid.CarService.Application.Features.SubServices.Commands.Delete;
 
 public record DeleteSubServiceCommand(Guid Id) : IRequest<Response<Guid>>;
 
-public class DeleteSubServiceCommandHandler(CarServiceDbContext dbContext, ICurrentUser currentUser, ICacheService cacheService)
+public class DeleteSubServiceCommandHandler(CarServiceDbContext dbContext, ICurrentUser currentUser, ICacheService cacheService, ILogger<DeleteSubServiceCommandHandler> logger)
     : IRequestHandler<DeleteSubServiceCommand, Response<Guid>>
 {
     const string redisKeyPrefix = "subservice:list";
@@ -30,8 +31,17 @@ public class DeleteSubServiceCommandHandler(CarServiceDbContext dbContext, ICurr
 
         await dbContext.SaveChangesAsync(cancellationToken);
 
-        var cacheListKey = $"{redisKeyPrefix}:{companyId}";
-        await cacheService.RemoveFromListAsync<dynamic>(cacheListKey, request.Id.ToString());
+        try
+        {
+            var cacheListKey = $"{redisKeyPrefix}:{companyId}";
+            await cacheService.RemoveFromListAsync<dynamic>(cacheListKey, request.Id.ToString());
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Error while deleting to cache for sub service delete.");
+        }
+
+        
 
         return Response<Guid>.Success(entity.Id);
     }
