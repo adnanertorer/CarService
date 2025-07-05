@@ -1,30 +1,54 @@
-﻿using Adoroid.CarService.Application.Features.Vehicles.Dtos;
-using Adoroid.CarService.Application.Features.Vehicles.MapperExtensions;
+﻿using Adoroid.CarService.Application.Common.Abstractions.Auth;
+using Adoroid.CarService.Application.Features.Vehicles.Dtos;
 using Adoroid.CarService.Persistence;
 using Adoroid.Core.Application.Requests;
 using Adoroid.Core.Application.Wrappers;
 using Adoroid.Core.Repository.Paging;
-using Microsoft.EntityFrameworkCore;
 using MinimalMediatR.Core;
 
 namespace Adoroid.CarService.Application.Features.Vehicles.Queries.GetList;
 
 public record GetListVehiclesQuery(PageRequest PageRequest, Guid CustomerId, string? Search) : IRequest<Response<Paginate<VehicleDto>>>;
 
-public class GetListVehiclesQueryHandler(CarServiceDbContext dbContext) : IRequestHandler<GetListVehiclesQuery, Response<Paginate<VehicleDto>>>
+public class GetListVehiclesQueryHandler(CarServiceDbContext dbContext, ICurrentUser currentUser) : IRequestHandler<GetListVehiclesQuery, Response<Paginate<VehicleDto>>>
 {
     public async Task<Response<Paginate<VehicleDto>>> Handle(GetListVehiclesQuery request, CancellationToken cancellationToken)
     {
-        var query = dbContext.Vehicles
-            .Where(i => i.VehicleUsers.Any(i => i.UserId == request.CustomerId))
-            .AsNoTracking();
+        var query = from cus in dbContext.Customers from vu in dbContext.VehicleUsers where cus.CompanyId == Guid.Parse(currentUser.CompanyId!) && (cus.Id == vu.UserId || cus.MobileUserId == vu.UserId)
+            join veh in dbContext.Vehicles on vu.VehicleId equals veh.Id into vehJoin
+            from veh in vehJoin.DefaultIfEmpty()
+            select new
+            {
+                Customer = new CustomerDto { Id = cus.Id, Name = cus.Name, Surname = cus.Surname},
+                Vehicle = new VehicleDto
+                {
+                    Id = veh.Id,
+                    Brand = veh.Brand,
+                    Model = veh.Model,
+                    Plate = veh.Plate,
+                    SerialNumber = veh.SerialNumber,
+                    Year = veh.Year,
+                    Engine = veh.Engine,
+                    FuelTypeId = veh.FuelTypeId
+                }
+            }; 
 
         if (!string.IsNullOrWhiteSpace(request.Search))
-            query = query.Where(i => i.Brand.Contains(request.Search) || i.Model.Contains(request.Search) || i.Plate.Contains(request.Search)
-            || (i.SerialNumber != null && i.SerialNumber.Contains(request.Search)));
+            query = query.Where(i => i.Vehicle.Brand.Contains(request.Search) || i.Vehicle.Model.Contains(request.Search) || i.Vehicle.Plate.Contains(request.Search)
+            || (i.Vehicle.SerialNumber != null && i.Vehicle.SerialNumber.Contains(request.Search)));
 
-        var result = await query.OrderBy(i => i.Brand)
-            .Select(i => i.FromEntity())
+        var result = await query.OrderBy(i => i.Vehicle.Brand)
+            .Select(i => new VehicleDto
+            {
+                Id = i.Vehicle.Id,
+                Brand = i.Vehicle.Brand,
+                Model = i.Vehicle.Model,
+                Plate = i.Vehicle.Plate,
+                SerialNumber = i.Vehicle.SerialNumber,
+                Year = i.Vehicle.Year,
+                Engine = i.Vehicle.Engine,
+                FuelTypeId = i.Vehicle.FuelTypeId
+            })
             .ToPaginateAsync(request.PageRequest.PageIndex, request.PageRequest.PageSize, cancellationToken);
 
         return Response<Paginate<VehicleDto>>.Success(result);
