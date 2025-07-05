@@ -89,6 +89,8 @@ public class UpdateMainServiceCommandHandler(CarServiceDbContext dbContext, ICur
             accountTransaction.IsDeleted = false;
             accountTransaction.TransactionType = (int)TransactionTypeEnum.Payable;
             accountTransaction.TransactionDate = DateTime.UtcNow;
+            accountTransaction.Description = $"Servis ücreti: {entity.Cost} TL. Araç: {entity.Vehicle.Plate} - {entity.Vehicle.Model} - {entity.Vehicle.Brand}";
+            accountTransaction.MainServiceId = request.Id;
 
             await dbContext.AddAsync(accountTransaction, cancellationToken);
         }
