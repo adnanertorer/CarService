@@ -3,7 +3,6 @@ using Adoroid.CarService.Application.Common.Enums;
 using Adoroid.CarService.Application.Features.Vehicles.Dtos;
 using Adoroid.CarService.Application.Features.Vehicles.ExceptionMessages;
 using Adoroid.CarService.Application.Features.Vehicles.MapperExtensions;
-using Adoroid.CarService.Domain.Entities;
 using Adoroid.CarService.Persistence;
 using Adoroid.Core.Application.Wrappers;
 using Microsoft.EntityFrameworkCore;
@@ -30,6 +29,7 @@ public class AssingVehicleToUserCommandHandler(CarServiceDbContext dbContext, IC
         if (vehicle is null)
             return Response<VehicleDto>.Fail(BusinessExceptionMessages.NotFound);
 
+        //kendisine atanmis gecici kullanicilari buluyoruz
         var vehicleTemporaryUsers = await dbContext.VehicleUsers
             .Where(i => i.VehicleId == request.VehicleId && i.UserTypeId == (int)VehicleUserTypeEnum.Temporary)
             .ToListAsync(cancellationToken);
@@ -37,12 +37,14 @@ public class AssingVehicleToUserCommandHandler(CarServiceDbContext dbContext, IC
         if (vehicleTemporaryUsers.Count == 0)
             return Response<VehicleDto>.Fail(BusinessExceptionMessages.VehicleUserRecordNotFound);
 
-        var vehicleUser = vehicleTemporaryUsers.First();
+        var vehicleUser = vehicleTemporaryUsers.First(); // ilk kaydi aliyoruz
 
-        var oldUserId = vehicleUser.UserId; //eski id alınıyor, customer tablo bakılacak. Customer tablosundaki customerId ile eşleşen userId ise, customer tablosundaki userId ve bilgiler güncellenecek.
+        var oldUserId = vehicleUser.UserId; //eski id alınıyor, customer tablo bakılacak.
+                                            //Customer tablosundaki customerId ile eşleşen userId ise,
+                                            //customer tablosundaki mobileuserId ve bilgiler güncellenecek.
 
         vehicleUser.UpdatedDate = DateTime.UtcNow;
-        vehicleUser.UserId = userId;
+        vehicleUser.UserId = userId; //mobil kullanicinin id'si atanıyor
         vehicleUser.UserTypeId = (int)VehicleUserTypeEnum.Master;
         vehicleUser.UpdatedBy = userId;
        
@@ -55,10 +57,10 @@ public class AssingVehicleToUserCommandHandler(CarServiceDbContext dbContext, IC
         }
 
         // Eğer eski kullanıcı bir müşteri ise, müşteri tablosundaki userId ve bilgileri güncelle
-        var oldCustomer = await dbContext.Customers
+        var currentCustomer = await dbContext.Customers
             .FirstOrDefaultAsync(i => i.Id == oldUserId, cancellationToken);
 
-        if (oldCustomer is null)
+        if (currentCustomer is null)
             return Response<VehicleDto>.Fail(BusinessExceptionMessages.CustomerNotFound);
 
         var mobileUser = await dbContext.MobileUsers
@@ -67,45 +69,16 @@ public class AssingVehicleToUserCommandHandler(CarServiceDbContext dbContext, IC
         if (mobileUser is null)
             return Response<VehicleDto>.Fail(BusinessExceptionMessages.MobileUserNotFound);
 
-        oldCustomer.DeletedBy = userId;
-        oldCustomer.DeletedDate = DateTime.UtcNow;
-        oldCustomer.IsDeleted = true;
-
-        var customer = new Customer
-        {
-            MobileUserId = userId,
-            Name = mobileUser.Name,
-            Surname = mobileUser.Surname,
-            Email = mobileUser.Email,
-            Phone = mobileUser.PhoneNumber,
-            CreatedBy = userId,
-            CreatedDate = DateTime.UtcNow,
-            Address = mobileUser.Address,
-            CityId = mobileUser.CityId,
-            DistrictId = mobileUser.DistrictId,
-            CompanyId = oldCustomer.CompanyId,
-            TaxNumber = oldCustomer.TaxNumber,
-            IsActive = true,
-            TaxOffice = oldCustomer.TaxOffice
-        };
-
-        await dbContext.Customers.AddAsync(customer, cancellationToken);
-        await dbContext.SaveChangesAsync(cancellationToken);
-
-        var newCustomerId = customer.Id;
-
-        var accountTransactions = await dbContext.AccountingTransactions
-            .Where(i => i.AccountOwnerId == oldCustomer.Id)
-            .ToListAsync(cancellationToken);
-
-        foreach (var transaction in accountTransactions)
-        {
-            transaction.AccountOwnerId = newCustomerId;
-            transaction.AccountOwnerType = (int)AccountOwnerTypeEnum.MobileUser;
-            transaction.UpdatedBy = userId;
-            transaction.UpdatedDate = DateTime.UtcNow;
-            dbContext.AccountingTransactions.Update(transaction);
-        }
+        currentCustomer.MobileUserId = userId;
+        currentCustomer.Name = mobileUser.Name;
+        currentCustomer.Surname = mobileUser.Surname;
+        currentCustomer.Email = mobileUser.Email;
+        currentCustomer.Phone = mobileUser.PhoneNumber;
+        currentCustomer.Address = mobileUser.Address;
+        currentCustomer.CityId = mobileUser.CityId;
+        currentCustomer.DistrictId = mobileUser.DistrictId;
+        currentCustomer.UpdatedBy = userId;
+        currentCustomer.UpdatedDate = DateTime.UtcNow;
 
         await dbContext.SaveChangesAsync(cancellationToken);
 
