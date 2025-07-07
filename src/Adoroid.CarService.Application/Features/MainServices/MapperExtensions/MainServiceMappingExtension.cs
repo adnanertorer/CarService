@@ -1,4 +1,5 @@
-﻿using Adoroid.CarService.Application.Features.MainServices.Dtos;
+﻿using Adoroid.CarService.Application.Common.Enums;
+using Adoroid.CarService.Application.Features.MainServices.Dtos;
 using Adoroid.CarService.Domain.Entities;
 
 namespace Adoroid.CarService.Application.Features.MainServices.MapperExtensions;
@@ -24,7 +25,8 @@ public static class MainServiceMappingExtension
                 SerialNumber = mainService.Vehicle!.SerialNumber,
                 Year = mainService.Vehicle!.Year
             } : null,
-            VehicleId = mainService.VehicleId
+            VehicleId = mainService.VehicleId,
+            MainServiceStatus = (MainServiceStatusEnum)mainService.ServiceStatus
         };
     }
 }
