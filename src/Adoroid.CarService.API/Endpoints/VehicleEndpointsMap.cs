@@ -16,10 +16,11 @@ namespace Adoroid.CarService.API.Endpoints;
 public static class VehicleEndpointsMap
 {
     private const string apiPath = "/api/vehicle";
+    private const string mobileUserScheme = "MobileUser";
 
     public static IEndpointRouteBuilder VehicleEndpoint(this IEndpointRouteBuilder builder)
     {
-        var schemes = new[] { JwtBearerDefaults.AuthenticationScheme, "MobileUser" };
+        var schemes = new[] { JwtBearerDefaults.AuthenticationScheme, mobileUserScheme };
 
         builder.MinimalMediatrMapCommand<CreateVehicleCommand, VehicleDto>(apiPath)
             .RequireAuthorization(policy =>
@@ -28,7 +29,7 @@ public static class VehicleEndpointsMap
 
         builder.MinimalMediatrMapCommand<AssignVehicleToUserCommand, VehicleDto>(apiPath + "/assing-vehicle", "POST")
             .RequireAuthorization(policy =>
-                policy.AddAuthenticationSchemes(["MobileUser"]).RequireAuthenticatedUser()
+                policy.AddAuthenticationSchemes([mobileUserScheme]).RequireAuthenticatedUser()
             );
 
         builder.MinimalMediatrMapCommand<UpdateVehicleCommand, VehicleDto>(apiPath, "PUT").RequireAuthorization(policy =>
@@ -62,7 +63,7 @@ public static class VehicleEndpointsMap
             var result = await mediator.Send(new GetMyVehicleListQuery(pageRequest, search), cancellationToken);
             return result.ToResult();
         }).RequireAuthorization(policy =>
-        policy.AddAuthenticationSchemes(["MobileUser"]).RequireAuthenticatedUser());
+        policy.AddAuthenticationSchemes([mobileUserScheme]).RequireAuthenticatedUser());
 
         builder.MapGet(apiPath + "/getby-serialnumber", async (string plateNumber, string serialNumber, IMediator mediator, CancellationToken cancellationToken) =>
         {
