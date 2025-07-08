@@ -4,7 +4,10 @@ namespace Adoroid.CarService.Domain.Entities;
 
 public class MobileUser : Entity<Guid>
 {
-
+    public MobileUser()
+    {
+        Bookings = new HashSet<Booking>();
+    }
     public string Name { get; set; }
     public string Surname { get; set; }
     public string Email { get; set; }
@@ -20,4 +23,6 @@ public class MobileUser : Entity<Guid>
 
     public City City { get; set; }
     public District District { get; set; }
+
+    public ICollection<Booking> Bookings { get; set; }
 }

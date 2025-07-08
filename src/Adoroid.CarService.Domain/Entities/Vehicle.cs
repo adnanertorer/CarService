@@ -8,6 +8,7 @@ public class Vehicle : Entity<Guid>
     {
         MainServices = new HashSet<MainService>();
         VehicleUsers = new HashSet<VehicleUser>();
+        Bookings = new HashSet<Booking>();
     }
 
     public string Brand { get; set; }
@@ -20,4 +21,5 @@ public class Vehicle : Entity<Guid>
 
     public ICollection<MainService> MainServices { get; set; }
     public ICollection<VehicleUser> VehicleUsers { get; set; }
+    public ICollection<Booking> Bookings { get; set; }
 }
