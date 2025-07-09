@@ -10,7 +10,7 @@ public class Booking : Entity<Guid>
     public Guid CompanyId { get; set; } 
     public DateTime BookingStartDate { get; set; }
     public DateTime BookingEndDate { get; set; }
-    public int BookingStatus { get; set; } // e.g., Accept, Waiting, Reject, Answered
+    public int BookingStatus { get; set; }
     public string? Description { get; set; }
 
     public MobileUser MobileUser { get; set; }

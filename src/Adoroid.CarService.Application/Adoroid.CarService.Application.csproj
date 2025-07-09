@@ -18,6 +18,11 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Features\Bookings\Commands\" />
+    <Folder Include="Features\Bookings\Dtos\" />
+    <Folder Include="Features\Bookings\ExceptionMessages\" />
+    <Folder Include="Features\Bookings\MapperExtensions\" />
+    <Folder Include="Features\Bookings\Queries\" />
     <Folder Include="Features\MainServices\ExceptionMessages\" />
   </ItemGroup>
 
