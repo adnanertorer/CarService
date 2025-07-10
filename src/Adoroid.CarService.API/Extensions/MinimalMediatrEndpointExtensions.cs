@@ -1,4 +1,5 @@
-﻿using Adoroid.Core.Application.Wrappers;
+﻿using Adoroid.Core.Application.Exceptions.Types;
+using Adoroid.Core.Application.Wrappers;
 using Microsoft.AspNetCore.Mvc;
 using MinimalMediatR.Core;
 using MinimalMediatR.Extensions;
@@ -12,8 +13,20 @@ public static class MinimalMediatrEndpointExtensions
     {
         var handler = async ([FromBody] TRequest request, IMediator mediator, CancellationToken cancellationToken) =>
         {
-            var result = await mediator.Send(request, cancellationToken);
-            return result.ToResult();
+            try
+            {
+                var result = await mediator.Send(request, cancellationToken);
+                return result.ToResult();
+            }
+            catch (ValidationException ex)
+            {
+                var errors = ex.Errors
+                    .Select(e => new { field = e.Property ?? string.Empty, error = e.Errors });
+
+                return Results.ValidationProblem(
+                    errors.ToDictionary(e => e.field, e => e.error.ToArray())
+                );
+            }
         };
 
         return httpMethod.ToUpper() switch
