@@ -15,8 +15,6 @@ public class UserLoginQueryValidator : AbstractValidator<UserLoginQuery>
 
         RuleFor(x => x.Password)
                .NotEmpty()
-               .WithMessage(string.Format(ValidationMessages.Required, "Parola"))
-               .EmailAddress()
-               .WithMessage(string.Format(ValidationMessages.Email, "Parola"));
+               .WithMessage(string.Format(ValidationMessages.Required, "Parola"));
     }
 }
