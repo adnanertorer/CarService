@@ -38,7 +38,9 @@ public class GetCustomerListQueryHandler(CarServiceDbContext dbContext, ICurrent
                 Phone = g.Phone,
                 Surname = g.Surname,
                 TaxNumber = g.TaxNumber,
-                TaxOffice = g.TaxOffice
+                TaxOffice = g.TaxOffice,
+                DistrictId = g.DistrictId,
+                CityId = g.CityId,
             })
             .OrderBy(x => x.Name)
             .ToPaginateAsync(request.PageRequest.PageIndex, request.PageRequest.PageSize, cancellationToken);
