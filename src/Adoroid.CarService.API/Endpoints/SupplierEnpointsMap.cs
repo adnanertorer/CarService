@@ -19,7 +19,16 @@ public static class SupplierEnpointsMap
     {
         builder.MinimalMediatrMapCommand<CreateSupplierCommand, SupplierDto>(apiPath).RequireAuthorization();
         builder.MinimalMediatrMapCommand<UpdateSupplierCommand, SupplierDto>(apiPath, "PUT").RequireAuthorization();
-        builder.MinimalMediatrMapCommand<DeleteSupplierCommand, Guid>(apiPath, "DELETE").RequireAuthorization();
+
+        builder.MapDelete(apiPath + "/{id}", async (string id, IMediator mediator, CancellationToken cancellationToken) =>
+        {
+            if (!Guid.TryParse(id, out var guid))
+                return Results.BadRequest("Invalid suplier id.");
+
+            var result = await mediator.Send(new DeleteSupplierCommand(guid), cancellationToken);
+            return result.ToResult();
+        }).RequireAuthorization();
+
         builder.MapGet(apiPath + "/{id}", async (string id, IMediator mediator, CancellationToken cancellationToken) =>
         {
             if (!Guid.TryParse(id, out var guid))
@@ -28,6 +37,7 @@ public static class SupplierEnpointsMap
             var result = await mediator.Send(new SupplierGetByIdRequest(guid), cancellationToken);
             return result.ToResult();
         }).RequireAuthorization();
+
         builder.MapGet(apiPath + "/list", async ([AsParameters] PageRequest pageRequest, string? search, IMediator mediator, CancellationToken cancellationToken) =>
         {
             var result = await mediator.Send(new SupplierGetListQuery(pageRequest, search), cancellationToken);

@@ -27,8 +27,14 @@ public static class UserToCompanyEndpointsMap
         builder.MinimalMediatrMapCommand<UpdateUserToCompanyCommand, UserToCompanyDto>(apiPath, "PUT").RequireAuthorization(policy =>
         policy.AddAuthenticationSchemes(schemes).RequireAuthenticatedUser());
 
-        builder.MinimalMediatrMapCommand<DeleteUserToCompanyCommand, Guid>(apiPath, "DELETE").RequireAuthorization(policy =>
-        policy.AddAuthenticationSchemes(schemes).RequireAuthenticatedUser());
+        builder.MapDelete(apiPath + "/{id}", async (string id, IMediator mediator, CancellationToken cancellationToken) =>
+        {
+            if (!Guid.TryParse(id, out var guid))
+                return Results.BadRequest("Invalid id.");
+
+            var result = await mediator.Send(new DeleteUserToCompanyCommand(guid), cancellationToken);
+            return result.ToResult();
+        }).RequireAuthorization();
 
         builder.MapGet(apiPath + "/{id}", async (string id, IMediator mediator, CancellationToken cancellationToken) =>
         {
