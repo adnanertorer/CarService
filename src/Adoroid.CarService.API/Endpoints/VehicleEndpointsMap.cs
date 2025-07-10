@@ -35,8 +35,14 @@ public static class VehicleEndpointsMap
         builder.MinimalMediatrMapCommand<UpdateVehicleCommand, VehicleDto>(apiPath, "PUT").RequireAuthorization(policy =>
         policy.AddAuthenticationSchemes(schemes).RequireAuthenticatedUser());
 
-        builder.MinimalMediatrMapCommand<DeleteVehicleCommand, Guid>(apiPath, "DELETE").RequireAuthorization(policy =>
-        policy.AddAuthenticationSchemes(schemes).RequireAuthenticatedUser());
+        builder.MapDelete(apiPath + "/{id}", async (string id, IMediator mediator, CancellationToken cancellationToken) =>
+        {
+            if (!Guid.TryParse(id, out var guid))
+                return Results.BadRequest("Invalid vehicle id.");
+
+            var result = await mediator.Send(new DeleteVehicleCommand(guid), cancellationToken);
+            return result.ToResult();
+        }).RequireAuthorization();
 
         builder.MapGet(apiPath + "/{id}", async (string id, IMediator mediator, CancellationToken cancellationToken) =>
         {

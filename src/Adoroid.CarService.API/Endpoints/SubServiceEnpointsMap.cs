@@ -19,7 +19,16 @@ public static class SubServiceEnpointsMap
     {
         builder.MinimalMediatrMapCommand<CreateSubServiceCommand, SubServiceDto>(apiPath).RequireAuthorization();
         builder.MinimalMediatrMapCommand<UpdateSubServiceCommand, SubServiceDto>(apiPath, "PUT").RequireAuthorization();
-        builder.MinimalMediatrMapCommand<DeleteSubServiceCommand, Guid>(apiPath, "DELETE").RequireAuthorization();
+
+        builder.MapDelete(apiPath + "/{id}", async (string id, IMediator mediator, CancellationToken cancellationToken) =>
+        {
+            if (!Guid.TryParse(id, out var guid))
+                return Results.BadRequest("Invalid subservice id.");
+
+            var result = await mediator.Send(new DeleteSubServiceCommand(guid), cancellationToken);
+            return result.ToResult();
+        }).RequireAuthorization();
+
         builder.MapGet(apiPath + "/{id}", async (string id, IMediator mediator, CancellationToken cancellationToken) =>
         {
             if (!Guid.TryParse(id, out var guid))

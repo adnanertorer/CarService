@@ -18,7 +18,16 @@ public static class EmployeeEndpointsMap
     {
         builder.MinimalMediatrMapCommand<CreateEmployeeCommand, EmployeeDto>(apiPath).RequireAuthorization();
         builder.MinimalMediatrMapCommand<UpdateEmployeeCommand, EmployeeDto>(apiPath, "PUT").RequireAuthorization();
-        builder.MinimalMediatrMapCommand<DeleteEmployeeCommand, Guid>(apiPath, "DELETE").RequireAuthorization();
+
+        builder.MapDelete(apiPath + "/{id}", async (string id, IMediator mediator, CancellationToken cancellationToken) =>
+        {
+            if (!Guid.TryParse(id, out var guid))
+                return Results.BadRequest("Invalid employee id.");
+
+            var result = await mediator.Send(new DeleteEmployeeCommand(guid), cancellationToken);
+            return result.ToResult();
+        }).RequireAuthorization();
+
         builder.MapGet(apiPath + "/{id}", async (string id, IMediator mediator, CancellationToken cancellationToken) =>
         {
             if (!Guid.TryParse(id, out var guid))
@@ -27,6 +36,7 @@ public static class EmployeeEndpointsMap
             var result = await mediator.Send(new EmployeeGetByIdQuery(guid), cancellationToken);
             return result.ToResult();
         }).RequireAuthorization();
+
         builder.MapGet(apiPath + "/list", async ([AsParameters] PageRequest pageRequest, string? search, IMediator mediator, CancellationToken cancellationToken) =>
         {
             var result = await mediator.Send(new GetEmployeeListQuery(pageRequest, search), cancellationToken);
