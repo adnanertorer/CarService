@@ -12,4 +12,6 @@ public class CustomerDto
     public bool IsActive { get; set; }
     public string? TaxNumber { get; set; }
     public string? TaxOffice { get; set; }
+    public int CityId { get; set; }
+    public int DistrictId { get; set; }
 }

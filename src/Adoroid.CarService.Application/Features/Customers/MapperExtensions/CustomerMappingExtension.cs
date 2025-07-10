@@ -18,7 +18,9 @@ public static class CustomerMappingExtension
             Phone = customer.Phone,
             Surname = customer.Surname,
             TaxNumber = customer.TaxNumber,
-            TaxOffice = customer.TaxOffice
+            TaxOffice = customer.TaxOffice,
+            CityId = customer.CityId,
+            DistrictId = customer.DistrictId
         };
     }
 
