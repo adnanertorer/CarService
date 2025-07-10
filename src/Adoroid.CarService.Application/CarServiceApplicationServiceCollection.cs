@@ -1,4 +1,7 @@
 ﻿using Adoroid.CarService.Application.Common.Abstractions.Auth;
+using Adoroid.CarService.Application.Features.Companies.Commands.Create;
+using Adoroid.CarService.Application.Features.Companies.Commands.Create.Validators;
+using Adoroid.Core.Application.Pipelines.Validation;
 using Adoroid.Core.Application.Rules;
 using FluentValidation;
 using Microsoft.Extensions.Configuration;
@@ -18,6 +21,7 @@ public static class CarServiceApplicationServiceCollection
         services.AddSubClassesOfType(Assembly.GetExecutingAssembly(), type: typeof(BaseBusinessRule));
         services.AddMinimalMediatR(Assembly.GetExecutingAssembly());
         services.AddTransient(typeof(IPipelineBehavior<,>), typeof(LoggingBehavior<,>));
+        services.AddTransient(typeof(IPipelineBehavior<,>), typeof(RequestValidationBehavior<,>));
         services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
         return services;
     }
