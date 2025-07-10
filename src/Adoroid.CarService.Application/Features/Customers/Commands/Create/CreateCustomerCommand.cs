@@ -27,7 +27,7 @@ public class CreateCustomerCommandHandler(CarServiceDbContext dbContext, ICurren
             i.CompanyId == companyId, cancellationToken);
 
         if (isExist)
-            return Response<CustomerDto>.Fail(BusinessExceptionMessages.NotFound);
+            return Response<CustomerDto>.Fail(BusinessExceptionMessages.AlreadyExists);
 
         var customer = new Customer
         {
