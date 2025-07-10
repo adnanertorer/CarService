@@ -26,6 +26,7 @@ public static class AccountTransactionEndpointsMap
             var result = await mediator.Send(new GetByIdAccountTransactionRequest(guid), cancellationToken);
             return result.ToResult();
         }).RequireAuthorization();
+
         builder.MapGet(apiPath + "/adjustment/{id}", async (string id, IMediator mediator, CancellationToken cancellationToken) =>
         {
             if (!Guid.TryParse(id, out var guid))
@@ -34,6 +35,7 @@ public static class AccountTransactionEndpointsMap
             var result = await mediator.Send(new AdjustmentAccountTransactionCommand(guid), cancellationToken);
             return result.ToResult();
         }).RequireAuthorization();
+
         builder.MapGet(apiPath + "/list", async ([AsParameters] PageRequest pageRequest, string? search, DateTime? startDate, DateTime? endDate, string? customerId, IMediator mediator, CancellationToken cancellationToken) =>
         {
             Guid? cId = null;

@@ -18,7 +18,16 @@ public static class CompanyServiceEndpointsMap
     {
         builder.MinimalMediatrMapCommand<CreateCompanyServiceCommand, CompanyServiceDto>(apiPath).RequireAuthorization();
         builder.MinimalMediatrMapCommand<UpdateCompanyServiceCommand, CompanyServiceDto>(apiPath, "PUT").RequireAuthorization();
-        builder.MinimalMediatrMapCommand<DeleteCompanyServiceCommand, Guid>(apiPath, "DELETE").RequireAuthorization();
+
+        builder.MapDelete(apiPath + "/{id}", async (string id, IMediator mediator, CancellationToken cancellationToken) =>
+        {
+            if (!Guid.TryParse(id, out var guid))
+                return Results.BadRequest("Invalid service id.");
+
+            var result = await mediator.Send(new DeleteCompanyServiceCommand(guid), cancellationToken);
+            return result.ToResult();
+        }).RequireAuthorization();
+
         builder.MapGet(apiPath + "/{id}", async (string id, IMediator mediator, CancellationToken cancellationToken) =>
         {
             if (!Guid.TryParse(id, out var guid))
@@ -27,6 +36,7 @@ public static class CompanyServiceEndpointsMap
             var result = await mediator.Send(new GetByIdCompanyServiceQuery(guid), cancellationToken);
             return result.ToResult();
         }).RequireAuthorization();
+
         builder.MapGet(apiPath + "/list", async ([AsParameters] PageRequest pageRequest, string? search, IMediator mediator, CancellationToken cancellationToken) =>
         {
             var result = await mediator.Send(new GetListCompanyServiceQuery(pageRequest, search), cancellationToken);
