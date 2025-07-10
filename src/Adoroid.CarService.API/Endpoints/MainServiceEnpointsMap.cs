@@ -21,7 +21,15 @@ public static class MainServiceEnpointsMap
     {
         builder.MinimalMediatrMapCommand<CreateMainServiceCommand, MainServiceDto>(apiPath).RequireAuthorization();
         builder.MinimalMediatrMapCommand<UpdateMainServiceCommand, MainServiceDto>(apiPath, "PUT").RequireAuthorization();
-        builder.MinimalMediatrMapCommand<DeleteMainServiceCommand, Guid>(apiPath, "DELETE").RequireAuthorization();
+
+        builder.MapDelete(apiPath + "/{id}", async (string id, IMediator mediator, CancellationToken cancellationToken) =>
+        {
+            if (!Guid.TryParse(id, out var guid))
+                return Results.BadRequest("Invalid mainservice id.");
+
+            var result = await mediator.Send(new DeleteMainServiceCommand(guid), cancellationToken);
+            return result.ToResult();
+        }).RequireAuthorization();
 
         builder.MapGet(apiPath + "/{id}", async (string id, IMediator mediator, CancellationToken cancellationToken) =>
         {

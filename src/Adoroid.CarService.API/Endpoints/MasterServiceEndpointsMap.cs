@@ -18,7 +18,16 @@ public static class MasterServiceEndpointsMap
     {
         builder.MinimalMediatrMapCommand<CreateMasterServiceCommand, MasterServiceDto>(apiPath).RequireAuthorization();
         builder.MinimalMediatrMapCommand<UpdateMasterServiceCommand, MasterServiceDto>(apiPath, "PUT").RequireAuthorization();
-        builder.MinimalMediatrMapCommand<DeleteMasterServiceCommand, Guid>(apiPath, "DELETE").RequireAuthorization();
+
+        builder.MapDelete(apiPath + "/{id}", async (string id, IMediator mediator, CancellationToken cancellationToken) =>
+        {
+            if (!Guid.TryParse(id, out var guid))
+                return Results.BadRequest("Invalid masterservice id.");
+
+            var result = await mediator.Send(new DeleteMasterServiceCommand(guid), cancellationToken);
+            return result.ToResult();
+        }).RequireAuthorization();
+
         builder.MapGet(apiPath + "/{id}", async (string id, IMediator mediator, CancellationToken cancellationToken) =>
         {
             if (!Guid.TryParse(id, out var guid))
@@ -27,11 +36,13 @@ public static class MasterServiceEndpointsMap
             var result = await mediator.Send(new GetByIdMasterServiceQuery(guid), cancellationToken);
             return result.ToResult();
         }).RequireAuthorization();
+
         builder.MapGet(apiPath + "/list", async ([AsParameters] PageRequest pageRequest, string? search, IMediator mediator, CancellationToken cancellationToken) =>
         {
             var result = await mediator.Send(new GetListMasterServicesQuery(pageRequest, search), cancellationToken);
             return result.ToResult();
         }).RequireAuthorization();
+
         return builder;
     }
 }
