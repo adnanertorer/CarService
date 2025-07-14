@@ -1,24 +1,22 @@
-﻿using Adoroid.CarService.Application.Common.Abstractions.Auth;
+﻿using Adoroid.CarService.Application.Common.Abstractions;
+using Adoroid.CarService.Application.Common.Abstractions.Auth;
 using Adoroid.CarService.Application.Common.Dtos.Auth;
 using Adoroid.CarService.Application.Features.Users.Dtos;
 using Adoroid.CarService.Application.Features.Users.ExceptionMessages;
-using Adoroid.CarService.Persistence;
 using Adoroid.Core.Application.Wrappers;
-using Microsoft.EntityFrameworkCore;
 using MinimalMediatR.Core;
 
 namespace Adoroid.CarService.Application.Features.Users.Queries.Login;
 
 public record UserLoginQuery(string Email, string Password) : IRequest<Response<AccesTokenDto>>;
 
-public class UserLoginQueryHandler(CarServiceDbContext dbContext, ITokenHandler tokenHandler, IAesEncryptionHelper aesEncryptionHelper) : IRequestHandler<UserLoginQuery, Response<AccesTokenDto>>
+public class UserLoginQueryHandler(IUnitOfWork unitOfWork, ITokenHandler tokenHandler, IAesEncryptionHelper aesEncryptionHelper) : IRequestHandler<UserLoginQuery, Response<AccesTokenDto>>
 {
     public async Task<Response<AccesTokenDto>> Handle(UserLoginQuery request, CancellationToken cancellationToken)
     {
         var encryptedPassword = aesEncryptionHelper.Encrypt(request.Password);
-        var user = await dbContext.Users
-            .AsNoTracking()
-            .FirstOrDefaultAsync(i => i.Email == request.Email && i.Password == encryptedPassword, cancellationToken);
+        var user = await unitOfWork.Users
+            .GetUserWithEmailAndPassword(request.Email, encryptedPassword, cancellationToken);
 
         if (user is null)
             return Response<AccesTokenDto>.Fail(BusinessExceptionMessages.InvalidCredentials);
