@@ -1,9 +1,9 @@
-﻿using Adoroid.CarService.Application.Common.Abstractions.Auth;
+﻿using Adoroid.CarService.Application.Common.Abstractions;
+using Adoroid.CarService.Application.Common.Abstractions.Auth;
 using Adoroid.CarService.Application.Common.Enums;
 using Adoroid.CarService.Application.Features.AccountTransactions.Dtos;
 using Adoroid.CarService.Application.Features.AccountTransactions.ExceptionMessages;
 using Adoroid.CarService.Domain.Entities;
-using Adoroid.CarService.Persistence;
 using Adoroid.Core.Application.Wrappers;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -13,13 +13,12 @@ namespace Adoroid.CarService.Application.Features.AccountTransactions.Commands.U
 
 public record AdjustmentAccountTransactionCommand(Guid Id) : IRequest<Response<AccountTransactionDto>>;
 
-public class AdjustmentAccountTransactionCommandHandler(CarServiceDbContext dbContext, ICurrentUser currentUser, ILogger<AdjustmentAccountTransactionCommandHandler> logger)
+public class AdjustmentAccountTransactionCommandHandler(IUnitOfWork unitOfWork, ICurrentUser currentUser, ILogger<AdjustmentAccountTransactionCommandHandler> logger)
     : IRequestHandler<AdjustmentAccountTransactionCommand, Response<AccountTransactionDto>>
 {
     public async Task<Response<AccountTransactionDto>> Handle(AdjustmentAccountTransactionCommand request, CancellationToken cancellationToken)
     {
-        var entity = await dbContext.AccountingTransactions
-            .FirstOrDefaultAsync(e => e.Id == request.Id, cancellationToken);
+        var entity = await unitOfWork.AccountTransactions.GetByIdAsync(request.Id, false, cancellationToken);
 
         if (entity is null)
             return Response<AccountTransactionDto>.Fail(BusinessExceptionMessages.NotFound);
@@ -57,13 +56,13 @@ public class AdjustmentAccountTransactionCommandHandler(CarServiceDbContext dbCo
         {
             accountTransaction.Claim = oldClaim * -1;
             accountTransaction.Debt = 0;
-            balance = await GetBalance(accountOwnerId, accountTransaction.Claim, cancellationToken);
+            balance = await unitOfWork.AccountTransactions.GetBalanceWithAmounAsync(accountOwnerId, Guid.Parse(currentUser.CompanyId!), accountTransaction.Claim, cancellationToken);
         }
         else
         {
             accountTransaction.Claim = 0;
             accountTransaction.Debt = oldDebt * -1;
-            balance = await GetBalance(accountOwnerId, accountTransaction.Debt, cancellationToken);
+            balance = await unitOfWork.AccountTransactions.GetBalanceWithAmounAsync(accountOwnerId, Guid.Parse(currentUser.CompanyId!), accountTransaction.Debt, cancellationToken);
         }
 
         accountTransaction.Balance = balance;
@@ -73,15 +72,15 @@ public class AdjustmentAccountTransactionCommandHandler(CarServiceDbContext dbCo
         accountTransaction.IsDeleted = false;
         accountTransaction.AdjustedTransactionId = entity.Id;
 
-        await dbContext.AccountingTransactions.AddAsync(accountTransaction, cancellationToken);
+        await unitOfWork.AccountTransactions.AddAsync(accountTransaction, cancellationToken);
 
         string ownerName = string.Empty;
 
-        await dbContext.SaveChangesAsync(cancellationToken);
+        await unitOfWork.SaveChangesAsync(cancellationToken);
 
         if (accountOwnerType == AccountOwnerTypeEnum.Customer)
         {
-            var customer = await dbContext.Customers.FirstOrDefaultAsync(c => c.Id == accountOwnerId, cancellationToken);
+            var customer = await unitOfWork.Customers.GetByIdAsync(accountOwnerId, true, cancellationToken);
             if (customer != null)
             {
                 ownerName = $"{customer.Name} {customer.Surname}";
@@ -94,7 +93,7 @@ public class AdjustmentAccountTransactionCommandHandler(CarServiceDbContext dbCo
         }
         else if (accountOwnerType == AccountOwnerTypeEnum.MobileUser)
         {
-            var mobileUser = await dbContext.Customers.FirstOrDefaultAsync(m => m.MobileUserId == accountOwnerId, cancellationToken);
+            var mobileUser = await unitOfWork.Customers.GetByMobileUserIdAsync(accountOwnerId, true, cancellationToken);
             if( mobileUser != null)
             {
                 ownerName = $"{mobileUser.Name} {mobileUser.Surname}";
@@ -122,19 +121,6 @@ public class AdjustmentAccountTransactionCommandHandler(CarServiceDbContext dbCo
             TransactionDate = accountTransaction.TransactionDate,
             TransactionType = accountTransaction.TransactionType
         });
-    }
-
-    private async Task<decimal> GetBalance(Guid customerId, decimal amount, CancellationToken cancellationToken)
-    {
-        var totalDebt = await dbContext.AccountingTransactions.AsNoTracking()
-            .Where(i => i.AccountOwnerId == customerId && i.CompanyId == Guid.Parse(currentUser.CompanyId!))
-            .SumAsync(i => i.Debt, cancellationToken);
-
-        var totalClaim = await dbContext.AccountingTransactions.AsNoTracking()
-            .Where(i => i.AccountOwnerId == customerId && i.CompanyId == Guid.Parse(currentUser.CompanyId!))
-            .SumAsync(i => i.Claim, cancellationToken);
-
-        return totalDebt - totalClaim + amount;
     }
 }
 
