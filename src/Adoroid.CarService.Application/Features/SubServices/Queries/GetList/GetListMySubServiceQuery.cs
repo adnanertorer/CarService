@@ -1,10 +1,10 @@
-﻿using Adoroid.CarService.Application.Common.Abstractions.Auth;
+﻿using Adoroid.CarService.Application.Common.Abstractions;
+using Adoroid.CarService.Application.Common.Abstractions.Auth;
 using Adoroid.CarService.Application.Common.Abstractions.Caching;
 using Adoroid.CarService.Application.Common.Extensions;
 using Adoroid.CarService.Application.Features.SubServices.Dtos;
 using Adoroid.CarService.Application.Features.SubServices.ExceptionMessages;
 using Adoroid.CarService.Application.Features.SubServices.MapperExtensions;
-using Adoroid.CarService.Persistence;
 using Adoroid.Core.Application.Requests;
 using Adoroid.Core.Application.Wrappers;
 using Adoroid.Core.Repository.Paging;
@@ -15,7 +15,7 @@ namespace Adoroid.CarService.Application.Features.SubServices.Queries.GetList;
 
 public record GetListMySubServiceQuery(PageRequest PageRequest, Guid MainServiceId) : IRequest<Response<Paginate<MobileSubServiceDto>>>;
 
-public class GetListMySubServiceQueryHandler(CarServiceDbContext dbContext, ICurrentUser currentUser, ICacheService cacheService)
+public class GetListMySubServiceQueryHandler(IUnitOfWork unitOfWork, ICurrentUser currentUser, ICacheService cacheService)
     : IRequestHandler<GetListMySubServiceQuery, Response<Paginate<MobileSubServiceDto>>>
 {
     const string redisKeyPrefix = "subservice:list";
@@ -29,9 +29,7 @@ public class GetListMySubServiceQueryHandler(CarServiceDbContext dbContext, ICur
 
         var list = await cacheService.GetOrSetPaginateAsync<List<MobileSubServiceDto>>(cacheKey, async () =>
         {
-            var query = dbContext.SubServices
-               .AsNoTracking()
-               .Where(i => i.MainServiceId == request.MainServiceId && i.MainService.Vehicle.VehicleUsers.Any(u => u.UserId == Guid.Parse(currentUser.Id!)));
+            var query = unitOfWork.SubServices.GetByMainServiceIdAndUser(request.MainServiceId, Guid.Parse(currentUser.Id!), true);
 
             return await query
                 .OrderByDescending(i => i.OperationDate)

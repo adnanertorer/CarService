@@ -8,7 +8,6 @@ using Adoroid.CarService.Application.Features.MainServices.ExceptionMessages;
 using Adoroid.CarService.Application.Features.MainServices.MapperExtensions;
 using Adoroid.CarService.Domain.Entities;
 using Adoroid.Core.Application.Wrappers;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using MinimalMediatR.Core;
 
@@ -43,7 +42,7 @@ public class UpdateMainServiceCommandHandler(IUnitOfWork unitOfWork, ICurrentUse
 
         if(request.ServiceStatus == MainServiceStatusEnum.Done)
         {
-            entity.Cost = await GetTotalPrice(request.Id, cancellationToken);
+            entity.Cost = await unitOfWork.SubServices.GetTotalPrice(request.Id, cancellationToken);
 
             if(entity.Vehicle is null)
                 return Response<MainServiceDto>.Fail(BusinessExceptionMessages.VehicleNotFound);
@@ -119,15 +118,5 @@ public class UpdateMainServiceCommandHandler(IUnitOfWork unitOfWork, ICurrentUse
         }
        
         return Response<MainServiceDto>.Success(resultDto);
-    }
-
-    private async Task<decimal> GetTotalPrice(Guid mainServiceId, CancellationToken cancellationToken)
-    {
-        var costs = await dbContext.SubServices.AsNoTracking()
-             .Where(i => i.MainServiceId == mainServiceId)
-             .Select(i => i.Cost - (i.Discount ?? 0))
-             .ToListAsync(cancellationToken);
-
-        return costs.Sum();
     }
 }
