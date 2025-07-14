@@ -1,27 +1,22 @@
-﻿using Adoroid.CarService.Application.Features.Companies.Dtos;
+﻿using Adoroid.CarService.Application.Common.Abstractions;
+using Adoroid.CarService.Application.Features.Companies.Dtos;
 using Adoroid.CarService.Application.Features.Companies.MapperExtensions;
-using Adoroid.CarService.Persistence;
 using Adoroid.Core.Application.Requests;
 using Adoroid.Core.Application.Wrappers;
 using Adoroid.Core.Repository.Paging;
-using Microsoft.EntityFrameworkCore;
 using MinimalMediatR.Core;
 
 namespace Adoroid.CarService.Application.Features.Companies.Queries.GetList;
 
 public record CompanyGetListQuery(PageRequest PageRequest, int? CityId, int? DistrictId, string? Search) : IRequest<Response<Paginate<CompanyDto>>>;
 
-public class CompanyGetListQueryHandler(CarServiceDbContext dbContext) : IRequestHandler<CompanyGetListQuery, Response<Paginate<CompanyDto>>>
+public class CompanyGetListQueryHandler(IUnitOfWork unitOfWork) : IRequestHandler<CompanyGetListQuery, Response<Paginate<CompanyDto>>>
 {
     public async Task<Response<Paginate<CompanyDto>>> Handle(CompanyGetListQuery request, CancellationToken cancellationToken)
     {
-        var companies = dbContext.Companies
-            .Include(i => i.City)
-            .Include(i => i.District)
-            .Include(i =>i.CompanyServices).ThenInclude(i => i.MasterService)
-            .AsNoTracking();
+        var companies = unitOfWork.Companies.GetAllWithIncludes();
 
-        if(request.CityId.HasValue)
+        if (request.CityId.HasValue)
             companies = companies.Where(i => i.CityId == request.CityId);
 
         if(request.DistrictId.HasValue)
