@@ -1,23 +1,21 @@
-﻿using Adoroid.CarService.Application.Common.Abstractions.Auth;
+﻿using Adoroid.CarService.Application.Common.Abstractions;
+using Adoroid.CarService.Application.Common.Abstractions.Auth;
 using Adoroid.CarService.Application.Common.Dtos.Auth;
 using Adoroid.CarService.Application.Features.MobileUsers.Dtos;
 using Adoroid.CarService.Application.Features.MobileUsers.ExceptionMessages;
-using Adoroid.CarService.Persistence;
 using Adoroid.Core.Application.Wrappers;
-using Microsoft.EntityFrameworkCore;
 using MinimalMediatR.Core;
 
 namespace Adoroid.CarService.Application.Features.MobileUsers.Queries.GetRefreshToken;
 
 public record GetMobileUserAccessTokenByRefreshToken(string RefreshToken) : IRequest<Response<MobileUserAccessTokenDto>>;
 
-public class GetMobileUserAccessTokenByRefreshTokenHandler(CarServiceDbContext dbContext, IMobileUserTokenHandler tokenHandler) 
+public class GetMobileUserAccessTokenByRefreshTokenHandler(IUnitOfWork unitOfWork, IMobileUserTokenHandler tokenHandler) 
     : IRequestHandler<GetMobileUserAccessTokenByRefreshToken, Response<MobileUserAccessTokenDto>>
 {
     public async Task<Response<MobileUserAccessTokenDto>> Handle(GetMobileUserAccessTokenByRefreshToken request, CancellationToken cancellationToken)
     {
-        var user = await dbContext.MobileUsers
-             .FirstOrDefaultAsync(i => i.RefreshToken == request.RefreshToken, cancellationToken);
+        var user = await unitOfWork.MobileUsers.GetByRefreshTokenAsync(request.RefreshToken, asNoTracking: false, cancellationToken: cancellationToken);
 
         if (user is null)
             return Response<MobileUserAccessTokenDto>.Fail(BusinessExceptionMessages.InvalidRefreshToken);
@@ -26,8 +24,7 @@ public class GetMobileUserAccessTokenByRefreshTokenHandler(CarServiceDbContext d
         {
             user.RefreshTokenExpr = null;
             user.RefreshToken = null;
-            dbContext.MobileUsers.Update(user);
-            await dbContext.SaveChangesAsync(cancellationToken);
+            await unitOfWork.SaveChangesAsync(cancellationToken);
 
             return Response<MobileUserAccessTokenDto>.Fail(BusinessExceptionMessages.RefreshTokenExpired);
         }
