@@ -1,20 +1,19 @@
-﻿using Adoroid.CarService.Application.Common.Abstractions.Auth;
+﻿using Adoroid.CarService.Application.Common.Abstractions;
+using Adoroid.CarService.Application.Common.Abstractions.Auth;
 using Adoroid.CarService.Application.Features.AccountTransactions.ExceptionMessages;
-using Adoroid.CarService.Persistence;
 using Adoroid.Core.Application.Wrappers;
-using Microsoft.EntityFrameworkCore;
 using MinimalMediatR.Core;
 
 namespace Adoroid.CarService.Application.Features.AccountTransactions.Commands.Delete;
 
 public record DeleteClaimCommand(Guid Id) : IRequest<Response<Guid>>; //kullanılmayacak
 
-public class DeleteClaimCommandHandler(CarServiceDbContext dbContext, ICurrentUser currentUser)
+public class DeleteClaimCommandHandler(IUnitOfWork unitOfWork, ICurrentUser currentUser)
     : IRequestHandler<DeleteClaimCommand, Response<Guid>>
 {
     public async Task<Response<Guid>> Handle(DeleteClaimCommand request, CancellationToken cancellationToken)
     {
-        var entity = await dbContext.AccountingTransactions.FirstOrDefaultAsync(e => e.Id == request.Id, cancellationToken);
+        var entity = await unitOfWork.AccountTransactions.GetByIdAsync(request.Id, false, cancellationToken);
 
         if (entity is null)
             return Response<Guid>.Fail(BusinessExceptionMessages.NotFound);
@@ -23,7 +22,7 @@ public class DeleteClaimCommandHandler(CarServiceDbContext dbContext, ICurrentUs
         entity.DeletedBy = Guid.Parse(currentUser.Id!);
         entity.DeletedDate = DateTime.UtcNow;
 
-        await dbContext.SaveChangesAsync(cancellationToken);
+        await unitOfWork.SaveChangesAsync(cancellationToken);
 
         return Response<Guid>.Success(entity.Id);
     }
