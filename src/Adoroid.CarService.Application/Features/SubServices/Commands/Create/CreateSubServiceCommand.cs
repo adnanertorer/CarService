@@ -7,7 +7,6 @@ using Adoroid.CarService.Application.Features.SubServices.ExceptionMessages;
 using Adoroid.CarService.Application.Features.SubServices.MapperExtensions;
 using Adoroid.CarService.Domain.Entities;
 using Adoroid.Core.Application.Wrappers;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using MinimalMediatR.Core;
 
@@ -29,9 +28,7 @@ public class CreateSubServiceCommandHandler(IUnitOfWork unitOfWork, ICurrentUser
         if (mainServiceEntity == null)
             return Response<SubServiceDto>.Fail(BusinessExceptionMessages.MainServiceNotFound);
 
-        var employee = await dbContext.Employees
-            .AsNoTracking()
-            .FirstOrDefaultAsync(i => i.Id == request.EmployeeId, cancellationToken);
+        var employee = await unitOfWork.Employees.GetByIdAsync(request.EmployeeId, true, cancellationToken);
 
         if (employee == null)
             return Response<SubServiceDto>.Fail(BusinessExceptionMessages.EmployeeNotFound);
