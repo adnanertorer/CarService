@@ -4,13 +4,11 @@ using Adoroid.CarService.Application.Common.Abstractions.Caching;
 using Adoroid.CarService.Application.Common.Extensions;
 using Adoroid.CarService.Application.Features.SubServices.ExceptionMessages;
 using Adoroid.Core.Application.Wrappers;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using MinimalMediatR.Core;
 
 namespace Adoroid.CarService.Application.Features.MainServices.Commands.Delete
 {
-
     public record DeleteMainServiceCommand(Guid Id) : IRequest<Response<Guid>>;
 
     public class DeleteMainServiceCommandHandler(IUnitOfWork unitOfWork, ICurrentUser currentUser, ICacheService cacheService, ILogger<DeleteMainServiceCommandHandler> logger)
@@ -31,7 +29,7 @@ namespace Adoroid.CarService.Application.Features.MainServices.Commands.Delete
             entity.DeletedBy = Guid.Parse(currentUser.Id!);
             entity.DeletedDate = DateTime.UtcNow;
 
-            var subServices = await dbContext.SubServices.Where(i => i.MainServiceId == request.Id).ToListAsync(cancellationToken);
+            var subServices = await unitOfWork.SubServices.GetListByMainServiceIdAsync(request.Id, false, cancellationToken);
             foreach(var item in subServices)
             {
                 item.IsDeleted = true;
