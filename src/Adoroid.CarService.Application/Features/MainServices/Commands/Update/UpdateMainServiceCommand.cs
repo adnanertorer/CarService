@@ -1,4 +1,5 @@
-﻿using Adoroid.CarService.Application.Common.Abstractions.Auth;
+﻿using Adoroid.CarService.Application.Common.Abstractions;
+using Adoroid.CarService.Application.Common.Abstractions.Auth;
 using Adoroid.CarService.Application.Common.Abstractions.Caching;
 using Adoroid.CarService.Application.Common.Enums;
 using Adoroid.CarService.Application.Common.Extensions;
@@ -6,7 +7,6 @@ using Adoroid.CarService.Application.Features.MainServices.Dtos;
 using Adoroid.CarService.Application.Features.MainServices.ExceptionMessages;
 using Adoroid.CarService.Application.Features.MainServices.MapperExtensions;
 using Adoroid.CarService.Domain.Entities;
-using Adoroid.CarService.Persistence;
 using Adoroid.Core.Application.Wrappers;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -17,7 +17,7 @@ namespace Adoroid.CarService.Application.Features.MainServices.Commands.Update;
 public record UpdateMainServiceCommand(Guid Id, Guid VehicleId, DateTime ServiceDate, string? Description, MainServiceStatusEnum ServiceStatus)
     : IRequest<Response<MainServiceDto>>;
 
-public class UpdateMainServiceCommandHandler(CarServiceDbContext dbContext, ICurrentUser currentUser, ICacheService cacheService,
+public class UpdateMainServiceCommandHandler(IUnitOfWork unitOfWork, ICurrentUser currentUser, ICacheService cacheService,
     ILogger<UpdateMainServiceCommandHandler> logger)
         : IRequestHandler<UpdateMainServiceCommand, Response<MainServiceDto>>
 {
@@ -28,9 +28,7 @@ public class UpdateMainServiceCommandHandler(CarServiceDbContext dbContext, ICur
 
         var userId = Guid.Parse(currentUser.Id!);
 
-        var entity = await dbContext.MainServices
-            .Include(i => i.Vehicle).ThenInclude(i => i.VehicleUsers)
-            .FirstOrDefaultAsync(e => e.Id == request.Id, cancellationToken);
+        var entity = await unitOfWork.MainServices.GetByIdWithVehiclesAsync(request.Id, false, cancellationToken);
 
         if (entity is null)
             return Response<MainServiceDto>.Fail(BusinessExceptionMessages.NotFound);
@@ -65,9 +63,8 @@ public class UpdateMainServiceCommandHandler(CarServiceDbContext dbContext, ICur
                     return Response<MainServiceDto>.Fail(BusinessExceptionMessages.VehicleUserNotFound);
                 temporaryUser = true;
             }
-                
 
-            balance = await GetBalance(vehicleUserId!.Value, cancellationToken);
+            balance = await unitOfWork.AccountTransactions.GetBalanceAsync(vehicleUserId!.Value, companyId, cancellationToken);
 
             var accountTransaction = new AccountingTransaction();
             accountTransaction.Balance = balance + entity.Cost;
@@ -92,21 +89,19 @@ public class UpdateMainServiceCommandHandler(CarServiceDbContext dbContext, ICur
             accountTransaction.Description = $"Servis ücreti: {entity.Cost} TL. Araç: {entity.Vehicle.Plate} - {entity.Vehicle.Model} - {entity.Vehicle.Brand}";
             accountTransaction.MainServiceId = request.Id;
 
-            await dbContext.AddAsync(accountTransaction, cancellationToken);
+            await unitOfWork.AccountTransactions.AddAsync(accountTransaction, cancellationToken);
         }
 
-        dbContext.MainServices.Update(entity);
-
-        await using var transaction = await dbContext.Database.BeginTransactionAsync();
+        await unitOfWork.BeginTransactionAsync(cancellationToken); ;
 
         try
         {
-            await dbContext.SaveChangesAsync(cancellationToken);
-            await transaction.CommitAsync(cancellationToken);
+            await unitOfWork.SaveChangesAsync(cancellationToken);
+            await unitOfWork.CommitAsync(cancellationToken);
         }
         catch(Exception ex)
         {
-            await transaction.RollbackAsync(cancellationToken);
+            await unitOfWork.RollbackAsync(cancellationToken);
             const string errorMessage = "MainService güncelleme işlemi başarısız oldu. MainServiceId: {MainServiceId}";
             logger.LogError(ex, errorMessage, request.Id);
             return Response<MainServiceDto>.Fail(BusinessExceptionMessages.MainServiceUpdateError);
@@ -124,19 +119,6 @@ public class UpdateMainServiceCommandHandler(CarServiceDbContext dbContext, ICur
         }
        
         return Response<MainServiceDto>.Success(resultDto);
-    }
-
-    private async Task<decimal> GetBalance(Guid customerId, CancellationToken cancellationToken)
-    {
-        var totalDebt = await dbContext.AccountingTransactions.AsNoTracking()
-            .Where(i => i.AccountOwnerId == customerId && i.CompanyId == Guid.Parse(currentUser.CompanyId!))
-            .SumAsync(i => i.Debt, cancellationToken);
-
-        var totalClaim = await dbContext.AccountingTransactions.AsNoTracking()
-            .Where(i => i.AccountOwnerId == customerId && i.CompanyId == Guid.Parse(currentUser.CompanyId!))
-            .SumAsync(i => i.Claim, cancellationToken);
-
-        return Math.Abs(totalDebt - totalClaim);
     }
 
     private async Task<decimal> GetTotalPrice(Guid mainServiceId, CancellationToken cancellationToken)
