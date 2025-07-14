@@ -1,10 +1,9 @@
-﻿using Adoroid.CarService.Application.Features.Companies.Dtos;
+﻿using Adoroid.CarService.Application.Common.Abstractions;
+using Adoroid.CarService.Application.Features.Companies.Dtos;
 using Adoroid.CarService.Application.Features.Companies.ExceptionMessages;
 using Adoroid.CarService.Application.Features.Companies.MapperExtensions;
 using Adoroid.CarService.Domain.Entities;
-using Adoroid.CarService.Persistence;
 using Adoroid.Core.Application.Wrappers;
-using Microsoft.EntityFrameworkCore;
 using MinimalMediatR.Core;
 
 namespace Adoroid.CarService.Application.Features.Companies.Commands.Create;
@@ -13,12 +12,11 @@ public record CreateCompanyCommand(string CompanyName, string AuthorizedName, st
     string TaxNumber, string TaxOffice, int CityId, int DistrictId, string CompanyAddress,
     string CompanyPhone, string CompanyEmail) : IRequest<Response<CompanyDto>>;
 
-public class CreateCompanyCommandHandler(CarServiceDbContext dbContext) : IRequestHandler<CreateCompanyCommand, Response<CompanyDto>>
+public class CreateCompanyCommandHandler(IUnitOfWork unitOfWork) : IRequestHandler<CreateCompanyCommand, Response<CompanyDto>>
 {
     public async Task<Response<CompanyDto>> Handle(CreateCompanyCommand request, CancellationToken cancellationToken)
     {
-        var isExist = await dbContext.Companies.AsNoTracking()
-            .AnyAsync(x => x.TaxNumber == request.TaxNumber || x.CompanyEmail == request.CompanyEmail, cancellationToken);
+        var isExist = await unitOfWork.Companies.IsCompanyExistsAsync(request.TaxNumber, request.CompanyEmail, cancellationToken);
 
         if (isExist)
             return Response<CompanyDto>.Fail(BusinessExceptionMessages.CompanyAlreadyExists);
@@ -40,8 +38,8 @@ public class CreateCompanyCommandHandler(CarServiceDbContext dbContext) : IReque
             TaxOffice = request.TaxOffice
         };
 
-        await dbContext.Companies.AddAsync(company, cancellationToken);
-        await dbContext.SaveChangesAsync(cancellationToken);
+        await unitOfWork.Companies.AddAsync(company, cancellationToken);
+        await unitOfWork.SaveChangesAsync(cancellationToken);
 
         return Response<CompanyDto>.Success(company.FromEntity());
     }
