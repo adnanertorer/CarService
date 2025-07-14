@@ -1,12 +1,11 @@
-﻿using Adoroid.CarService.Application.Common.Abstractions.Auth;
+﻿using Adoroid.CarService.Application.Common.Abstractions;
+using Adoroid.CarService.Application.Common.Abstractions.Auth;
 using Adoroid.CarService.Application.Common.Extensions;
 using Adoroid.CarService.Application.Features.Customers.Dtos;
 using Adoroid.CarService.Application.Features.Customers.ExceptionMessages;
 using Adoroid.CarService.Application.Features.Customers.MapperExtensions;
 using Adoroid.CarService.Domain.Entities;
-using Adoroid.CarService.Persistence;
 using Adoroid.Core.Application.Wrappers;
-using Microsoft.EntityFrameworkCore;
 using MinimalMediatR.Core;
 
 namespace Adoroid.CarService.Application.Features.Customers.Commands.Create;
@@ -14,17 +13,14 @@ namespace Adoroid.CarService.Application.Features.Customers.Commands.Create;
 public record CreateCustomerCommand(string Name, string Surname, string? Email, string Phone, string? Address,
     string? TaxNumber, string? TaxOffice, bool IsActive, int CityId, int DistrictId) : IRequest<Response<CustomerDto>>;
 
-public class CreateCustomerCommandHandler(CarServiceDbContext dbContext, ICurrentUser currentUser) : IRequestHandler<CreateCustomerCommand,
+public class CreateCustomerCommandHandler(IUnitOfWork unitOfWork, ICurrentUser currentUser) : IRequestHandler<CreateCustomerCommand,
     Response<CustomerDto>>
 {
     public async Task<Response<CustomerDto>> Handle(CreateCustomerCommand request, CancellationToken cancellationToken)
     {
         var companyId = currentUser.ValidCompanyId();
 
-        var isExist = await dbContext.Customers.AsNoTracking()
-            .AnyAsync(i => i.Name == request.Name && 
-            i.Surname == request.Surname && 
-            i.CompanyId == companyId, cancellationToken);
+        var isExist = await unitOfWork.Customers.IsCustomerExistsAsync(request.Name, request.Surname, companyId, request.Phone, cancellationToken);
 
         if (isExist)
             return Response<CustomerDto>.Fail(BusinessExceptionMessages.AlreadyExists);
@@ -47,9 +43,9 @@ public class CreateCustomerCommandHandler(CarServiceDbContext dbContext, ICurren
             DistrictId = request.DistrictId
         };
 
-        var entityResult = await dbContext.Customers.AddAsync(customer, cancellationToken);
-        await dbContext.SaveChangesAsync(cancellationToken);
+        await unitOfWork.Customers.AddAsync(customer, cancellationToken);
+        await unitOfWork.SaveChangesAsync(cancellationToken);
 
-        return Response<CustomerDto>.Success(entityResult.Entity.FromEntity());
+        return Response<CustomerDto>.Success(customer.FromEntity());
     }
 }
