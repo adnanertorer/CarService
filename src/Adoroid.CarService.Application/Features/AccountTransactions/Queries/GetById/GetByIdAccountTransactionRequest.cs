@@ -23,7 +23,7 @@ public class GetByIdAccountTransactionRequestHandler(IUnitOfWork unitOfWork)
         var dto = new AccountTransactionDto
         {
             OwnerName = result.AccountOwnerType == (int)AccountOwnerTypeEnum.Customer
-                ? unitOfWork.Customers.GetNameById(result.AccountOwnerId)
+                ? unitOfWork.Customers.GetNameByIdAsync(result.AccountOwnerId, cancellationToken)
                 : unitOfWork.MobileUsers.GetNameById(result.AccountOwnerId),
             Id = result.Id,
             AccountOwnerId = result.AccountOwnerId,

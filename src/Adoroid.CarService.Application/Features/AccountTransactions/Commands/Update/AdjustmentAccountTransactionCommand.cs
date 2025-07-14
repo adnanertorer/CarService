@@ -5,7 +5,6 @@ using Adoroid.CarService.Application.Features.AccountTransactions.Dtos;
 using Adoroid.CarService.Application.Features.AccountTransactions.ExceptionMessages;
 using Adoroid.CarService.Domain.Entities;
 using Adoroid.Core.Application.Wrappers;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using MinimalMediatR.Core;
 
@@ -26,9 +25,7 @@ public class AdjustmentAccountTransactionCommandHandler(IUnitOfWork unitOfWork, 
         if(entity.MainServiceId is null)
             return Response<AccountTransactionDto>.Fail(BusinessExceptionMessages.MainServiceIdCannotBeNull);
 
-        var mainService = await dbContext.MainServices
-            .Include(i => i.Vehicle)
-            .FirstOrDefaultAsync(e => e.Id == entity.MainServiceId, cancellationToken);
+        var mainService = await unitOfWork.MainServices.GetByIdAsync(entity.MainServiceId.Value, false, cancellationToken);
 
         if (mainService is null)
             return Response<AccountTransactionDto>.Fail(BusinessExceptionMessages.MainServiceNotFound);
@@ -41,8 +38,6 @@ public class AdjustmentAccountTransactionCommandHandler(IUnitOfWork unitOfWork, 
 
         var accountOwnerId = entity.AccountOwnerId;
         var accountOwnerType = (AccountOwnerTypeEnum)entity.AccountOwnerType;
-
-
 
         var accountTransaction = new AccountingTransaction();
         accountTransaction.CompanyId = Guid.Parse(currentUser.CompanyId!);
