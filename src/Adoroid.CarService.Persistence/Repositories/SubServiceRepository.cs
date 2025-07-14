@@ -1,7 +1,6 @@
 ﻿using Adoroid.CarService.Application.Features.SubServices.Abstracts;
 using Adoroid.CarService.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
-using MinimalMediatR.Core;
 
 namespace Adoroid.CarService.Persistence.Repositories;
 

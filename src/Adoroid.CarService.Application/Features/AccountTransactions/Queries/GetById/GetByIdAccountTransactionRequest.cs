@@ -20,11 +20,19 @@ public class GetByIdAccountTransactionRequestHandler(IUnitOfWork unitOfWork)
         if (result is null)
             return Response<AccountTransactionDto>.Fail(BusinessExceptionMessages.NotFound);
 
+        string ownerName = string.Empty;
+        if(result.AccountOwnerType == (int)AccountOwnerTypeEnum.Customer)
+        {
+            ownerName = await unitOfWork.Customers.GetNameByIdAsync(result.AccountOwnerId, cancellationToken);
+        }
+        else
+        {
+            ownerName = await unitOfWork.MobileUsers.GetNameById(result.AccountOwnerId, cancellationToken);
+        }
+
         var dto = new AccountTransactionDto
         {
-            OwnerName = result.AccountOwnerType == (int)AccountOwnerTypeEnum.Customer
-                ? unitOfWork.Customers.GetNameByIdAsync(result.AccountOwnerId, cancellationToken)
-                : unitOfWork.MobileUsers.GetNameById(result.AccountOwnerId),
+            OwnerName = ownerName,
             Id = result.Id,
             AccountOwnerId = result.AccountOwnerId,
             AccountOwnerType = result.AccountOwnerType,
