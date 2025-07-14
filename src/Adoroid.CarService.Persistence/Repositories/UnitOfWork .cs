@@ -3,8 +3,8 @@ using Adoroid.CarService.Application.Features.AccountTransactions.Abstracts;
 using Adoroid.CarService.Application.Features.Companies.Abstracts;
 using Adoroid.CarService.Application.Features.Customers.Abstracts;
 using Adoroid.CarService.Application.Features.MainServices.Abstracts;
+using Adoroid.CarService.Application.Features.SubServices.Abstracts;
 using Adoroid.CarService.Application.Features.Users.Abtracts.Repositories;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 
 namespace Adoroid.CarService.Persistence.Repositories;
@@ -21,6 +21,8 @@ public class UnitOfWork : IUnitOfWork
 
     public IMainServiceRepository MainServices { get; }
 
+    public ISubServiceRepository SubServices { get; }
+
     public UnitOfWork(CarServiceDbContext dbContext)
     {
         _dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
@@ -29,6 +31,7 @@ public class UnitOfWork : IUnitOfWork
         AccountTransactions = new AccountTransactionRepository(_dbContext);
         Customers = new CustomerRepository(_dbContext);
         MainServices = new MainServiceRepository(_dbContext);
+        SubServices = new SubServiceRepository(_dbContext);
     }
 
     public async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
