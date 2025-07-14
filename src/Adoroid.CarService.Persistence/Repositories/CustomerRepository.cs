@@ -38,6 +38,20 @@ public class CustomerRepository(CarServiceDbContext dbContext) : ICustomerReposi
             .FirstOrDefaultAsync(predicate: c => c.MobileUserId == mobileUserId, cancellationToken);
     }
 
+    public async Task<string> GetNameByIdAsync(Guid customerId, CancellationToken cancellationToken)
+    {
+        var customer = await dbContext.Customers
+            .AsNoTracking()
+            .Where(c => c.Id == customerId)
+            .Select(c => new { c.Name, c.Surname })
+            .FirstOrDefaultAsync(cancellationToken);
+
+        if (customer is null)
+            return $"{customer!.Name} {customer.Surname}";
+
+        return "";
+    }
+
     public async Task<(Customer Customer, List<(VehicleUser VehicleUser, Vehicle Vehicle)> VehicleUsers)> GetWithVehicleUsersAsync(Guid customerId, CancellationToken cancellationToken)
     {
         var data = await dbContext.Customers
