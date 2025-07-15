@@ -1,5 +1,4 @@
 ﻿using Adoroid.CarService.Application.Common.Abstractions;
-using Adoroid.CarService.Application.Features.Users.Abtracts.Repositories;
 using Adoroid.CarService.Persistence.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -18,7 +17,6 @@ public static class CarServicePersistenceServiceCollection
         });
 
         services.AddScoped<IUnitOfWork, UnitOfWork>();
-        services.AddScoped<IUserRepository, UserRepository>();
 
         return services;
     }

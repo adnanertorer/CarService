@@ -10,4 +10,5 @@ public interface IMobileUserRepository
     Task<MobileUser?> GetByIdAsync(Guid id, bool asNoTracking = true, CancellationToken cancellationToken = default);
     Task<MobileUser?> GetByRefreshTokenAsync(string refreshToken, bool asNoTracking = true, CancellationToken cancellationToken = default);
     Task<MobileUser?> GetByUsernamePasswordAsync(string username, string password, bool asNoTracking = true, CancellationToken cancellationToken = default);
+    Task<Dictionary<Guid, string>> GetUserNames(List<Guid> guids, CancellationToken cancellationToken);
 }
