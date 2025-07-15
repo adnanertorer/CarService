@@ -8,7 +8,6 @@ using Adoroid.CarService.Application.Features.MainServices.ExceptionMessages;
 using Adoroid.CarService.Application.Features.MainServices.MapperExtensions;
 using Adoroid.CarService.Domain.Entities;
 using Adoroid.Core.Application.Wrappers;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using MinimalMediatR.Core;
 
@@ -25,8 +24,7 @@ public class CreateMainServiceCommandHandler(IUnitOfWork unitOfWork, ICurrentUse
     {
         var companyId = currentUser.ValidCompanyId();
 
-        var vehicle = await dbContext.Vehicles.AsNoTracking()
-            .FirstOrDefaultAsync(i => i.Id == request.VehicleId, cancellationToken);
+        var vehicle = await unitOfWork.Vehicles.GetByIdAsync(request.VehicleId, true, cancellationToken);
 
         if (vehicle is null)
             return Response<MainServiceDto>.Fail(BusinessExceptionMessages.VehicleNotFound);
