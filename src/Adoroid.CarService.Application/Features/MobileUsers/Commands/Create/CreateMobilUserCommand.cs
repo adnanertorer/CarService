@@ -1,10 +1,9 @@
-﻿using Adoroid.CarService.Application.Common.Abstractions.Auth;
+﻿using Adoroid.CarService.Application.Common.Abstractions;
+using Adoroid.CarService.Application.Common.Abstractions.Auth;
 using Adoroid.CarService.Application.Features.MobileUsers.Dtos;
 using Adoroid.CarService.Application.Features.MobileUsers.ExceptionMessages;
 using Adoroid.CarService.Domain.Entities;
-using Adoroid.CarService.Persistence;
 using Adoroid.Core.Application.Wrappers;
-using Microsoft.EntityFrameworkCore;
 using MinimalMediatR.Core;
 
 namespace Adoroid.CarService.Application.Features.MobileUsers.Commands.Create;
@@ -13,15 +12,12 @@ public record CreateMobilUserCommand(string Name, string Surname, string Email, 
     string? Address) 
     : IRequest<Response<MobileUserDto>>;
 
-public class CreateMobilUserCommandHandler(CarServiceDbContext dbContext, IAesEncryptionHelper aesEncryptionHelper)
+public class CreateMobilUserCommandHandler(IUnitOfWork unitOfWork, IAesEncryptionHelper aesEncryptionHelper)
     : IRequestHandler<CreateMobilUserCommand, Response<MobileUserDto>>
 {
     public async Task<Response<MobileUserDto>> Handle(CreateMobilUserCommand request, CancellationToken cancellationToken)
     {
-        var isExist = await dbContext.MobileUsers
-            .AsNoTracking()
-            .Where(i => i.Email == request.Email)
-            .AnyAsync(cancellationToken);
+        var isExist = await unitOfWork.MobileUsers.IsExistByEmail(request.Email, cancellationToken);
 
         if (isExist)
             return Response<MobileUserDto>.Fail(BusinessExceptionMessages.UserAlreadyExists);
@@ -42,8 +38,8 @@ public class CreateMobilUserCommandHandler(CarServiceDbContext dbContext, IAesEn
             Address = request.Address
         };
 
-        await dbContext.MobileUsers.AddAsync(user, cancellationToken);
-        var result = await dbContext.SaveChangesAsync(cancellationToken);
+        var _ = await unitOfWork.MobileUsers.AddAsync(user, cancellationToken);
+        await unitOfWork.SaveChangesAsync(cancellationToken);
 
         return Response<MobileUserDto>.Success(new MobileUserDto
         {

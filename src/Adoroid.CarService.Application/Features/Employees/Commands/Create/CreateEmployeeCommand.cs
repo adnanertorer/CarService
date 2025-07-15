@@ -1,12 +1,11 @@
-﻿using Adoroid.CarService.Application.Common.Abstractions.Auth;
+﻿using Adoroid.CarService.Application.Common.Abstractions;
+using Adoroid.CarService.Application.Common.Abstractions.Auth;
 using Adoroid.CarService.Application.Common.Extensions;
 using Adoroid.CarService.Application.Features.Employees.Dtos;
 using Adoroid.CarService.Application.Features.Employees.ExecptionMessages;
 using Adoroid.CarService.Application.Features.Employees.MapperExtensions;
 using Adoroid.CarService.Domain.Entities;
-using Adoroid.CarService.Persistence;
 using Adoroid.Core.Application.Wrappers;
-using Microsoft.EntityFrameworkCore;
 using MinimalMediatR.Core;
 
 namespace Adoroid.CarService.Application.Features.Employees.Commands.Create;
@@ -14,15 +13,13 @@ namespace Adoroid.CarService.Application.Features.Employees.Commands.Create;
 public record CreateEmployeeCommand(string Name, string Surname, string PhoneNumber, bool IsActive, string? Email, string? Address) 
     : IRequest<Response<EmployeeDto>>;
 
-public class CreateEmployeeCommandHandler(CarServiceDbContext dbContext, ICurrentUser currentUser) : IRequestHandler<CreateEmployeeCommand, Response<EmployeeDto>>
+public class CreateEmployeeCommandHandler(IUnitOfWork unitOfWork, ICurrentUser currentUser) : IRequestHandler<CreateEmployeeCommand, Response<EmployeeDto>>
 {
     public async Task<Response<EmployeeDto>> Handle(CreateEmployeeCommand request, CancellationToken cancellationToken)
     {
         var companyId = currentUser.ValidCompanyId();
 
-        var isExist = await dbContext.Employees
-             .AsNoTracking()
-             .AnyAsync(i => i.Name == request.Name && i.Surname == request.Surname, cancellationToken);
+        var isExist = await unitOfWork.Employees.AnyAsync(request.Name, request.Surname, companyId, cancellationToken);
 
         if (isExist)
             return Response<EmployeeDto>.Fail(BusinessExceptionMessages.AlreadyExists);
@@ -41,9 +38,9 @@ public class CreateEmployeeCommandHandler(CarServiceDbContext dbContext, ICurren
             CreatedDate = DateTime.UtcNow
         };
 
-        var result = await dbContext.Employees.AddAsync(employeeEntity, cancellationToken);
-        await dbContext.SaveChangesAsync(cancellationToken);
+        var result = await unitOfWork.Employees.AddAsync(employeeEntity, cancellationToken);
+        await unitOfWork.SaveChangesAsync(cancellationToken);
 
-        return Response<EmployeeDto>.Success(result.Entity.FromEntity());
+        return Response<EmployeeDto>.Success(result.FromEntity());
     }
 }

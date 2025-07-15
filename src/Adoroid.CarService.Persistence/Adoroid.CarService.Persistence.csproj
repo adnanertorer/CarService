@@ -20,6 +20,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Adoroid.CarService.Application\Adoroid.CarService.Application.csproj" />
     <ProjectReference Include="..\Adoroid.CarService.Domain\Adoroid.CarService.Domain.csproj" />
   </ItemGroup>
 
