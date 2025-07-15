@@ -1,6 +1,6 @@
-﻿using Adoroid.CarService.Application.Common.Abstractions.Auth;
+﻿using Adoroid.CarService.Application.Common.Abstractions;
+using Adoroid.CarService.Application.Common.Abstractions.Auth;
 using Adoroid.CarService.Application.Features.Vehicles.Dtos;
-using Adoroid.CarService.Persistence;
 using Adoroid.Core.Application.Requests;
 using Adoroid.Core.Application.Wrappers;
 using Adoroid.Core.Repository.Paging;
@@ -10,12 +10,17 @@ namespace Adoroid.CarService.Application.Features.Vehicles.Queries.GetList;
 
 public record GetListVehiclesQuery(PageRequest PageRequest, Guid CustomerId, string? Search) : IRequest<Response<Paginate<VehicleDto>>>;
 
-public class GetListVehiclesQueryHandler(CarServiceDbContext dbContext, ICurrentUser currentUser) : IRequestHandler<GetListVehiclesQuery, Response<Paginate<VehicleDto>>>
+public class GetListVehiclesQueryHandler(IUnitOfWork unitOfWork, ICurrentUser currentUser) : IRequestHandler<GetListVehiclesQuery, Response<Paginate<VehicleDto>>>
 {
     public async Task<Response<Paginate<VehicleDto>>> Handle(GetListVehiclesQuery request, CancellationToken cancellationToken)
     {
-        var query = from cus in dbContext.Customers from vu in dbContext.VehicleUsers where cus.CompanyId == Guid.Parse(currentUser.CompanyId!) && (cus.Id == vu.UserId || cus.MobileUserId == vu.UserId)
-            join veh in dbContext.Vehicles on vu.VehicleId equals veh.Id into vehJoin
+        var customers = unitOfWork.Customers.GetByCompanyId(Guid.Parse(currentUser.CompanyId!));
+        var vehicles = unitOfWork.Vehicles.GetQueryable();
+        var vehicleUsers = unitOfWork.VehicleUsers.GetQueryable();
+
+        var query = from cus in customers from vu in vehicleUsers
+                    where cus.CompanyId == Guid.Parse(currentUser.CompanyId!) && (cus.Id == vu.UserId || cus.MobileUserId == vu.UserId)
+            join veh in vehicles on vu.VehicleId equals veh.Id into vehJoin
             from veh in vehJoin.DefaultIfEmpty()
             select new
             {
