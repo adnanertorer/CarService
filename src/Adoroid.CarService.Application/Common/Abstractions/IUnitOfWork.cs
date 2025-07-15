@@ -6,6 +6,7 @@ using Adoroid.CarService.Application.Features.MainServices.Abstracts;
 using Adoroid.CarService.Application.Features.MobileUsers.Abstracts;
 using Adoroid.CarService.Application.Features.SubServices.Abstracts;
 using Adoroid.CarService.Application.Features.Users.Abtracts.Repositories;
+using Adoroid.CarService.Application.Features.Vehicles.Abstracts;
 
 namespace Adoroid.CarService.Application.Common.Abstractions;
 
@@ -19,6 +20,8 @@ public interface IUnitOfWork
     ISubServiceRepository SubServices { get; }
     IEmployeeRepository Employees { get; }
     IMobileUserRepository MobileUsers { get; }
+    IVehicleRepository Vehicles { get; }
+    IVehicleUserRepository VehicleUsers { get; }
 
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
 
