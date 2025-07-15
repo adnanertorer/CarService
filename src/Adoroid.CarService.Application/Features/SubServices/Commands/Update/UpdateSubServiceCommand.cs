@@ -1,12 +1,11 @@
-﻿using Adoroid.CarService.Application.Common.Abstractions.Auth;
+﻿using Adoroid.CarService.Application.Common.Abstractions;
+using Adoroid.CarService.Application.Common.Abstractions.Auth;
 using Adoroid.CarService.Application.Common.Abstractions.Caching;
 using Adoroid.CarService.Application.Common.Extensions;
 using Adoroid.CarService.Application.Features.SubServices.Dtos;
 using Adoroid.CarService.Application.Features.SubServices.ExceptionMessages;
 using Adoroid.CarService.Application.Features.SubServices.MapperExtensions;
-using Adoroid.CarService.Persistence;
 using Adoroid.Core.Application.Wrappers;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using MinimalMediatR.Core;
 
@@ -15,7 +14,7 @@ namespace Adoroid.CarService.Application.Features.SubServices.Commands.Update;
 public record UpdateSubServiceCommand(Guid Id, string Operation, Guid EmployeeId, DateTime OperationDate, string? Description,
     string? Material, string? MaterialBrand, Guid? SupplierId, decimal? Discount, decimal Cost) : IRequest<Response<SubServiceDto>>;
 
-public class UpdateSubServiceCommandHandler(CarServiceDbContext dbContext, ICurrentUser currentUser, ICacheService cacheService, ILogger<UpdateSubServiceCommandHandler> logger)
+public class UpdateSubServiceCommandHandler(IUnitOfWork unitOfWork, ICurrentUser currentUser, ICacheService cacheService, ILogger<UpdateSubServiceCommandHandler> logger)
     : IRequestHandler<UpdateSubServiceCommand, Response<SubServiceDto>>
 {
     const string redisKeyPrefix = "subservice:list";
@@ -23,18 +22,16 @@ public class UpdateSubServiceCommandHandler(CarServiceDbContext dbContext, ICurr
     {
         var companyId = currentUser.ValidCompanyId();
 
-        var entity = await dbContext.SubServices.FirstOrDefaultAsync(e => e.Id == request.Id, cancellationToken);
+        var entity = await unitOfWork.SubServices.GetByIdAsync(request.Id, false, cancellationToken);
 
         if (entity is null)
             return Response<SubServiceDto>.Fail(BusinessExceptionMessages.NotFound);
 
-        var mainServiceEntity = await dbContext.MainServices.AsNoTracking().FirstOrDefaultAsync(i => i.Id == entity.MainServiceId, cancellationToken);
+        var mainServiceEntity = await unitOfWork.MainServices.GetByIdAsync(entity.MainServiceId, true, cancellationToken);
         if (mainServiceEntity == null)
             return Response<SubServiceDto>.Fail(BusinessExceptionMessages.MainServiceNotFound);
 
-        var employee = await dbContext.Employees
-            .AsNoTracking()
-            .FirstOrDefaultAsync(i => i.Id == request.EmployeeId, cancellationToken);
+        var employee = await unitOfWork.Employees.GetByIdAsync(request.EmployeeId, true, cancellationToken);
 
         if (employee == null)
             return Response<SubServiceDto>.Fail(BusinessExceptionMessages.EmployeeNotFound);
@@ -52,8 +49,7 @@ public class UpdateSubServiceCommandHandler(CarServiceDbContext dbContext, ICurr
         entity.UpdatedBy = Guid.Parse(currentUser.Id!);
         entity.UpdatedDate = DateTime.UtcNow;
 
-        dbContext.SubServices.Update(entity);
-        await dbContext.SaveChangesAsync(cancellationToken);
+        await unitOfWork.SaveChangesAsync(cancellationToken);
 
         entity.MainService = mainServiceEntity;
         entity.Employee = employee;

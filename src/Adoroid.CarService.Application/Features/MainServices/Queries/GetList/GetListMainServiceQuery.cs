@@ -1,10 +1,10 @@
-﻿using Adoroid.CarService.Application.Common.Abstractions.Auth;
+﻿using Adoroid.CarService.Application.Common.Abstractions;
+using Adoroid.CarService.Application.Common.Abstractions.Auth;
 using Adoroid.CarService.Application.Common.Abstractions.Caching;
 using Adoroid.CarService.Application.Common.Dtos.Filters;
 using Adoroid.CarService.Application.Common.Extensions;
 using Adoroid.CarService.Application.Features.MainServices.Dtos;
 using Adoroid.CarService.Application.Features.MainServices.MapperExtensions;
-using Adoroid.CarService.Persistence;
 using Adoroid.Core.Application.Wrappers;
 using Adoroid.Core.Repository.Paging;
 using Microsoft.EntityFrameworkCore;
@@ -16,7 +16,7 @@ namespace Adoroid.CarService.Application.Features.MainServices.Queries.GetList;
 public record GetListMainServiceQuery(MainFilterRequestModel FilterRequest)
     : IRequest<Response<Paginate<MainServiceDto>>>;
 
-public class GetListMainServiceQueryHandler(CarServiceDbContext dbContext, ICacheService cacheService, ICurrentUser currentUser)
+public class GetListMainServiceQueryHandler(IUnitOfWork unitOfWork, ICacheService cacheService, ICurrentUser currentUser)
     : IRequestHandler<GetListMainServiceQuery, Response<Paginate<MainServiceDto>>>
 {
     const string redisKeyPrefix = "mainservice:list";
@@ -29,10 +29,7 @@ public class GetListMainServiceQueryHandler(CarServiceDbContext dbContext, ICach
         var list = await cacheService.GetOrSetPaginateAsync<List<MainServiceDto>>(cacheKey,
             async () =>
             {
-                var query = dbContext.MainServices
-                    .Include(i => i.Vehicle).ThenInclude(i => i.VehicleUsers)
-                    .AsNoTracking()
-                    .Where(i => i.Vehicle != null && i.CompanyId == companyId);
+                var query = unitOfWork.MainServices.GetByCompanyIdWithVehicle(companyId, true);
 
                 if (request.FilterRequest.StartDate.HasValue && request.FilterRequest.EndDate.HasValue)
                 {
