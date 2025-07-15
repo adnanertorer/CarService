@@ -13,8 +13,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Adoroid.CarService.Persistence\Adoroid.CarService.Persistence.csproj" />
-    <ProjectReference Include="..\Adoroid.CarService.Shared\Adoroid.CarService.Shared.csproj" />
+    <ProjectReference Include="..\Adoroid.CarService.Domain\Adoroid.CarService.Domain.csproj" />
   </ItemGroup>
 
   <ItemGroup>

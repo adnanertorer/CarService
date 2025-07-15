@@ -1,9 +1,9 @@
-﻿using Adoroid.CarService.Application.Common.Abstractions.Auth;
+﻿using Adoroid.CarService.Application.Common.Abstractions;
+using Adoroid.CarService.Application.Common.Abstractions.Auth;
 using Adoroid.CarService.Application.Common.Abstractions.Caching;
 using Adoroid.CarService.Application.Common.Extensions;
 using Adoroid.CarService.Application.Features.SubServices.Dtos;
 using Adoroid.CarService.Application.Features.SubServices.MapperExtensions;
-using Adoroid.CarService.Persistence;
 using Adoroid.Core.Application.Requests;
 using Adoroid.Core.Application.Wrappers;
 using Adoroid.Core.Repository.Paging;
@@ -17,7 +17,7 @@ public record GetListSubServiceQuery(PageRequest PageRequest, Guid MainServiceId
 public record GetListSubServiceQueryHandler(PageRequest PageRequest, string? Search)
     : IRequest<Response<Paginate<SubServiceDto>>>;
 
-public class GetEntityListQueryHandler(CarServiceDbContext dbContext, ICacheService cacheService, ICurrentUser currentUser)
+public class GetEntityListQueryHandler(IUnitOfWork unitOfWork, ICacheService cacheService, ICurrentUser currentUser)
     : IRequestHandler<GetListSubServiceQuery, Response<Paginate<SubServiceDto>>>
 {
     const string redisKeyPrefix = "subservice:list";
@@ -29,12 +29,7 @@ public class GetEntityListQueryHandler(CarServiceDbContext dbContext, ICacheServ
 
         var list = await cacheService.GetOrSetPaginateAsync<List<SubServiceDto>>(cacheKey, async () =>
         {
-            var query = dbContext.SubServices
-               .Include(i => i.MainService).ThenInclude(i => i.Vehicle)
-               .Include(i => i.Employee)
-               .Include(i => i.Supplier)
-               .AsNoTracking()
-               .Where(i => i.MainServiceId == request.MainServiceId);
+            var query = unitOfWork.SubServices.GetListByMainServiceIdWithDetails(request.MainServiceId, true);
 
             return await query
                 .OrderByDescending(i => i.OperationDate)

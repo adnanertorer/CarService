@@ -1,4 +1,5 @@
-﻿using Adoroid.CarService.Application.Common.Abstractions.Auth;
+﻿using Adoroid.CarService.Application.Common.Abstractions;
+using Adoroid.CarService.Application.Common.Abstractions.Auth;
 using Adoroid.CarService.Application.Common.Abstractions.Caching;
 using Adoroid.CarService.Application.Common.Enums;
 using Adoroid.CarService.Application.Common.Extensions;
@@ -6,9 +7,7 @@ using Adoroid.CarService.Application.Features.MainServices.Dtos;
 using Adoroid.CarService.Application.Features.MainServices.ExceptionMessages;
 using Adoroid.CarService.Application.Features.MainServices.MapperExtensions;
 using Adoroid.CarService.Domain.Entities;
-using Adoroid.CarService.Persistence;
 using Adoroid.Core.Application.Wrappers;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using MinimalMediatR.Core;
 
@@ -16,8 +15,7 @@ namespace Adoroid.CarService.Application.Features.MainServices.Commands.Create;
 
 public record CreateMainServiceCommand(Guid VehicleId, DateTime ServiceDate, string? Description) : IRequest<Response<MainServiceDto>>;
 
-
-public class CreateMainServiceCommandHandler(CarServiceDbContext dbContext, ICurrentUser currentUser, 
+public class CreateMainServiceCommandHandler(IUnitOfWork unitOfWork, ICurrentUser currentUser, 
     ICacheService cacheService, ILogger<CreateMainServiceCommandHandler> logger) 
     : IRequestHandler<CreateMainServiceCommand, Response<MainServiceDto>>
 {
@@ -26,8 +24,7 @@ public class CreateMainServiceCommandHandler(CarServiceDbContext dbContext, ICur
     {
         var companyId = currentUser.ValidCompanyId();
 
-        var vehicle = await dbContext.Vehicles.AsNoTracking()
-            .FirstOrDefaultAsync(i => i.Id == request.VehicleId, cancellationToken);
+        var vehicle = await unitOfWork.Vehicles.GetByIdAsync(request.VehicleId, true, cancellationToken);
 
         if (vehicle is null)
             return Response<MainServiceDto>.Fail(BusinessExceptionMessages.VehicleNotFound);
@@ -44,12 +41,12 @@ public class CreateMainServiceCommandHandler(CarServiceDbContext dbContext, ICur
             CompanyId = companyId
         };
 
-        var result = await dbContext.AddAsync(entity, cancellationToken);
-        await dbContext.SaveChangesAsync(cancellationToken);
+        var result = await unitOfWork.MainServices.AddAsync(entity, cancellationToken);
+        await unitOfWork.SaveChangesAsync(cancellationToken);
         
-        result.Entity.Vehicle = vehicle;
+        result.Vehicle = vehicle;
 
-        var resultDto = result.Entity.FromEntity();
+        var resultDto = result.FromEntity();
 
         try
         {

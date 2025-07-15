@@ -1,10 +1,9 @@
-﻿using Adoroid.CarService.Application.Features.CompanyMasterServices.Dtos;
+﻿using Adoroid.CarService.Application.Common.Abstractions;
+using Adoroid.CarService.Application.Features.CompanyMasterServices.Dtos;
 using Adoroid.CarService.Application.Features.CompanyMasterServices.MapperExtensions;
-using Adoroid.CarService.Persistence;
 using Adoroid.Core.Application.Requests;
 using Adoroid.Core.Application.Wrappers;
 using Adoroid.Core.Repository.Paging;
-using Microsoft.EntityFrameworkCore;
 using MinimalMediatR.Core;
 
 namespace Adoroid.CarService.Application.Features.CompanyMasterServices.Queries.GetList;
@@ -12,16 +11,13 @@ namespace Adoroid.CarService.Application.Features.CompanyMasterServices.Queries.
 public record GetListCompanyServiceQuery(PageRequest PageRequest, string? Search)
     : IRequest<Response<Paginate<CompanyServiceDto>>>;
 
-public class GetListCompanyServiceQueryHandler(CarServiceDbContext dbContext)
+public class GetListCompanyServiceQueryHandler(IUnitOfWork unitOfWork)
     : IRequestHandler<GetListCompanyServiceQuery, Response<Paginate<CompanyServiceDto>>>
 {
 
     public async Task<Response<Paginate<CompanyServiceDto>>> Handle(GetListCompanyServiceQuery request, CancellationToken cancellationToken)
     {
-        var query = dbContext.CompanyServices
-            .Include(i => i.MasterService)
-            .Include(i => i.Company)
-            .AsNoTracking();
+        var query = unitOfWork.CompanyServices.GetMasterServices(cancellationToken);
 
 
         if (!string.IsNullOrEmpty(request.Search))

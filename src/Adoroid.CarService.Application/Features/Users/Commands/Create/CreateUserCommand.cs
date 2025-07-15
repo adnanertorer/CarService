@@ -1,10 +1,9 @@
-﻿using Adoroid.CarService.Application.Common.Abstractions.Auth;
+﻿using Adoroid.CarService.Application.Common.Abstractions;
+using Adoroid.CarService.Application.Common.Abstractions.Auth;
 using Adoroid.CarService.Application.Features.Users.Dtos;
 using Adoroid.CarService.Application.Features.Users.ExceptionMessages;
 using Adoroid.CarService.Domain.Entities;
-using Adoroid.CarService.Persistence;
 using Adoroid.Core.Application.Wrappers;
-using Microsoft.EntityFrameworkCore;
 using MinimalMediatR.Core;
 
 namespace Adoroid.CarService.Application.Features.Users.Commands.Create;
@@ -12,14 +11,13 @@ namespace Adoroid.CarService.Application.Features.Users.Commands.Create;
 public record CreateUserCommand(string Name, string Surname, string Email, string Password, string PhoneNumber) :
     IRequest<Response<UserDto>>;
 
-public class CreateUserCommandHandler(CarServiceDbContext dbContext, IAesEncryptionHelper aesEncryptionHelper) : IRequestHandler<CreateUserCommand, Response<UserDto>>
+public class CreateUserCommandHandler(IUnitOfWork unitOfWork, IAesEncryptionHelper aesEncryptionHelper) : IRequestHandler<CreateUserCommand, Response<UserDto>>
 {
     public async Task<Response<UserDto>> Handle(CreateUserCommand request, CancellationToken cancellationToken)
     {
-        var userExist = await dbContext.Users.AsNoTracking()
-            .AnyAsync(i => i.Email == request.Email || i.PhoneNumber == request.PhoneNumber, cancellationToken);
+        var userExist = await unitOfWork.Users.AnyUserWithEmailAndPhonenumber(request.Email, request.PhoneNumber, cancellationToken);
 
-        if(userExist )
+        if (userExist )
             return Response<UserDto>.Fail(BusinessExceptionMessages.UserAlreadyExists);
 
         var encryptedPassword = aesEncryptionHelper.Encrypt(request.Password);
@@ -35,8 +33,8 @@ public class CreateUserCommandHandler(CarServiceDbContext dbContext, IAesEncrypt
             IsDeleted = false
         };
 
-        await dbContext.Users.AddAsync(user, cancellationToken);
-        var result = await dbContext.SaveChangesAsync(cancellationToken);
+        await unitOfWork.Users.AddAsync(user, cancellationToken);
+        await unitOfWork.SaveChangesAsync(cancellationToken);
 
         return Response<UserDto>.Success(new UserDto
         {
