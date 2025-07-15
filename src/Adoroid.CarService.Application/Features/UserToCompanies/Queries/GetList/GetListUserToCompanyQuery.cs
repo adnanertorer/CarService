@@ -1,12 +1,11 @@
-﻿using Adoroid.CarService.Application.Common.Abstractions.Auth;
+﻿using Adoroid.CarService.Application.Common.Abstractions;
+using Adoroid.CarService.Application.Common.Abstractions.Auth;
 using Adoroid.CarService.Application.Common.Extensions;
 using Adoroid.CarService.Application.Features.UserToCompanies.Dtos;
 using Adoroid.CarService.Application.Features.UserToCompanies.MappingExtensions;
-using Adoroid.CarService.Persistence;
 using Adoroid.Core.Application.Requests;
 using Adoroid.Core.Application.Wrappers;
 using Adoroid.Core.Repository.Paging;
-using Microsoft.EntityFrameworkCore;
 using MinimalMediatR.Core;
 
 namespace Adoroid.CarService.Application.Features.UserToCompanies.Queries.GetList;
@@ -14,18 +13,14 @@ namespace Adoroid.CarService.Application.Features.UserToCompanies.Queries.GetLis
 public record GetListUserToCompanyQuery(PageRequest PageRequest)
     : IRequest<Response<Paginate<UserToCompanyDto>>>;
 
-public class GetListUserToCompanyQueryHandler(CarServiceDbContext dbContext, ICurrentUser currentUser)
+public class GetListUserToCompanyQueryHandler(IUnitOfWork unitOfWork, ICurrentUser currentUser)
     : IRequestHandler<GetListUserToCompanyQuery, Response<Paginate<UserToCompanyDto>>>
 {
     public async Task<Response<Paginate<UserToCompanyDto>>> Handle(GetListUserToCompanyQuery request, CancellationToken cancellationToken)
     {
         var companyId = currentUser.ValidCompanyId();
 
-        var query = dbContext.UserToCompanies
-            .Include(i => i.Company)
-            .Include(i => i.User)
-            .AsNoTracking()
-            .Where(i => i.CompanyId == companyId);
+        var query = unitOfWork.UserToCompanies.GetQueryable(companyId);
 
             var result = await query
                 .OrderByDescending(i => i.CreatedDate)
