@@ -12,7 +12,7 @@ public class DeleteCustomerCommandHandler(IUnitOfWork unitOfWork, ICurrentUser c
 {
     public async Task<Response<Guid>> Handle(DeleteCustomerCommand request, CancellationToken cancellationToken)
     {
-        var customer = await unitOfWork.Customers.GetByIdAsync(request.Id, true, cancellationToken);
+        var customer = await unitOfWork.Customers.GetByIdAsync(request.Id, false, cancellationToken);
 
         if (customer is null)
             return Response<Guid>.Fail(BusinessExceptionMessages.NotFound);
