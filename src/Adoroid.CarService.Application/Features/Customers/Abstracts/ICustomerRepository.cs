@@ -19,4 +19,5 @@ public interface ICustomerRepository
 
     IQueryable<Customer> GetAllWithIncludes(Guid companyId);
     Task<string> GetNameByIdAsync(Guid customerId, CancellationToken cancellationToken);
+    IQueryable<Customer> GetByCompanyId(Guid companyId);
 }
