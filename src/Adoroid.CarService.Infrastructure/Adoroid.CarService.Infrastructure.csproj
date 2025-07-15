@@ -27,6 +27,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Adoroid.CarService.Application\Adoroid.CarService.Application.csproj" />
+    <ProjectReference Include="..\Adoroid.CarService.Persistence\Adoroid.CarService.Persistence.csproj" />
   </ItemGroup>
 
   <ItemGroup>
