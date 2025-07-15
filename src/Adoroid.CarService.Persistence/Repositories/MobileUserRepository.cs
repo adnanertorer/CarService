@@ -50,6 +50,14 @@ public class MobileUserRepository(CarServiceDbContext dbContext) : IMobileUserRe
         return user is not null ? $"{user.Name} {user.Surname}" : string.Empty;
     }
 
+    public async Task<Dictionary<Guid, string>> GetUserNames(List<Guid> guids, CancellationToken cancellationToken)
+    {
+        return await dbContext.MobileUsers
+            .AsNoTracking()
+            .Where(m => guids.Contains(m.Id))
+            .ToDictionaryAsync(m => m.Id, m => $"{m.Name} {m.Surname}", cancellationToken);
+    }
+
     public async Task<bool> IsExistByEmail(string email, CancellationToken cancellationToken = default)
     {
        return await dbContext.MobileUsers

@@ -14,7 +14,7 @@ public class GetBySerialNumberQueryHandler(IUnitOfWork unitOfWork)
 {
     public async Task<Response<VehicleDto>> Handle(GetBySerialNumberQuery request, CancellationToken cancellationToken)
     {
-        var entity = await unitOfWork.Vehicles.GetBySerialNumber(request.PlateNumber, request.SerialNumber, cancellationToken)
+        var entity = await unitOfWork.Vehicles.GetBySerialNumber(request.PlateNumber, request.SerialNumber, cancellationToken);
 
         if (entity is null)
             return Response<VehicleDto>.Fail(BusinessExceptionMessages.NotFound);
