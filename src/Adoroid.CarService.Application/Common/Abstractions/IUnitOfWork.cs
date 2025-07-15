@@ -2,6 +2,7 @@
 using Adoroid.CarService.Application.Features.Cities.Abstracts;
 using Adoroid.CarService.Application.Features.Companies.Abstracts;
 using Adoroid.CarService.Application.Features.Customers.Abstracts;
+using Adoroid.CarService.Application.Features.Districts.Abstracts;
 using Adoroid.CarService.Application.Features.Employees.Abstracts;
 using Adoroid.CarService.Application.Features.MainServices.Abstracts;
 using Adoroid.CarService.Application.Features.MobileUsers.Abstracts;
@@ -24,6 +25,7 @@ public interface IUnitOfWork
     IVehicleRepository Vehicles { get; }
     IVehicleUserRepository VehicleUsers { get; }
     ICityRepository Cities { get; }
+    IDistrictRepository Districts { get; }
 
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
 

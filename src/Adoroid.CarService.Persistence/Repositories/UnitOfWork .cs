@@ -3,6 +3,7 @@ using Adoroid.CarService.Application.Features.AccountTransactions.Abstracts;
 using Adoroid.CarService.Application.Features.Cities.Abstracts;
 using Adoroid.CarService.Application.Features.Companies.Abstracts;
 using Adoroid.CarService.Application.Features.Customers.Abstracts;
+using Adoroid.CarService.Application.Features.Districts.Abstracts;
 using Adoroid.CarService.Application.Features.Employees.Abstracts;
 using Adoroid.CarService.Application.Features.MainServices.Abstracts;
 using Adoroid.CarService.Application.Features.MobileUsers.Abstracts;
@@ -37,6 +38,8 @@ public class UnitOfWork : IUnitOfWork
 
     public ICityRepository Cities { get; }
 
+    public IDistrictRepository Districts { get; }
+
     public UnitOfWork(CarServiceDbContext dbContext)
     {
         _dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
@@ -51,6 +54,7 @@ public class UnitOfWork : IUnitOfWork
         Vehicles = new VehicleRepository(_dbContext);
         VehicleUsers  = new VehicleUserRepository(_dbContext);
         Cities = new CityRepository(_dbContext);
+        Districts = new DistrictRepository(_dbContext);
     }
 
     public async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
