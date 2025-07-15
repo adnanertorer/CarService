@@ -1,26 +1,23 @@
-﻿using Adoroid.CarService.Application.Common.Abstractions.Auth;
+﻿using Adoroid.CarService.Application.Common.Abstractions;
+using Adoroid.CarService.Application.Common.Abstractions.Auth;
 using Adoroid.CarService.Application.Common.Extensions;
 using Adoroid.CarService.Application.Features.Customers.Dtos;
-using Adoroid.CarService.Persistence;
 using Adoroid.Core.Application.Requests;
 using Adoroid.Core.Application.Wrappers;
 using Adoroid.Core.Repository.Paging;
-using Microsoft.EntityFrameworkCore;
 using MinimalMediatR.Core;
 
 namespace Adoroid.CarService.Application.Features.Customers.Queries.GetList;
 
 public record GetCustomerListQuery(PageRequest PageRequest, string? Search) : IRequest<Response<Paginate<CustomerDto>>>;
 
-public class GetCustomerListQueryHandler(CarServiceDbContext dbContext, ICurrentUser currentUser) : IRequestHandler<GetCustomerListQuery, Response<Paginate<CustomerDto>>>
+public class GetCustomerListQueryHandler(IUnitOfWork unitOfWork, ICurrentUser currentUser) : IRequestHandler<GetCustomerListQuery, Response<Paginate<CustomerDto>>>
 {
     public async Task<Response<Paginate<CustomerDto>>> Handle(GetCustomerListQuery request, CancellationToken cancellationToken)
     {
         var companyId = currentUser.ValidCompanyId();
 
-        var query = dbContext.Customers
-            .AsNoTracking()
-            .Where(i => i.CompanyId == companyId && i.IsActive);
+        var query = unitOfWork.Customers.GetAllWithIncludes(companyId);
 
         if (!string.IsNullOrWhiteSpace(request.Search)) 
             query = query.Where(i => i.Name.Contains(request.Search) || i.Surname.Contains(request.Search) || i.Phone.Contains(request.Search));

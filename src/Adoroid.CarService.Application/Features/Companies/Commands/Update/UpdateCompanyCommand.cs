@@ -1,10 +1,9 @@
-﻿using Adoroid.CarService.Application.Common.Abstractions.Auth;
+﻿using Adoroid.CarService.Application.Common.Abstractions;
+using Adoroid.CarService.Application.Common.Abstractions.Auth;
 using Adoroid.CarService.Application.Features.Companies.Dtos;
 using Adoroid.CarService.Application.Features.Companies.ExceptionMessages;
 using Adoroid.CarService.Application.Features.Companies.MapperExtensions;
-using Adoroid.CarService.Persistence;
 using Adoroid.Core.Application.Wrappers;
-using Microsoft.EntityFrameworkCore;
 using MinimalMediatR.Core;
 
 namespace Adoroid.CarService.Application.Features.Companies.Commands.Update
@@ -13,11 +12,11 @@ namespace Adoroid.CarService.Application.Features.Companies.Commands.Update
     string TaxNumber, string TaxOffice, int CityId, int DistrictId, string CompanyAddress,
     string CompanyPhone, string CompanyEmail) : IRequest<Response<CompanyDto>>;
 
-    public class UpdateCompanyCommandHandler(CarServiceDbContext dbContext, ICurrentUser currentUser) : IRequestHandler<UpdateCompanyCommand, Response<CompanyDto>>
+    public class UpdateCompanyCommandHandler(IUnitOfWork unitOfWork, ICurrentUser currentUser) : IRequestHandler<UpdateCompanyCommand, Response<CompanyDto>>
     {
         public async Task<Response<CompanyDto>> Handle(UpdateCompanyCommand request, CancellationToken cancellationToken)
         {
-            var company = await dbContext.Companies.FirstOrDefaultAsync(i => i.Id == request.Id, cancellationToken);
+            var company = await unitOfWork.Companies.GetByIdAsync(request.Id, cancellationToken);
             if (company == null)
                 return Response<CompanyDto>.Fail(BusinessExceptionMessages.CompanyNotFound);
 
@@ -33,10 +32,8 @@ namespace Adoroid.CarService.Application.Features.Companies.Commands.Update
             company.CompanyName = request.CompanyName;  
             company.DistrictId = request.DistrictId;
             company.TaxNumber = request.TaxNumber;
-            
-            dbContext.Update(company);
 
-            await dbContext.SaveChangesAsync(cancellationToken);
+            await unitOfWork.SaveChangesAsync(cancellationToken);
 
             return Response<CompanyDto>.Success(company.FromEntity());
         }

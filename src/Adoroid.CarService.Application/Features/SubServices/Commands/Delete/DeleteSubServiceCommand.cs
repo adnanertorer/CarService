@@ -1,10 +1,9 @@
-﻿using Adoroid.CarService.Application.Common.Abstractions.Auth;
+﻿using Adoroid.CarService.Application.Common.Abstractions;
+using Adoroid.CarService.Application.Common.Abstractions.Auth;
 using Adoroid.CarService.Application.Common.Abstractions.Caching;
 using Adoroid.CarService.Application.Common.Extensions;
 using Adoroid.CarService.Application.Features.SubServices.ExceptionMessages;
-using Adoroid.CarService.Persistence;
 using Adoroid.Core.Application.Wrappers;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using MinimalMediatR.Core;
 
@@ -12,7 +11,7 @@ namespace Adoroid.CarService.Application.Features.SubServices.Commands.Delete;
 
 public record DeleteSubServiceCommand(Guid Id) : IRequest<Response<Guid>>;
 
-public class DeleteSubServiceCommandHandler(CarServiceDbContext dbContext, ICurrentUser currentUser, ICacheService cacheService, ILogger<DeleteSubServiceCommandHandler> logger)
+public class DeleteSubServiceCommandHandler(IUnitOfWork unitOfWork, ICurrentUser currentUser, ICacheService cacheService, ILogger<DeleteSubServiceCommandHandler> logger)
     : IRequestHandler<DeleteSubServiceCommand, Response<Guid>>
 {
     const string redisKeyPrefix = "subservice:list";
@@ -20,7 +19,7 @@ public class DeleteSubServiceCommandHandler(CarServiceDbContext dbContext, ICurr
     {
         var companyId = currentUser.ValidCompanyId();
 
-        var entity = await dbContext.SubServices.FirstOrDefaultAsync(e => e.Id == request.Id, cancellationToken);
+        var entity = await unitOfWork.SubServices.GetByIdAsync(request.Id, false, cancellationToken);
 
         if (entity is null)
             return Response<Guid>.Fail(BusinessExceptionMessages.NotFound);
@@ -29,7 +28,7 @@ public class DeleteSubServiceCommandHandler(CarServiceDbContext dbContext, ICurr
         entity.DeletedBy = Guid.Parse(currentUser.Id!);
         entity.DeletedDate = DateTime.UtcNow;
 
-        await dbContext.SaveChangesAsync(cancellationToken);
+        await unitOfWork.SaveChangesAsync(cancellationToken);
 
         try
         {
@@ -40,8 +39,6 @@ public class DeleteSubServiceCommandHandler(CarServiceDbContext dbContext, ICurr
         {
             logger.LogError(ex, "Error while deleting to cache for sub service delete.");
         }
-
-        
 
         return Response<Guid>.Success(entity.Id);
     }

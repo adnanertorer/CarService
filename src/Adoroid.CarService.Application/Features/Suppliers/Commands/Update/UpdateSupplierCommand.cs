@@ -1,10 +1,9 @@
-﻿using Adoroid.CarService.Application.Common.Abstractions.Auth;
+﻿using Adoroid.CarService.Application.Common.Abstractions;
+using Adoroid.CarService.Application.Common.Abstractions.Auth;
 using Adoroid.CarService.Application.Features.Suppliers.Dtos;
 using Adoroid.CarService.Application.Features.Suppliers.ExceptionMessages;
 using Adoroid.CarService.Application.Features.Suppliers.MapperExtensions;
-using Adoroid.CarService.Persistence;
 using Adoroid.Core.Application.Wrappers;
-using Microsoft.EntityFrameworkCore;
 using MinimalMediatR.Core;
 
 namespace Adoroid.CarService.Application.Features.Suppliers.Commands.Update;
@@ -12,11 +11,11 @@ namespace Adoroid.CarService.Application.Features.Suppliers.Commands.Update;
 public record UpdateSupplierCommand(Guid Id, string Name, string ContactName, string PhoneNumber, string? Email, string? Address) :
     IRequest<Response<SupplierDto>>;
 
-public class UpdateSupplierCommandHandler(CarServiceDbContext dbContext, ICurrentUser currentUser) : IRequestHandler<UpdateSupplierCommand, Response<SupplierDto>>
+public class UpdateSupplierCommandHandler(IUnitOfWork unitOfWork, ICurrentUser currentUser) : IRequestHandler<UpdateSupplierCommand, Response<SupplierDto>>
 {
     public async Task<Response<SupplierDto>> Handle(UpdateSupplierCommand request, CancellationToken cancellationToken)
     {
-        var supplier = await dbContext.Suppliers.FirstOrDefaultAsync(i => i.Id == request.Id, cancellationToken);
+        var supplier = await unitOfWork.Suppliers.GetByIdAsync(request.Id.ToString(), asNoTracking: false, cancellationToken);
         if (supplier is null)
             return Response<SupplierDto>.Fail(BusinessExceptionMessages.SupplierNotFound);
 
@@ -28,8 +27,7 @@ public class UpdateSupplierCommandHandler(CarServiceDbContext dbContext, ICurren
         supplier.Email = request.Email;
         supplier.Name = request.Name;
         
-        dbContext.Suppliers.Update(supplier);
-        await dbContext.SaveChangesAsync(cancellationToken);
+        await unitOfWork.SaveChangesAsync(cancellationToken);
 
         return Response<SupplierDto>.Success(supplier.FromEntity());
     }

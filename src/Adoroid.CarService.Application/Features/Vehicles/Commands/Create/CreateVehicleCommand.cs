@@ -1,26 +1,23 @@
-﻿using Adoroid.CarService.Application.Common.Abstractions.Auth;
+﻿using Adoroid.CarService.Application.Common.Abstractions;
+using Adoroid.CarService.Application.Common.Abstractions.Auth;
+using Adoroid.CarService.Application.Common.Enums;
 using Adoroid.CarService.Application.Features.Vehicles.Dtos;
+using Adoroid.CarService.Application.Features.Vehicles.ExceptionMessages;
 using Adoroid.CarService.Application.Features.Vehicles.MapperExtensions;
 using Adoroid.CarService.Domain.Entities;
-using Adoroid.CarService.Persistence;
 using Adoroid.Core.Application.Wrappers;
-using Microsoft.EntityFrameworkCore;
 using MinimalMediatR.Core;
-using Adoroid.CarService.Application.Features.Vehicles.ExceptionMessages;
-using Adoroid.CarService.Application.Common.Enums;
 
 namespace Adoroid.CarService.Application.Features.Vehicles.Commands.Create;
 
 public record CreateVehicleCommand(Guid? CustomerId, string Brand, string Model, int Year, string Plate,
     int FuelTypeId, string? Engine, string SerialNumber) : IRequest<Response<VehicleDto>>;
 
-public class CreateVehicleCommandHandler(CarServiceDbContext dbContext, ICurrentUser currentUser) : IRequestHandler<CreateVehicleCommand, Response<VehicleDto>>
+public class CreateVehicleCommandHandler(IUnitOfWork unitOfWork, ICurrentUser currentUser) : IRequestHandler<CreateVehicleCommand, Response<VehicleDto>>
 {
     public async Task<Response<VehicleDto>> Handle(CreateVehicleCommand request, CancellationToken cancellationToken)
     {
-        var isExist = await dbContext.Vehicles
-            .AsNoTracking()
-            .AnyAsync(i => i.Plate == request.Plate && i.SerialNumber == request.SerialNumber, cancellationToken);
+        var isExist = await unitOfWork.Vehicles.ExistsAsync(request.Plate, request.SerialNumber, cancellationToken); ;
 
         if (isExist)
             return Response<VehicleDto>.Fail(BusinessExceptionMessages.AlreadyExists);
@@ -39,23 +36,23 @@ public class CreateVehicleCommandHandler(CarServiceDbContext dbContext, ICurrent
             CreatedDate = DateTime.UtcNow
         };
 
-        var resultEntity = await dbContext.Vehicles.AddAsync(entity, cancellationToken);
+        var resultEntity = await unitOfWork.Vehicles.AddAsync(entity, cancellationToken);
 
         if(request.CustomerId.HasValue)
         {
             var vehicleUser = new VehicleUser
             {
-                VehicleId = resultEntity.Entity.Id,
+                VehicleId = resultEntity.Id,
                 UserId = request.CustomerId.Value,
                 UserTypeId = (int)VehicleUserTypeEnum.Temporary, // Geçici kullanıcı olarak işaretleniyor
                 CreatedDate = DateTime.UtcNow,
                 CreatedBy = Guid.Parse(currentUser.Id!)
             };
-            await dbContext.VehicleUsers.AddAsync(vehicleUser, cancellationToken);
+            await unitOfWork.VehicleUsers.AddAsync(vehicleUser, cancellationToken);
         }
 
-        await dbContext.SaveChangesAsync(cancellationToken);
+        await unitOfWork.SaveChangesAsync(cancellationToken);
 
-        return Response<VehicleDto>.Success(resultEntity.Entity.FromEntity());
+        return Response<VehicleDto>.Success(resultEntity.FromEntity());
     }
 }
