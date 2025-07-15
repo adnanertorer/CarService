@@ -39,4 +39,10 @@ public class CompanyRepository(CarServiceDbContext dbContext) : ICompanyReposiyo
         .Include(i => i.CompanyServices).ThenInclude(i => i.MasterService)
         .AsNoTracking();
     }
+
+    public async Task<bool> IsCompanyExistsAsync(Guid id, CancellationToken cancellationToken)
+    {
+        return await dbContext.Companies.AsNoTracking()
+           .AnyAsync(x => x.Id == id, cancellationToken);
+    }
 }

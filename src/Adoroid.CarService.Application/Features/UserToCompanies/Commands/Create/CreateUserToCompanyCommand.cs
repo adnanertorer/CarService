@@ -1,11 +1,10 @@
-﻿using Adoroid.CarService.Application.Common.Abstractions.Auth;
+﻿using Adoroid.CarService.Application.Common.Abstractions;
+using Adoroid.CarService.Application.Common.Abstractions.Auth;
 using Adoroid.CarService.Application.Features.UserToCompanies.Dtos;
 using Adoroid.CarService.Application.Features.UserToCompanies.ExceptionMessages;
 using Adoroid.CarService.Application.Features.UserToCompanies.MappingExtensions;
 using Adoroid.CarService.Domain.Entities;
-using Adoroid.CarService.Persistence;
 using Adoroid.Core.Application.Wrappers;
-using Microsoft.EntityFrameworkCore;
 using MinimalMediatR.Core;
 
 namespace Adoroid.CarService.Application.Features.UserToCompanies.Commands.Create;
@@ -13,21 +12,16 @@ namespace Adoroid.CarService.Application.Features.UserToCompanies.Commands.Creat
 public record CreateUserToCompanyCommand(Guid CompanyId, int CompanyUserType) 
     : IRequest<Response<UserToCompanyDto>>;
 
-public class CreateUserToCompanyCommandHandler(CarServiceDbContext dbContext, ICurrentUser currentUser)
+public class CreateUserToCompanyCommandHandler(IUnitOfWork unitOfWork, ICurrentUser currentUser)
     : IRequestHandler<CreateUserToCompanyCommand, Response<UserToCompanyDto>>
 {
     public async Task<Response<UserToCompanyDto>> Handle(CreateUserToCompanyCommand request, CancellationToken cancellationToken)
     {
-        var companyExist = await dbContext.Companies
-            .AsNoTracking()
-            .AnyAsync(i => i.Id == request.CompanyId, cancellationToken);
-
+        var companyExist = await unitOfWork.Companies.IsCompanyExistsAsync(request.CompanyId, cancellationToken);
         if (!companyExist)
             return Response<UserToCompanyDto>.Fail(BusinessExceptionMessages.CompanyNotFound);
 
-        var isExist = await dbContext.UserToCompanies
-            .AsNoTracking()
-            .AnyAsync(i => i.UserId == Guid.Parse(currentUser.Id!) && i.CompanyId == request.CompanyId, cancellationToken);
+        var isExist = await unitOfWork.UserToCompanies.IsExists(Guid.Parse(currentUser.Id!), request.CompanyId, cancellationToken);
 
         if (isExist)
             return Response<UserToCompanyDto>.Fail(BusinessExceptionMessages.AlreadyExists);
@@ -42,8 +36,8 @@ public class CreateUserToCompanyCommandHandler(CarServiceDbContext dbContext, IC
             UserType = request.CompanyUserType
         };
 
-        await dbContext.AddAsync(entity, cancellationToken);
-        await dbContext.SaveChangesAsync(cancellationToken);
+        await unitOfWork.UserToCompanies.AddAsync(entity, cancellationToken);
+        await unitOfWork.SaveChangesAsync(cancellationToken);
 
         return Response<UserToCompanyDto>.Success(entity.FromEntity());
     }
