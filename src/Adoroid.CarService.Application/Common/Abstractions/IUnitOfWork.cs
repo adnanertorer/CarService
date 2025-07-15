@@ -1,4 +1,5 @@
 ﻿using Adoroid.CarService.Application.Features.AccountTransactions.Abstracts;
+using Adoroid.CarService.Application.Features.Cities.Abstracts;
 using Adoroid.CarService.Application.Features.Companies.Abstracts;
 using Adoroid.CarService.Application.Features.Customers.Abstracts;
 using Adoroid.CarService.Application.Features.Employees.Abstracts;
@@ -22,6 +23,7 @@ public interface IUnitOfWork
     IMobileUserRepository MobileUsers { get; }
     IVehicleRepository Vehicles { get; }
     IVehicleUserRepository VehicleUsers { get; }
+    ICityRepository Cities { get; }
 
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
 
