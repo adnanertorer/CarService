@@ -27,7 +27,7 @@ public class CustomerRepository(CarServiceDbContext dbContext) : ICustomerReposi
             .Where(c => c.CompanyId == companyId && c.IsActive);
     }
 
-    public async Task<Customer?> GetByIdAsync(Guid customerId, bool asNoTracking = true, CancellationToken cancellationToken)
+    public async Task<Customer?> GetByIdAsync(Guid customerId, bool asNoTracking = true, CancellationToken cancellationToken = default)
     {
         var query = asNoTracking ? 
             dbContext.Customers.AsNoTracking() : 
@@ -45,6 +45,14 @@ public class CustomerRepository(CarServiceDbContext dbContext) : ICustomerReposi
 
         return await query
             .FirstOrDefaultAsync(predicate: c => c.MobileUserId == mobileUserId, cancellationToken);
+    }
+
+    public async Task<Dictionary<Guid, string>> GetCustomerNames(List<Guid> guids, CancellationToken cancellationToken)
+    {
+        return await dbContext.Customers
+            .AsNoTracking()
+            .Where(c => guids.Contains(c.Id))
+            .ToDictionaryAsync(c => c.Id, c => $"{c.Name} {c.Surname}", cancellationToken);
     }
 
     public async Task<string> GetNameByIdAsync(Guid customerId, CancellationToken cancellationToken)

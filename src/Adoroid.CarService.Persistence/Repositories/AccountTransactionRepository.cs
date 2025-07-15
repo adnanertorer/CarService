@@ -37,6 +37,13 @@ public class AccountTransactionRepository(CarServiceDbContext dbContext) : IAcco
         return totalDebt - totalClaim + amount;
     }
 
+    public IQueryable<AccountingTransaction> GetByCompanyId(Guid companyId, bool asNoTracking = true)
+    {
+       return asNoTracking ? dbContext.AccountingTransactions
+            .AsNoTracking() : dbContext.AccountingTransactions
+            .Where(i => i.CompanyId == companyId);
+    }
+
     public async Task<AccountingTransaction?> GetByIdAsync(Guid id, bool asNoTracking = true, CancellationToken cancellationToken = default)
     {
         var query = dbContext.AccountingTransactions.AsQueryable();

@@ -1,12 +1,11 @@
-﻿using Adoroid.CarService.Application.Common.Abstractions.Auth;
+﻿using Adoroid.CarService.Application.Common.Abstractions;
+using Adoroid.CarService.Application.Common.Abstractions.Auth;
 using Adoroid.CarService.Application.Common.Dtos.Filters;
 using Adoroid.CarService.Application.Common.Enums;
 using Adoroid.CarService.Application.Common.Extensions;
 using Adoroid.CarService.Application.Features.AccountTransactions.Dtos;
-using Adoroid.CarService.Persistence;
 using Adoroid.Core.Application.Wrappers;
 using Adoroid.Core.Repository.Paging;
-using Microsoft.EntityFrameworkCore;
 using MinimalMediatR.Core;
 
 namespace Adoroid.CarService.Application.Features.AccountTransactions.Queries.GetList;
@@ -14,7 +13,7 @@ namespace Adoroid.CarService.Application.Features.AccountTransactions.Queries.Ge
 public record GetListAccountTransactionRequest(MainFilterRequestModel MainFilterRequest)
     : IRequest<Response<Paginate<AccountTransactionDto>>>;
 
-public class GetListAccountTransactionRequestHandler(CarServiceDbContext dbContext, ICurrentUser currentUser)
+public class GetListAccountTransactionRequestHandler(IUnitOfWork unitOfWork, ICurrentUser currentUser)
     : IRequestHandler<GetListAccountTransactionRequest, Response<Paginate<AccountTransactionDto>>>
 {
 
@@ -22,9 +21,7 @@ public class GetListAccountTransactionRequestHandler(CarServiceDbContext dbConte
     {
         var companyId = currentUser.ValidCompanyId();
 
-        var transactionsQuery = dbContext.AccountingTransactions
-            .AsNoTracking()
-            .Where(i => i.CompanyId == companyId);
+        var transactionsQuery = unitOfWork.AccountTransactions.GetByCompanyId(companyId, asNoTracking: true);
 
         if (request.MainFilterRequest.CustomerId != null)
             transactionsQuery = transactionsQuery.Where(i => i.AccountOwnerId == request.MainFilterRequest.CustomerId);
@@ -61,13 +58,9 @@ public class GetListAccountTransactionRequestHandler(CarServiceDbContext dbConte
             .Distinct()
             .ToList();
 
-        var customers = await dbContext.Customers
-            .Where(c => customerIds.Contains(c.Id))
-            .ToDictionaryAsync(c => c.Id, c => $"{c.Name} {c.Surname}", cancellationToken);
+        var customers = await unitOfWork.Customers.GetCustomerNames(customerIds, cancellationToken);
 
-        var mobileUsers = await dbContext.MobileUsers
-            .Where(m => mobileUserIds.Contains(m.Id))
-            .ToDictionaryAsync(m => m.Id, m => $"{m.Name} {m.Surname}", cancellationToken);
+        var mobileUsers = await unitOfWork.MobileUsers.GetUserNames(mobileUserIds, cancellationToken);
 
         var dtoItems = transactions.Items.Select(t => new AccountTransactionDto
         {
