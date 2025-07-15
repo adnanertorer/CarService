@@ -12,6 +12,7 @@ using Adoroid.CarService.Application.Features.MobileUsers.Abstracts;
 using Adoroid.CarService.Application.Features.SubServices.Abstracts;
 using Adoroid.CarService.Application.Features.Suppliers.Abstracts;
 using Adoroid.CarService.Application.Features.Users.Abtracts.Repositories;
+using Adoroid.CarService.Application.Features.UserToCompanies.Abstracts;
 using Adoroid.CarService.Application.Features.Vehicles.Abstracts;
 using Microsoft.EntityFrameworkCore.Storage;
 
@@ -49,6 +50,8 @@ public class UnitOfWork : IUnitOfWork
 
     public ISupplierRepository Suppliers { get; }
 
+    public IUserToCompanyRepository UserToCompanies { get; }
+
     public UnitOfWork(CarServiceDbContext dbContext)
     {
         _dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
@@ -67,6 +70,7 @@ public class UnitOfWork : IUnitOfWork
         CompanyServices = new CompanyServiceRepository(_dbContext);
         MasterServices = new MasterServiceRepository(_dbContext);
         Suppliers = new SupplierRepository(_dbContext);
+        UserToCompanies = new UserToCompanyRepository(_dbContext);
     }
 
     public async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
