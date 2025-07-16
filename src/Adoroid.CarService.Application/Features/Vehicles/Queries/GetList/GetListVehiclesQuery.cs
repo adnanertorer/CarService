@@ -19,7 +19,9 @@ public class GetListVehiclesQueryHandler(IUnitOfWork unitOfWork, ICurrentUser cu
         var vehicleUsers = unitOfWork.VehicleUsers.GetQueryable();
 
         var query = from cus in customers from vu in vehicleUsers
-                    where cus.CompanyId == Guid.Parse(currentUser.CompanyId!) && (cus.Id == vu.UserId || cus.MobileUserId == vu.UserId)
+                    where cus.CompanyId == Guid.Parse(currentUser.CompanyId!) 
+                    && cus.Id == request.CustomerId 
+                    && (cus.Id == vu.UserId || cus.MobileUserId == vu.UserId)
             join veh in vehicles on vu.VehicleId equals veh.Id into vehJoin
             from veh in vehJoin.DefaultIfEmpty()
             select new
