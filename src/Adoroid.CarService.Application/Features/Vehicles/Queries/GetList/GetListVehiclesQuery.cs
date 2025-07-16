@@ -24,7 +24,8 @@ public class GetListVehiclesQueryHandler(IUnitOfWork unitOfWork, ICurrentUser cu
                     && (cus.Id == vu.UserId || cus.MobileUserId == vu.UserId)
             join veh in vehicles on vu.VehicleId equals veh.Id into vehJoin
             from veh in vehJoin.DefaultIfEmpty()
-            select new
+            where veh != null
+                    select new
             {
                 Customer = new CustomerDto { Id = cus.Id, Name = cus.Name, Surname = cus.Surname},
                 Vehicle = new VehicleDto
@@ -41,8 +42,15 @@ public class GetListVehiclesQueryHandler(IUnitOfWork unitOfWork, ICurrentUser cu
             }; 
 
         if (!string.IsNullOrWhiteSpace(request.Search))
-            query = query.Where(i => i.Vehicle.Brand.Contains(request.Search) || i.Vehicle.Model.Contains(request.Search) || i.Vehicle.Plate.Contains(request.Search)
-            || (i.Vehicle.SerialNumber != null && i.Vehicle.SerialNumber.Contains(request.Search)));
+            query = query.Where(i =>
+                    i.Vehicle != null &&
+                    (
+                        (i.Vehicle.Brand != null && i.Vehicle.Brand.Contains(request.Search)) ||
+                        (i.Vehicle.Model != null && i.Vehicle.Model.Contains(request.Search)) ||
+                        (i.Vehicle.Plate != null && i.Vehicle.Plate.Contains(request.Search)) ||
+                        (i.Vehicle.SerialNumber != null && i.Vehicle.SerialNumber.Contains(request.Search))
+                    )
+                );
 
         var result = await query.OrderBy(i => i.Vehicle.Brand)
             .Select(i => new VehicleDto
