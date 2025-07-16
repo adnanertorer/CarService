@@ -1,5 +1,6 @@
 ﻿using Adoroid.CarService.Application.Common.Abstractions;
 using Adoroid.CarService.Application.Common.Abstractions.Auth;
+using Adoroid.CarService.Application.Common.Enums;
 using Adoroid.CarService.Application.Features.Vehicles.ExceptionMessages;
 using Adoroid.Core.Application.Wrappers;
 using MinimalMediatR.Core;
@@ -12,6 +13,11 @@ public class DeleteVehicleCommandHandler(IUnitOfWork unitOfWork, ICurrentUser cu
     public async Task<Response<Guid>> Handle(DeleteVehicleCommand request, CancellationToken cancellationToken)
     {
         var vehicle = await unitOfWork.Vehicles.GetByIdWithMainServiceAsync(request.Id, false, cancellationToken);
+
+        var isVehicleNotTemporary = await unitOfWork.VehicleUsers.IsVehicleNotTempoary(request.Id, cancellationToken);
+
+        if(isVehicleNotTemporary) 
+            return Response<Guid>.Fail(BusinessExceptionMessages.VehicleIsNotTemporary);
 
         if (vehicle is null)
             return Response<Guid>.Fail(BusinessExceptionMessages.NotFound);

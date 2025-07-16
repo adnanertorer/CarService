@@ -19,6 +19,11 @@ public class UpdateVehicleCommandHandler(IUnitOfWork unitOfWork, ICurrentUser cu
         if (vehicle is null)
             return Response<VehicleDto>.Fail(BusinessExceptionMessages.NotFound);
 
+        var isVehicleNotTemporary = await unitOfWork.VehicleUsers.IsVehicleNotTempoary(request.Id, cancellationToken);
+
+        if (isVehicleNotTemporary && currentUser.UserType == "company")
+            return Response<VehicleDto>.Fail(BusinessExceptionMessages.VehicleIsNotTemporary);
+
         vehicle.UpdatedDate = DateTime.UtcNow;
         vehicle.UpdatedBy = Guid.Parse(currentUser.Id!);
         vehicle.FuelTypeId = request.FuelTypeId;
