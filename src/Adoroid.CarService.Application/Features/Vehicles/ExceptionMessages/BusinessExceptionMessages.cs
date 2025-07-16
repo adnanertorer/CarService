@@ -8,4 +8,5 @@ public class BusinessExceptionMessages
     public const string VehicleUserRecordNotFound = "Araç kullanıcı kaydı bulunamadı.";
     public const string CustomerNotFound = "Müşteri bulunamadı.";
     public const string MobileUserNotFound = "Mobil kullanıcı bulunamadı.";
+    public const string VehicleIsNotTemporary = "Araç bir müşteri üzerine atanmış, bu yüzden silinemez ya da değiştirilemez.";
 }
