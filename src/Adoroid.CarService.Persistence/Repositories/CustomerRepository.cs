@@ -1,5 +1,4 @@
-﻿using Adoroid.CarService.Application;
-using Adoroid.CarService.Application.Features.Customers.Abstracts;
+﻿using Adoroid.CarService.Application.Features.Customers.Abstracts;
 using Adoroid.CarService.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 
@@ -96,11 +95,17 @@ public class CustomerRepository(CarServiceDbContext dbContext) : ICustomerReposi
         return (data.Customer, result);
     }
 
-    public async Task<bool> IsCustomerExistsAsync(string name, string surname, Guid companyId, string phone, CancellationToken cancellationToken)
+    public async Task<bool> IsCustomerExistsAsync(Guid companyId, string phone, string? email, CancellationToken cancellationToken)
     {
-       return await dbContext.Customers.AsNoTracking()
-            .AnyAsync(i => i.Name == name &&
-            i.Surname == surname && i.Phone == phone &&
-            i.CompanyId == companyId, cancellationToken);
+        if (!string.IsNullOrEmpty(email))
+        {
+            email = email.Trim().ToLowerInvariant();
+            return await dbContext.Customers.AsNoTracking()
+                .AnyAsync(i => i.CompanyId == companyId && i.Email == email || i.Phone == phone, cancellationToken);
+        }
+        return await dbContext.Customers.AsNoTracking()
+               .AnyAsync(i => i.CompanyId == companyId && i.Phone == phone, cancellationToken);
+
     }
+           
 }

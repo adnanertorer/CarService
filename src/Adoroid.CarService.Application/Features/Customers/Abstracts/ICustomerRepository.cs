@@ -4,7 +4,7 @@ namespace Adoroid.CarService.Application.Features.Customers.Abstracts;
 
 public interface ICustomerRepository
 {
-    Task<bool> IsCustomerExistsAsync(string name, string surname, Guid companyId, string phone,
+    Task<bool> IsCustomerExistsAsync(Guid companyId, string phone, string? email,
         CancellationToken cancellationToken);
     Task<Customer?> GetByIdAsync(Guid customerId, bool asNoTracking = true, 
         CancellationToken cancellationToken = default);
