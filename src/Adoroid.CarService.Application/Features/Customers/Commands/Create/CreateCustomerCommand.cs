@@ -20,7 +20,7 @@ public class CreateCustomerCommandHandler(IUnitOfWork unitOfWork, ICurrentUser c
     {
         var companyId = currentUser.ValidCompanyId();
 
-        var isExist = await unitOfWork.Customers.IsCustomerExistsAsync(request.Name, request.Surname, companyId, request.Phone, cancellationToken);
+        var isExist = await unitOfWork.Customers.IsCustomerExistsAsync(companyId, request.Phone, request.Email, cancellationToken);
 
         if (isExist)
             return Response<CustomerDto>.Fail(BusinessExceptionMessages.AlreadyExists);
