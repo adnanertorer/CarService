@@ -21,7 +21,7 @@ public interface IUnitOfWork
     IUserRepository Users { get; }
     ICompanyReposiyory Companies { get; }
     IAccountTransactionRepository AccountTransactions { get; }
-    ICustomerRepository Customers { get; }
+    ICustomerRepository Customers { get; set; }
     IMainServiceRepository MainServices { get; }
     ISubServiceRepository SubServices { get; }
     IEmployeeRepository Employees { get; }
