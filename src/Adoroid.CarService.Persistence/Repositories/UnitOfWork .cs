@@ -26,7 +26,7 @@ public class UnitOfWork : IUnitOfWork
     public ICompanyReposiyory Companies { get; }
     public IAccountTransactionRepository AccountTransactions { get; }
 
-    public ICustomerRepository Customers { get; }
+    public ICustomerRepository Customers { get; set; }
 
     public IMainServiceRepository MainServices { get; }
 
