@@ -24,6 +24,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Çözüm Öğeleri", "Çöz
 		wait-for-postgres.sh = wait-for-postgres.sh
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Adoroid.CarService.Application.Tests", "src\Adoroid.CarService.Application.Tests\Adoroid.CarService.Application.Tests.csproj", "{56122910-6B1C-4BFA-A290-CC035F01DEE8}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -54,6 +56,10 @@ Global
 		{3751CA41-9199-4687-B87F-9A9D6FCB5471}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3751CA41-9199-4687-B87F-9A9D6FCB5471}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3751CA41-9199-4687-B87F-9A9D6FCB5471}.Release|Any CPU.Build.0 = Release|Any CPU
+		{56122910-6B1C-4BFA-A290-CC035F01DEE8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{56122910-6B1C-4BFA-A290-CC035F01DEE8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{56122910-6B1C-4BFA-A290-CC035F01DEE8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{56122910-6B1C-4BFA-A290-CC035F01DEE8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -65,6 +71,7 @@ Global
 		{895C45DB-58FA-4BA7-8561-77138AB40F89} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 		{9BC539F8-87D8-41F6-8480-FCBD04BF6241} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 		{3751CA41-9199-4687-B87F-9A9D6FCB5471} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
+		{56122910-6B1C-4BFA-A290-CC035F01DEE8} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {EF87AD31-EBAC-4F47-9704-B3ED13607D61}
