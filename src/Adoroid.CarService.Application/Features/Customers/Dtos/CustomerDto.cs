@@ -14,4 +14,7 @@ public class CustomerDto
     public string? TaxOffice { get; set; }
     public int CityId { get; set; }
     public int DistrictId { get; set; }
+
+    public CityModel? City { get; set; }
+    public DistrictModel? District { get; set; }
 }
