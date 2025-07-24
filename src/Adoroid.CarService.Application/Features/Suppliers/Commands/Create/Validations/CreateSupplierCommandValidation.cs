@@ -8,12 +8,10 @@ public class CreateSupplierCommandValidation : AbstractValidator<CreateSupplierC
     public CreateSupplierCommandValidation()
     {
         RuleFor(x => x.Email)
-           .NotEmpty()
-           .WithMessage(string.Format(ValidationMessages.Required, "E-Posta"))
            .EmailAddress()
-           .WithMessage(string.Format(ValidationMessages.Email, "E-Posta"))
+           .WithMessage(string.Format(ValidationMessages.Email, "E-Posta")).When(x => !string.IsNullOrWhiteSpace(x.Email))
            .MaximumLength(60)
-           .WithMessage(string.Format(ValidationMessages.MaxLength, "E-Posta", "60"));
+           .WithMessage(string.Format(ValidationMessages.MaxLength, "E-Posta", "60")).When(x => !string.IsNullOrWhiteSpace(x.Email));
 
         RuleFor(x => x.Address)
             .MaximumLength(250)
