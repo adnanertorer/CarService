@@ -14,6 +14,8 @@ public class SupplierRepository(CarServiceDbContext dbContext) : ISupplierReposi
     public IQueryable<Supplier> GetAll(Guid companyId, CancellationToken cancellationToken = default)
     {
         return dbContext.Suppliers
+            .Include(i => i.City)
+            .Include(i => i.District)
             .AsNoTracking()
             .Where(i => i.CompanyId == companyId);
     }
@@ -23,6 +25,21 @@ public class SupplierRepository(CarServiceDbContext dbContext) : ISupplierReposi
          var query = asNoTracking ?
             dbContext.Suppliers.AsNoTracking() :
             dbContext.Suppliers.AsQueryable();
+
+        return query.FirstOrDefaultAsync(i => i.Id.ToString() == id, cancellationToken);
+    }
+
+    public Task<Supplier?> GetByIdWithIncludesAsync(string id, bool asNoTracking, CancellationToken cancellationToken)
+    {
+        var query = asNoTracking ?
+           dbContext.Suppliers
+           .Include(i => i.City)
+           .Include(i => i.DistrictId)
+           .AsNoTracking() :
+           dbContext.Suppliers
+           .Include(i => i.City)
+           .Include(i => i.DistrictId)
+           .AsQueryable();
 
         return query.FirstOrDefaultAsync(i => i.Id.ToString() == id, cancellationToken);
     }
