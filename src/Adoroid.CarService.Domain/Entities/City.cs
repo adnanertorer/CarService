@@ -7,6 +7,7 @@ public class City
         Companies = new HashSet<Company>();
         MobileUsers = new HashSet<MobileUser>();
         Suppliers = new HashSet<Supplier>();
+        Customers = new HashSet<Customer>();
     }
     public int Id { get; set; }
     public string Name { get; set; }
@@ -17,4 +18,5 @@ public class City
     public ICollection<Company>? Companies { get; set; }
     public ICollection<MobileUser>? MobileUsers { get; set; }
     public ICollection<Supplier>? Suppliers { get; set; }
+    public ICollection<Customer>? Customers { get; set; }
 }

@@ -20,7 +20,17 @@ public static class CustomerMappingExtension
             TaxNumber = customer.TaxNumber,
             TaxOffice = customer.TaxOffice,
             CityId = customer.CityId,
-            DistrictId = customer.DistrictId
+            DistrictId = customer.DistrictId,
+            City = customer.City != null ? new CityModel
+            {
+                Id = customer.City.Id,
+                Name = customer.City.Name
+            } : null,
+            District = customer.District != null ? new DistrictModel
+            {
+                Id = customer.District.Id,
+                Name = customer.District.Name
+            } : null,
         };
     }
 
