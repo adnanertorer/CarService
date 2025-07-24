@@ -8,7 +8,9 @@ using MinimalMediatR.Core;
 
 namespace Adoroid.CarService.Application.Features.Suppliers.Commands.Update;
 
-public record UpdateSupplierCommand(Guid Id, string Name, string ContactName, string PhoneNumber, string? Email, string? Address) :
+public record UpdateSupplierCommand(Guid Id, string Name, string ContactName, string PhoneNumber, string? Email, string? Address,
+    int CityId,
+    int DistrictId, string TaxOffice, string TaxNumber) :
     IRequest<Response<SupplierDto>>;
 
 public class UpdateSupplierCommandHandler(IUnitOfWork unitOfWork, ICurrentUser currentUser) : IRequestHandler<UpdateSupplierCommand, Response<SupplierDto>>
@@ -26,7 +28,11 @@ public class UpdateSupplierCommandHandler(IUnitOfWork unitOfWork, ICurrentUser c
         supplier.ContactName = request.ContactName;
         supplier.Email = request.Email;
         supplier.Name = request.Name;
-        
+        supplier.CityId = request.CityId;
+        supplier.DistrictId = request.DistrictId;
+        supplier.TaxOffice = request.TaxOffice;
+        supplier.TaxNumber = request.TaxNumber;
+
         await unitOfWork.SaveChangesAsync(cancellationToken);
 
         return Response<SupplierDto>.Success(supplier.FromEntity());

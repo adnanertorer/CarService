@@ -15,6 +15,10 @@ public class SupplierConfiguration : IEntityTypeConfiguration<Supplier>
         builder.Property(b => b.Email).HasMaxLength(60);
         builder.Property(b => b.Address).HasMaxLength(250);
         builder.Property(b => b.CompanyId).IsRequired();
+        builder.Property(b => b.CityId).IsRequired();
+        builder.Property(b => b.DistrictId).IsRequired();
+        builder.Property(b => b.TaxNumber).HasMaxLength(20);
+        builder.Property(b => b.TaxOffice).HasMaxLength(150);
 
         builder.Property(i => i.CreatedDate).IsRequired();
         builder.Property(c => c.CreatedBy).IsRequired().HasMaxLength(64);
@@ -28,5 +32,15 @@ public class SupplierConfiguration : IEntityTypeConfiguration<Supplier>
           .WithMany(c => c.Suppliers)
           .HasForeignKey(b => b.CompanyId)
           .OnDelete(DeleteBehavior.NoAction);
+
+        builder.HasOne(b => b.City)
+            .WithMany(c => c.Suppliers)
+            .HasForeignKey(b => b.CityId)
+            .OnDelete(DeleteBehavior.NoAction);
+
+        builder.HasOne(b => b.District)
+            .WithMany(c => c.Suppliers)
+            .HasForeignKey(b => b.DistrictId)
+            .OnDelete(DeleteBehavior.NoAction);
     }
 }
