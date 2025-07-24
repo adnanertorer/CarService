@@ -17,7 +17,7 @@ public class DeleteSupplierCommandHandler(IUnitOfWork unitOfWork, ICurrentUser c
             return Response<Guid>.Fail(BusinessExceptionMessages.SupplierNotFound);
 
         supplier.IsDeleted = true;
-        supplier.DeletedDate = DateTime.Now;
+        supplier.DeletedDate = DateTime.UtcNow;
         supplier.DeletedBy = Guid.Parse(currentUser.Id!);
 
         await unitOfWork.SaveChangesAsync(cancellationToken);
