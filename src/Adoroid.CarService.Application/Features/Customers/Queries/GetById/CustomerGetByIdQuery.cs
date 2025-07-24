@@ -13,7 +13,7 @@ public class CustomerGetByIdQueryHandler(IUnitOfWork unitOfWork) : IRequestHandl
 {
     public async Task<Response<CustomerDto>> Handle(CustomerGetByIdQuery request, CancellationToken cancellationToken)
     {
-        var customer = await unitOfWork.Customers.GetByIdAsync(request.Id, true, cancellationToken);
+        var customer = await unitOfWork.Customers.GetByIdWithIncludesAsync(request.Id, true, cancellationToken);
 
         if (customer is null)
             return Response<CustomerDto>.Fail(BusinessExceptionMessages.NotFound);
