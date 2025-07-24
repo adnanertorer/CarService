@@ -9,4 +9,11 @@ public class SupplierDto
     public string PhoneNumber { get; set; }
     public string? Email { get; set; }
     public string? Address { get; set; }
+    public int CityId { get; set; }
+    public int DistrictId { get; set; }
+    public string? TaxNumber { get; set; }
+    public string? TaxOffice { get; set; }
+
+    public CityModel? City { get; set; }
+    public DistrictModel? District { get; set; }
 }

@@ -16,6 +16,20 @@ public static class SupplierMappingExtension
             Id = supplier.Id,
             Name = supplier.Name,
             PhoneNumber = supplier.PhoneNumber,
+            TaxNumber = supplier.TaxNumber,
+            CityId = supplier.CityId,
+            DistrictId = supplier.DistrictId,
+            TaxOffice = supplier.TaxOffice,
+            City = supplier.City != null ? new CityModel
+            {
+                Id = supplier.City.Id,
+                Name = supplier.City.Name
+            } : null,
+            District = supplier.District != null ? new DistrictModel
+            {
+                Id = supplier.District.Id,
+                Name = supplier.District.Name
+            } : null
         };
     }
 
@@ -28,7 +42,11 @@ public static class SupplierMappingExtension
             ContactName = supplierDto.ContactName,
             Email = supplierDto.Email,
             Name = supplierDto.Name,
-            PhoneNumber = supplierDto.PhoneNumber
+            PhoneNumber = supplierDto.PhoneNumber,
+            DistrictId = supplierDto.DistrictId,
+            CityId = supplierDto.CityId,
+            TaxNumber = supplierDto.TaxNumber,
+            TaxOffice = supplierDto.TaxOffice
         };
     }
 }

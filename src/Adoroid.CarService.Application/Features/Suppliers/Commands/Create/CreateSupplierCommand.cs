@@ -10,7 +10,8 @@ using MinimalMediatR.Core;
 
 namespace Adoroid.CarService.Application.Features.Suppliers.Commands.Create;
 
-public record CreateSupplierCommand(string Name, string ContactName, string PhoneNumber, string? Email, string? Address):
+public record CreateSupplierCommand(string Name, string ContactName, string PhoneNumber, string? Email, string? Address, int CityId,
+    int DistrictId, string TaxOffice, string TaxNumber):
     IRequest<Response<SupplierDto>>;
 
 public class CreateSupplierCommandHandler(IUnitOfWork unitOfWork, ICurrentUser currentUser) : IRequestHandler<CreateSupplierCommand, Response<SupplierDto>>
@@ -33,7 +34,11 @@ public class CreateSupplierCommandHandler(IUnitOfWork unitOfWork, ICurrentUser c
             CreatedBy = Guid.Parse(currentUser.Id!),
             PhoneNumber = request.PhoneNumber,
             IsDeleted = false,
-            CreatedDate = DateTime.UtcNow
+            CreatedDate = DateTime.UtcNow,
+            TaxOffice = request.TaxOffice,  
+            TaxNumber = request.TaxNumber,
+            CityId = request.CityId,
+            DistrictId = request.DistrictId
         };
 
         await unitOfWork.Suppliers.AddAsync(supplier, cancellationToken);
