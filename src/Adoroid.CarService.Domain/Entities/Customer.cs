@@ -23,5 +23,7 @@ public class Customer : Entity<Guid>
     public Guid? MobileUserId { get; set; }
 
     public Company? Company { get; set; }
+    public City City { get; set; }
+    public District District { get; set; }
     public ICollection<VehicleUser>? VehicleUsers { get; set; }
 }

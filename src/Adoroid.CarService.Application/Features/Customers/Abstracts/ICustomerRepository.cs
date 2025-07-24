@@ -21,4 +21,5 @@ public interface ICustomerRepository
     Task<string> GetNameByIdAsync(Guid customerId, CancellationToken cancellationToken);
     IQueryable<Customer> GetByCompanyId(Guid companyId);
     Task<Dictionary<Guid, string>> GetCustomerNames(List<Guid> guids, CancellationToken cancellationToken);
+    Task<Customer?> GetByIdWithIncludesAsync(Guid customerId, bool asNoTracking = true, CancellationToken cancellationToken = default);
 }
