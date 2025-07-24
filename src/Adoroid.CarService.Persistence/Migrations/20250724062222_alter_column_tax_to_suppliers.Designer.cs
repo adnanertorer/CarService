@@ -3,6 +3,7 @@ using System;
 using Adoroid.CarService.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Adoroid.CarService.Persistence.Migrations
 {
     [DbContext(typeof(CarServiceDbContext))]
-    partial class CarServiceDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250724062222_alter_column_tax_to_suppliers")]
+    partial class alter_column_tax_to_suppliers
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -911,11 +914,7 @@ namespace Adoroid.CarService.Persistence.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CityId");
-
                     b.HasIndex("CompanyId");
-
-                    b.HasIndex("DistrictId");
 
                     b.ToTable("Suppliers");
                 });
@@ -1290,29 +1289,13 @@ namespace Adoroid.CarService.Persistence.Migrations
 
             modelBuilder.Entity("Adoroid.CarService.Domain.Entities.Supplier", b =>
                 {
-                    b.HasOne("Adoroid.CarService.Domain.Entities.City", "City")
-                        .WithMany("Suppliers")
-                        .HasForeignKey("CityId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
                     b.HasOne("Adoroid.CarService.Domain.Entities.Company", "Company")
                         .WithMany("Suppliers")
                         .HasForeignKey("CompanyId")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
-                    b.HasOne("Adoroid.CarService.Domain.Entities.District", "District")
-                        .WithMany("Suppliers")
-                        .HasForeignKey("DistrictId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
-                    b.Navigation("City");
-
                     b.Navigation("Company");
-
-                    b.Navigation("District");
                 });
 
             modelBuilder.Entity("Adoroid.CarService.Domain.Entities.UserToCompany", b =>
@@ -1357,8 +1340,6 @@ namespace Adoroid.CarService.Persistence.Migrations
                     b.Navigation("Companies");
 
                     b.Navigation("MobileUsers");
-
-                    b.Navigation("Suppliers");
                 });
 
             modelBuilder.Entity("Adoroid.CarService.Domain.Entities.Company", b =>
@@ -1388,8 +1369,6 @@ namespace Adoroid.CarService.Persistence.Migrations
                     b.Navigation("Companies");
 
                     b.Navigation("MobileUsers");
-
-                    b.Navigation("Suppliers");
                 });
 
             modelBuilder.Entity("Adoroid.CarService.Domain.Entities.Employee", b =>
