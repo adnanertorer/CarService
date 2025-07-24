@@ -13,7 +13,7 @@ public class SupplierGetByIdRequestHandler(IUnitOfWork unitOfWork) : IRequestHan
 {
     public async Task<Response<SupplierDto>> Handle(SupplierGetByIdRequest request, CancellationToken cancellationToken)
     {
-        var supplier = await unitOfWork.Suppliers.GetByIdAsync(request.Id.ToString(), asNoTracking: true, cancellationToken);
+        var supplier = await unitOfWork.Suppliers.GetByIdWithIncludesAsync(request.Id.ToString(), asNoTracking: true, cancellationToken);
 
         if (supplier is null)
             return Response<SupplierDto>.Fail(BusinessExceptionMessages.SupplierNotFound);
