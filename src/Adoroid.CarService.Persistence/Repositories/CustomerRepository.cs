@@ -15,6 +15,8 @@ public class CustomerRepository(CarServiceDbContext dbContext) : ICustomerReposi
     {
         return  dbContext.Customers
              .AsNoTracking()
+             .Include(i => i.City)
+             .Include(i => i.District)
              .Include(i => i.VehicleUsers)
              .Where(i => i.CompanyId == companyId && i.IsActive);
     }
@@ -31,6 +33,22 @@ public class CustomerRepository(CarServiceDbContext dbContext) : ICustomerReposi
         var query = asNoTracking ? 
             dbContext.Customers.AsNoTracking() : 
             dbContext.Customers.AsQueryable();
+
+        return await query
+            .FirstOrDefaultAsync(predicate: c => c.Id == customerId, cancellationToken);
+    }
+
+    public async Task<Customer?> GetByIdWithIncludesAsync(Guid customerId, bool asNoTracking = true, CancellationToken cancellationToken = default)
+    {
+        var query = asNoTracking ?
+            dbContext.Customers
+            .Include(i => i.City)
+            .Include(i => i.District)
+            .AsNoTracking() :
+            dbContext.Customers
+            .Include(i => i.City)
+            .Include(i => i.District)
+            .AsQueryable();
 
         return await query
             .FirstOrDefaultAsync(predicate: c => c.Id == customerId, cancellationToken);
