@@ -27,7 +27,7 @@ public class CreateSupplierCommandValidation : AbstractValidator<CreateSupplierC
             .NotEmpty()
             .WithMessage(string.Format(ValidationMessages.Required, "Tedarikçi adı"))
             .MaximumLength(150)
-            .WithMessage(string.Format(ValidationMessages.MaxLength, "Tedarikçi adı", "150"));
+            .WithMessage(string.Format(ValidationMessages.MaxLength, "Tedarikçi adı", "250"));
 
         RuleFor(x => x.PhoneNumber)
             .NotEmpty()

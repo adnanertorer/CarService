@@ -9,7 +9,7 @@ public class SupplierConfiguration : IEntityTypeConfiguration<Supplier>
     public void Configure(EntityTypeBuilder<Supplier> builder)
     {
         builder.HasKey(b => b.Id);
-        builder.Property(b => b.Name).IsRequired().HasMaxLength(50);
+        builder.Property(b => b.Name).IsRequired().HasMaxLength(250);
         builder.Property(b => b.ContactName).IsRequired().HasMaxLength(150);
         builder.Property(b => b.PhoneNumber).IsRequired().HasMaxLength(20);
         builder.Property(b => b.Email).HasMaxLength(60);
