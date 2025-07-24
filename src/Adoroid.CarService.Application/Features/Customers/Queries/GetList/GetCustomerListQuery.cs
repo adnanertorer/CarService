@@ -37,6 +37,16 @@ public class GetCustomerListQueryHandler(IUnitOfWork unitOfWork, ICurrentUser cu
                 TaxOffice = g.TaxOffice,
                 DistrictId = g.DistrictId,
                 CityId = g.CityId,
+                City = g.City != null ? new CityModel
+                {
+                    Id = g.City.Id,
+                    Name = g.City.Name
+                } : null,
+                District = g.District != null ? new DistrictModel
+                {
+                    Id = g.District.Id,
+                    Name = g.District.Name
+                } : null
             })
             .OrderBy(x => x.Name)
             .ToPaginateAsync(request.PageRequest.PageIndex, request.PageRequest.PageSize, cancellationToken);
