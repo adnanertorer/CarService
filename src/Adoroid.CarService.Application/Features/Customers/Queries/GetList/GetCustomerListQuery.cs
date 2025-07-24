@@ -22,7 +22,6 @@ public class GetCustomerListQueryHandler(IUnitOfWork unitOfWork, ICurrentUser cu
         if (!string.IsNullOrWhiteSpace(request.Search)) 
             query = query.Where(i => i.Name.Contains(request.Search) || i.Surname.Contains(request.Search) || i.Phone.Contains(request.Search));
 
-
         var result = await query
             .Select(g => new CustomerDto
             {
