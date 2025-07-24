@@ -1,7 +1,6 @@
 ﻿using Adoroid.CarService.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using System.Reflection.Emit;
 
 namespace Adoroid.CarService.Persistence.EntityConfiguration;
 
@@ -31,6 +30,16 @@ public class CustomerConfiguration : IEntityTypeConfiguration<Customer>
         builder.HasOne(b => b.Company)
             .WithMany(c => c.Customers)
             .HasForeignKey(b => b.CompanyId)
+            .OnDelete(DeleteBehavior.NoAction);
+
+        builder.HasOne(b => b.City)
+            .WithMany(c => c.Customers)
+            .HasForeignKey(b => b.CityId)
+            .OnDelete(DeleteBehavior.NoAction);
+
+        builder.HasOne(b => b.District)
+            .WithMany(c => c.Customers)
+            .HasForeignKey(b => b.DistrictId)
             .OnDelete(DeleteBehavior.NoAction);
 
     }
