@@ -62,7 +62,13 @@ public class GetListVehiclesQueryHandler(IUnitOfWork unitOfWork, ICurrentUser cu
                 SerialNumber = i.Vehicle.SerialNumber,
                 Year = i.Vehicle.Year,
                 Engine = i.Vehicle.Engine,
-                FuelTypeId = i.Vehicle.FuelTypeId
+                FuelTypeId = i.Vehicle.FuelTypeId,
+                Customer = i.Customer != null ? new CustomerDto
+                {
+                    Id = i.Customer.Id,
+                    Name = i.Customer.Name,
+                    Surname = i.Customer.Surname
+                } : null
             })
             .ToPaginateAsync(request.PageRequest.PageIndex, request.PageRequest.PageSize, cancellationToken);
 
