@@ -10,4 +10,6 @@ public class VehicleDto
     public string? Engine { get; set; }
     public int FuelTypeId { get; set; }
     public string? SerialNumber { get; set; }
+
+    public CustomerDto? Customer { get; set; }
 }
