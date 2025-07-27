@@ -1,11 +1,13 @@
 ﻿using Adoroid.CarService.API.Extensions;
 using Adoroid.CarService.Application.Common.Dtos.Filters;
+using Adoroid.CarService.Application.Features.Customers.Queries.GetById;
 using Adoroid.CarService.Application.Features.MainServices.Commands.Create;
 using Adoroid.CarService.Application.Features.MainServices.Commands.Delete;
 using Adoroid.CarService.Application.Features.MainServices.Commands.Update;
 using Adoroid.CarService.Application.Features.MainServices.Dtos;
 using Adoroid.CarService.Application.Features.MainServices.Queries.GetById;
 using Adoroid.CarService.Application.Features.MainServices.Queries.GetList;
+using Adoroid.CarService.Application.Features.SubServices.Queries.GetSubTotals;
 using Adoroid.Core.Application.Requests;
 using MinimalMediatR.Core;
 using MinimalMediatR.Extensions;
@@ -34,9 +36,18 @@ public static class MainServiceEnpointsMap
         builder.MapGet(apiPath + "/{id}", async (string id, IMediator mediator, CancellationToken cancellationToken) =>
         {
             if (!Guid.TryParse(id, out var guid))
-                return Results.BadRequest("Invalid service id.");
+                return Results.BadRequest("Invalid mainservice id.");
 
             var result = await mediator.Send(new GetByIdMainServiceQuery(guid), cancellationToken);
+            return result.ToResult();
+        }).RequireAuthorization();
+
+        builder.MapGet(apiPath + "/sub-totals/{id}", async (string id, IMediator mediator, CancellationToken cancellationToken) =>
+        {
+            if (!Guid.TryParse(id, out var guid))
+                return Results.BadRequest("Invalid mainservice id.");
+
+            var result = await mediator.Send(new GetSubTotalQuery(guid), cancellationToken);
             return result.ToResult();
         }).RequireAuthorization();
 

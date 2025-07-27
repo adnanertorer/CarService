@@ -17,7 +17,7 @@ public record UpdateSubServiceCommand(Guid Id, string Operation, Guid EmployeeId
 public class UpdateSubServiceCommandHandler(IUnitOfWork unitOfWork, ICurrentUser currentUser, ICacheService cacheService, ILogger<UpdateSubServiceCommandHandler> logger)
     : IRequestHandler<UpdateSubServiceCommand, Response<SubServiceDto>>
 {
-    const string redisKeyPrefix = "subservice:list";
+    
     public async Task<Response<SubServiceDto>> Handle(UpdateSubServiceCommand request, CancellationToken cancellationToken)
     {
         var companyId = currentUser.ValidCompanyId();
@@ -26,6 +26,8 @@ public class UpdateSubServiceCommandHandler(IUnitOfWork unitOfWork, ICurrentUser
 
         if (entity is null)
             return Response<SubServiceDto>.Fail(BusinessExceptionMessages.NotFound);
+
+        var redisKeyPrefix = $"subservice:list:{entity.MainServiceId}";
 
         var mainServiceEntity = await unitOfWork.MainServices.GetByIdAsync(entity.MainServiceId, true, cancellationToken);
         if (mainServiceEntity == null)

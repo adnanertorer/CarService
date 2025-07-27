@@ -20,9 +20,11 @@ public record GetListSubServiceQueryHandler(PageRequest PageRequest, string? Sea
 public class GetEntityListQueryHandler(IUnitOfWork unitOfWork, ICacheService cacheService, ICurrentUser currentUser)
     : IRequestHandler<GetListSubServiceQuery, Response<Paginate<SubServiceDto>>>
 {
-    const string redisKeyPrefix = "subservice:list";
+  
     public async Task<Response<Paginate<SubServiceDto>>> Handle(GetListSubServiceQuery request, CancellationToken cancellationToken)
     {
+        var redisKeyPrefix = $"subservice:list:{request.MainServiceId}";
+
         var companyId = currentUser.ValidCompanyId();
 
         var cacheKey = $"{redisKeyPrefix}:{companyId}";

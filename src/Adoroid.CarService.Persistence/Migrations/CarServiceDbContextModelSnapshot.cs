@@ -93,7 +93,7 @@ namespace Adoroid.CarService.Persistence.Migrations
 
                     b.HasIndex("CompanyId");
 
-                    b.ToTable("AccountingTransactions");
+                    b.ToTable("AccountingTransactions", (string)null);
                 });
 
             modelBuilder.Entity("Adoroid.CarService.Domain.Entities.City", b =>
@@ -119,7 +119,7 @@ namespace Adoroid.CarService.Persistence.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Cities");
+                    b.ToTable("Cities", (string)null);
                 });
 
             modelBuilder.Entity("Adoroid.CarService.Domain.Entities.Company", b =>
@@ -204,7 +204,7 @@ namespace Adoroid.CarService.Persistence.Migrations
 
                     b.HasIndex("DistrictId");
 
-                    b.ToTable("Companies");
+                    b.ToTable("Companies", (string)null);
                 });
 
             modelBuilder.Entity("Adoroid.CarService.Domain.Entities.CompanyService", b =>
@@ -249,7 +249,7 @@ namespace Adoroid.CarService.Persistence.Migrations
 
                     b.HasIndex("MasterServiceId");
 
-                    b.ToTable("CompanyServices");
+                    b.ToTable("CompanyServices", (string)null);
                 });
 
             modelBuilder.Entity("Adoroid.CarService.Domain.Entities.Customer", b =>
@@ -336,7 +336,7 @@ namespace Adoroid.CarService.Persistence.Migrations
 
                     b.HasIndex("DistrictId");
 
-                    b.ToTable("Customers");
+                    b.ToTable("Customers", (string)null);
                 });
 
             modelBuilder.Entity("Adoroid.CarService.Domain.Entities.District", b =>
@@ -360,7 +360,7 @@ namespace Adoroid.CarService.Persistence.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Districts");
+                    b.ToTable("Districts", (string)null);
                 });
 
             modelBuilder.Entity("Adoroid.CarService.Domain.Entities.Employee", b =>
@@ -426,7 +426,7 @@ namespace Adoroid.CarService.Persistence.Migrations
 
                     b.HasIndex("CompanyId");
 
-                    b.ToTable("Employees");
+                    b.ToTable("Employees", (string)null);
                 });
 
             modelBuilder.Entity("Adoroid.CarService.Domain.Entities.MainService", b =>
@@ -485,7 +485,7 @@ namespace Adoroid.CarService.Persistence.Migrations
 
                     b.HasIndex("VehicleId");
 
-                    b.ToTable("MainServices");
+                    b.ToTable("MainServices", (string)null);
                 });
 
             modelBuilder.Entity("Adoroid.CarService.Domain.Entities.MasterService", b =>
@@ -528,7 +528,7 @@ namespace Adoroid.CarService.Persistence.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("MasterServices");
+                    b.ToTable("MasterServices", (string)null);
 
                     b.HasData(
                         new
@@ -762,7 +762,7 @@ namespace Adoroid.CarService.Persistence.Migrations
 
                     b.HasIndex("DistrictId");
 
-                    b.ToTable("MobileUsers");
+                    b.ToTable("MobileUsers", (string)null);
                 });
 
             modelBuilder.Entity("Adoroid.CarService.Domain.Entities.SubService", b =>
@@ -840,7 +840,7 @@ namespace Adoroid.CarService.Persistence.Migrations
 
                     b.HasIndex("SupplierId");
 
-                    b.ToTable("SubServices");
+                    b.ToTable("SubServices", (string)null);
                 });
 
             modelBuilder.Entity("Adoroid.CarService.Domain.Entities.Supplier", b =>
@@ -921,7 +921,7 @@ namespace Adoroid.CarService.Persistence.Migrations
 
                     b.HasIndex("DistrictId");
 
-                    b.ToTable("Suppliers");
+                    b.ToTable("Suppliers", (string)null);
                 });
 
             modelBuilder.Entity("Adoroid.CarService.Domain.Entities.User", b =>
@@ -992,7 +992,7 @@ namespace Adoroid.CarService.Persistence.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Users");
+                    b.ToTable("Users", (string)null);
                 });
 
             modelBuilder.Entity("Adoroid.CarService.Domain.Entities.UserToCompany", b =>
@@ -1040,7 +1040,7 @@ namespace Adoroid.CarService.Persistence.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("UserToCompanies");
+                    b.ToTable("UserToCompanies", (string)null);
                 });
 
             modelBuilder.Entity("Adoroid.CarService.Domain.Entities.Vehicle", b =>
@@ -1104,7 +1104,7 @@ namespace Adoroid.CarService.Persistence.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Vehicles");
+                    b.ToTable("Vehicles", (string)null);
                 });
 
             modelBuilder.Entity("Adoroid.CarService.Domain.Entities.VehicleUser", b =>
@@ -1155,7 +1155,7 @@ namespace Adoroid.CarService.Persistence.Migrations
 
                     b.HasIndex("VehicleId");
 
-                    b.ToTable("VehicleUsers");
+                    b.ToTable("VehicleUsers", (string)null);
                 });
 
             modelBuilder.Entity("Adoroid.CarService.Domain.Entities.AccountingTransaction", b =>

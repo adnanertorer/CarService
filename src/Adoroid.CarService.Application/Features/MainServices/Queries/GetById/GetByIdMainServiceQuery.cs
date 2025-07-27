@@ -8,11 +8,7 @@ using MinimalMediatR.Core;
 
 namespace Adoroid.CarService.Application.Features.MainServices.Queries.GetById;
 
-public record GetByIdMainServiceQuery(Guid Id) : ICacheableQuery<Response<MainServiceDto>>, IRequest<Response<MainServiceDto>>
-{
-    public TimeSpan? Expiration => TimeSpan.FromHours(2);
-    public string GetCacheKey() => $"mainservice:{Id}";
-}
+public record GetByIdMainServiceQuery(Guid Id) : IRequest<Response<MainServiceDto>>;
 
 public class GetEntityByIdMainServiceQueryHandler(IUnitOfWork unitOfWork)
     : IRequestHandler<GetByIdMainServiceQuery, Response<MainServiceDto>>

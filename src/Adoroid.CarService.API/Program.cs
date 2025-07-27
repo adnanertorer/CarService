@@ -1,3 +1,4 @@
+using Adoroid.CarService.API;
 using Adoroid.CarService.API.Endpoints;
 using Adoroid.CarService.Application;
 using Adoroid.CarService.Infrastructure;
@@ -164,6 +165,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseCors("CorsPolicy");
 
+app.UseMiddleware<RequestTrackingMiddleware>();
 app.UseMiddleware<ExceptionMiddleware>();
 
 app.UseHttpsRedirection();

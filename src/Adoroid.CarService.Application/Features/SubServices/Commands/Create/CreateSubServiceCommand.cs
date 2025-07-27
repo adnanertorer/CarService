@@ -18,9 +18,11 @@ public record CreateSubServiceCommand(Guid MainServiceId, string Operation, Guid
 public class CreateSubServiceCommandHandler(IUnitOfWork unitOfWork, ICurrentUser currentUser, ICacheService cacheService, ILogger<CreateSubServiceCommandHandler> logger)
     : IRequestHandler<CreateSubServiceCommand, Response<SubServiceDto>>
 {
-    const string redisKeyPrefix = "subservice:list";
+ 
     public async Task<Response<SubServiceDto>> Handle(CreateSubServiceCommand request, CancellationToken cancellationToken)
     {
+        var redisKeyPrefix = $"subservice:list:{request.MainServiceId}";
+
         var companyId = currentUser.ValidCompanyId();
 
         var mainServiceEntity = await unitOfWork.MainServices.GetByIdAsync(request.MainServiceId, true, cancellationToken);
