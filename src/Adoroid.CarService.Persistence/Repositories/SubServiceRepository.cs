@@ -74,4 +74,24 @@ public class SubServiceRepository(CarServiceDbContext dbContext) : ISubServiceRe
 
         return costs.Sum();
     }
+
+    public async Task<(decimal?, decimal?, decimal?)> GetTotalCost(Guid mainServiceId, CancellationToken cancellationToken = default)
+    {
+        var totalCost = await dbContext.SubServices.AsNoTracking()
+            .Where(i => i.MainServiceId == mainServiceId)
+            .Select(i => i.Cost)
+            .SumAsync(cancellationToken);
+
+        var totalDiscount = await dbContext.SubServices.AsNoTracking()
+           .Where(i => i.MainServiceId == mainServiceId && i.Discount != null)
+           .Select(i => i.Discount)
+           .SumAsync(cancellationToken);
+
+        var netCost = await dbContext.SubServices.AsNoTracking()
+            .Where(i => i.MainServiceId == mainServiceId)
+            .Select(i => i.Cost - (i.Discount ?? 0))
+            .SumAsync(cancellationToken);
+
+        return (totalCost, totalDiscount, netCost);
+    }
 }

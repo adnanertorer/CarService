@@ -36,7 +36,10 @@ public class MainServiceRepository(CarServiceDbContext dbContext) : IMainService
     public async Task<MainService?> GetByIdWithVehiclesAsync(Guid id, bool asNoTracking = true, CancellationToken cancellationToken = default)
     {
         return await (asNoTracking ?
-            dbContext.MainServices.AsNoTracking() :
+            dbContext.MainServices
+            .Include(i => i.Vehicle)
+            .ThenInclude(i => i.VehicleUsers)
+            .AsNoTracking() :
             dbContext.MainServices.AsQueryable())
             .Include(i => i.Vehicle)
             .ThenInclude(i => i.VehicleUsers)

@@ -1,20 +1,26 @@
 ﻿using Adoroid.CarService.Application.Common.Abstractions;
 using Adoroid.CarService.Application.Common.Abstractions.Auth;
+using Adoroid.CarService.Application.Common.Abstractions.Caching;
 using Adoroid.CarService.Application.Common.Enums;
+using Adoroid.CarService.Application.Common.Extensions;
 using Adoroid.CarService.Application.Features.AccountTransactions.Dtos;
 using Adoroid.CarService.Application.Features.AccountTransactions.ExceptionMessages;
+using Adoroid.CarService.Application.Features.MainServices.MapperExtensions;
 using Adoroid.CarService.Domain.Entities;
 using Adoroid.Core.Application.Wrappers;
 using Microsoft.Extensions.Logging;
 using MinimalMediatR.Core;
+using System.ComponentModel.Design;
 
 namespace Adoroid.CarService.Application.Features.AccountTransactions.Commands.Update;
 
 public record AdjustmentAccountTransactionCommand(Guid Id) : IRequest<Response<AccountTransactionDto>>;
 
-public class AdjustmentAccountTransactionCommandHandler(IUnitOfWork unitOfWork, ICurrentUser currentUser, ILogger<AdjustmentAccountTransactionCommandHandler> logger)
+public class AdjustmentAccountTransactionCommandHandler(IUnitOfWork unitOfWork, ICurrentUser currentUser,
+    ILogger<AdjustmentAccountTransactionCommandHandler> logger, ICacheService cacheService)
     : IRequestHandler<AdjustmentAccountTransactionCommand, Response<AccountTransactionDto>>
 {
+    const string redisKeyPrefix = "mainservice:list";
     public async Task<Response<AccountTransactionDto>> Handle(AdjustmentAccountTransactionCommand request, CancellationToken cancellationToken)
     {
         var entity = await unitOfWork.AccountTransactions.GetByIdAsync(request.Id, false, cancellationToken);
@@ -25,7 +31,7 @@ public class AdjustmentAccountTransactionCommandHandler(IUnitOfWork unitOfWork, 
         if(entity.MainServiceId is null)
             return Response<AccountTransactionDto>.Fail(BusinessExceptionMessages.MainServiceIdCannotBeNull);
 
-        var mainService = await unitOfWork.MainServices.GetByIdAsync(entity.MainServiceId.Value, false, cancellationToken);
+        var mainService = await unitOfWork.MainServices.GetByIdWithVehiclesAsync(entity.MainServiceId.Value, false, cancellationToken);
 
         if (mainService is null)
             return Response<AccountTransactionDto>.Fail(BusinessExceptionMessages.MainServiceNotFound);
@@ -98,6 +104,18 @@ public class AdjustmentAccountTransactionCommandHandler(IUnitOfWork unitOfWork, 
                 logger.LogWarning("Mobile User with ID {AccountOwnerId} not found.", accountOwnerId);
                 return Response<AccountTransactionDto>.Fail(BusinessExceptionMessages.CustomerNotFound);
             }
+        }
+
+      
+        try
+        {
+            var mainServiceDto = mainService.FromEntity();
+            await cacheService.UpdateToListAsync($"{redisKeyPrefix}:{Guid.Parse(currentUser.CompanyId!)}", request.Id.ToString(), mainServiceDto, null);
+        }
+        catch (Exception ex)
+        {
+            const string errorMessage = "Cache güncelleme işlemi başarısız oldu. MainServiceId: {MainServiceId}";
+            logger.LogError(ex, errorMessage, request.Id);
         }
 
         logger.LogInformation("Adjustment transaction created successfully for MainServiceId: {MainServiceId}", mainService.Id);
