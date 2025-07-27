@@ -36,5 +36,10 @@ public class SubServiceConfiguration : IEntityTypeConfiguration<SubService>
            .WithMany(c => c.SubServices)
            .HasForeignKey(b => b.EmployeeId)
            .OnDelete(DeleteBehavior.NoAction);
+
+        builder.HasOne(b => b.Supplier)
+            .WithMany(c => c.SubServices)
+            .HasForeignKey(b => b.SupplierId)
+            .OnDelete(DeleteBehavior.NoAction);
     }
 }

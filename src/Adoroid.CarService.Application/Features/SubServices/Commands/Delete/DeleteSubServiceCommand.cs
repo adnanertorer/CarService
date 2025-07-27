@@ -14,7 +14,6 @@ public record DeleteSubServiceCommand(Guid Id) : IRequest<Response<Guid>>;
 public class DeleteSubServiceCommandHandler(IUnitOfWork unitOfWork, ICurrentUser currentUser, ICacheService cacheService, ILogger<DeleteSubServiceCommandHandler> logger)
     : IRequestHandler<DeleteSubServiceCommand, Response<Guid>>
 {
-    const string redisKeyPrefix = "subservice:list";
     public async Task<Response<Guid>> Handle(DeleteSubServiceCommand request, CancellationToken cancellationToken)
     {
         var companyId = currentUser.ValidCompanyId();
@@ -23,6 +22,8 @@ public class DeleteSubServiceCommandHandler(IUnitOfWork unitOfWork, ICurrentUser
 
         if (entity is null)
             return Response<Guid>.Fail(BusinessExceptionMessages.NotFound);
+
+        var redisKeyPrefix = $"subservice:list:{entity.MainServiceId}";
 
         entity.IsDeleted = true;
         entity.DeletedBy = Guid.Parse(currentUser.Id!);
