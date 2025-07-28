@@ -17,6 +17,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Features\Bookings\Commands\Delete\" />
+    <Folder Include="Features\Bookings\Commands\Update\" />
+    <Folder Include="Features\Bookings\Qeries\" />
     <Folder Include="Features\MainServices\ExceptionMessages\" />
   </ItemGroup>
 
