@@ -6,9 +6,11 @@ public static class ValidationMessages
     public const string Email = "{0} alanı geçerli bir e-posta adresi olmalıdır.";
     public const string MinLength = "{0} alanı en az {1} karakter uzunluğunda olmalıdır.";
     public const string MaxLength = "{0} alanı en fazla {1} karakter uzunluğunda olmalıdır.";
+    public const string MinMaxLength = "{0} alanı en az {1} ve en fazla {2} karakter uzunluğunda olmalıdır.";
     public const string NotEmpty = "{0} alanı boş bırakılamaz.";
     public const string NotNull = "{0} alanı null olamaz.";
     public const string GreaterThanZero = "{0} alanı sıfırdan büyük olmak zorunda";
+    public const string GreaterThan = "{0} alanı {1} değerinden büyük olmalıdır.";
     public const string PageRequestRequired = "Page request required";
     public const string PageRequestPageSizeMustBeGreaterThanZero = "Page size must be greater than 0.";
     public const string PageRequestPageSizeMustBeLessThan100 = "Page size must be less than 100.";
