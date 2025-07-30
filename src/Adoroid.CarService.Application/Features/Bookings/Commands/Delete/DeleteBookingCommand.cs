@@ -13,7 +13,7 @@ public class DeleteBookingCommandHandler(IUnitOfWork unitOfWork, ICurrentUser cu
 {
     public async Task<Response<Guid>> Handle(DeleteBookingCommand request, CancellationToken cancellationToken)
     {
-        var booking = await unitOfWork.Bookings.GetByIdAsync(request.BookingId, cancellationToken: cancellationToken);
+        var booking = await unitOfWork.Bookings.GetByIdAsync(request.BookingId, false, cancellationToken: cancellationToken);
         if (booking == null)
             return Response<Guid>.Fail(BusinessExceptionMessages.NotFound);
 
