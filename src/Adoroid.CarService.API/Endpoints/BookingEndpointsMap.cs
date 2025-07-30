@@ -5,7 +5,6 @@ using Adoroid.CarService.Application.Features.Bookings.Commands.Update;
 using Adoroid.CarService.Application.Features.Bookings.Dtos;
 using Adoroid.CarService.Application.Features.Bookings.Qeries.GetByCompanyId;
 using Adoroid.CarService.Application.Features.Bookings.Qeries.GetByMobileUserIdQuery;
-using Adoroid.CarService.Application.Features.Companies.Commands.Delete;
 using Adoroid.Core.Application.Requests;
 using MinimalMediatR.Core;
 using MinimalMediatR.Extensions;
