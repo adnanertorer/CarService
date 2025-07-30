@@ -15,7 +15,7 @@ public class ApproveBookingCommandHandler(IUnitOfWork unitOfWork, ICurrentUser c
 {
     public async Task<Response<BookingDto>> Handle(ApproveBookingCommand request, CancellationToken cancellationToken)
     {
-        var booking = await unitOfWork.Bookings.GetByIdAsync(request.BookingId, cancellationToken: cancellationToken);
+        var booking = await unitOfWork.Bookings.GetByIdAsync(request.BookingId, false, cancellationToken: cancellationToken);
 
         if (booking == null)
             return Response<BookingDto>.Fail(BusinessExceptionMessages.NotFound);

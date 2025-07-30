@@ -29,7 +29,7 @@ public class GetEntityListQueryHandler(IUnitOfWork unitOfWork, ICacheService cac
 
         var cacheKey = $"{redisKeyPrefix}:{companyId}";
 
-        var list = await cacheService.GetOrSetPaginateAsync<List<SubServiceDto>>(cacheKey, async () =>
+        var list = await cacheService.GetOrSetListAsync<List<SubServiceDto>>(cacheKey, async () =>
         {
             var query = unitOfWork.SubServices.GetListByMainServiceIdWithDetails(request.MainServiceId, true);
 
