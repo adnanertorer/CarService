@@ -17,7 +17,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Features\Bookings\Qeries\" />
     <Folder Include="Features\MainServices\ExceptionMessages\" />
   </ItemGroup>
 

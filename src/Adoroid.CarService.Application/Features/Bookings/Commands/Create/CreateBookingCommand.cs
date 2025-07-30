@@ -18,7 +18,7 @@ public class CreateBookingCommandHandler(IUnitOfWork unitOfWork, ICurrentUser cu
     {
         var isExistCompany = await unitOfWork.Companies.IsCompanyExistsAsync(request.CompanyId, cancellationToken: cancellationToken);
 
-        if (isExistCompany)
+        if (!isExistCompany)
             return Response<BookingDto>.Fail(BusinessExceptionMessages.CompanyNotFound);
 
         var booking = new Booking

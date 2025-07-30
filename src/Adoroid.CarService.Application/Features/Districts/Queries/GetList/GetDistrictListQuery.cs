@@ -18,7 +18,7 @@ public class GetDistrictListQueryHandler(IUnitOfWork unitOfWork, ICacheService c
     {
         string redisKeyPrefix = $"district:list:{request.CityId}";
 
-        var list = await cacheService.GetOrSetPaginateAsync<List<District>>(redisKeyPrefix, async() => {
+        var list = await cacheService.GetOrSetListAsync<List<District>>(redisKeyPrefix, async() => {
             var list = await unitOfWork.Districts.GetDistricts(request.CityId, cancellationToken);
             return [.. list];
         }
