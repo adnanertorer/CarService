@@ -27,7 +27,7 @@ public class GetListMySubServiceQueryHandler(IUnitOfWork unitOfWork, ICurrentUse
         if(currentUser.UserType != MobileUser)
             return Response<Paginate<MobileSubServiceDto>>.Fail(BusinessExceptionMessages.YouAreNotAuthorized);
 
-        var list = await cacheService.GetOrSetPaginateAsync<List<MobileSubServiceDto>>(cacheKey, async () =>
+        var list = await cacheService.GetOrSetListAsync<List<MobileSubServiceDto>>(cacheKey, async () =>
         {
             var query = unitOfWork.SubServices.GetByMainServiceIdAndUser(request.MainServiceId, Guid.Parse(currentUser.Id!), true);
 
