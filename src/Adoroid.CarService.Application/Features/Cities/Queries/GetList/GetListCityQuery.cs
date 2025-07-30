@@ -16,7 +16,7 @@ public class GetListCityQueryHandler(IUnitOfWork unitOfWork, ICacheService cache
     public async Task<Response<Paginate<City>>> Handle(GetListCityQuery request, CancellationToken cancellationToken)
     {
 
-        var list = await cacheService.GetOrSetPaginateAsync<List<City>>(redisKeyPrefix, async () =>
+        var list = await cacheService.GetOrSetListAsync<List<City>>(redisKeyPrefix, async () =>
         {
             var list = await unitOfWork.Cities.GetAllAsync(cancellationToken);
             return [.. list];

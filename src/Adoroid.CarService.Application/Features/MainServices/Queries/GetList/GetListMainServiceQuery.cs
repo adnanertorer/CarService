@@ -26,7 +26,7 @@ public class GetListMainServiceQueryHandler(IUnitOfWork unitOfWork, ICacheServic
 
         var cacheKey = $"{redisKeyPrefix}:{companyId}";
 
-        var list = await cacheService.GetOrSetPaginateAsync<List<MainServiceDto>>(cacheKey,
+        var list = await cacheService.GetOrSetListAsync<List<MainServiceDto>>(cacheKey,
             async () =>
             {
                 var query = unitOfWork.MainServices.GetByCompanyIdWithVehicle(companyId, true);

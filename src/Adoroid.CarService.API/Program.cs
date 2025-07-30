@@ -154,6 +154,7 @@ app.AccountTransactionEndpoint();
 app.MobileUserEndpoints();
 app.GeographicEndpoints();
 app.UserToCompanyEndpoints();
+app.MapBookingEndpoints();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
