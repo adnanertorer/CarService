@@ -1,12 +1,11 @@
 ﻿using Adoroid.CarService.Application.Common.Abstractions.Caching;
-using System.Collections.Generic;
 using System.Text.Json;
 
 namespace Adoroid.CarService.Application.Common.Extensions;
 
 public static class CacheServiceExtensions
 {
-    public static async Task<T> GetOrSetPaginateAsync<T>(this ICacheService cache, string key, Func<Task<T>> factory, TimeSpan? expiry = null) where T: class
+    public static async Task<T> GetOrSetListAsync<T>(this ICacheService cache, string key, Func<Task<T>> factory, TimeSpan? expiry = null) where T: class
     {
         var cached = await cache.GetAsync<T>(key);
         if (cached is not null)

@@ -15,4 +15,15 @@ public static class CurrentUserExtensions
 
         return companyId;
     }
+
+    public static Guid ValidUserId(this ICurrentUser currentUser)
+    {
+        if (string.IsNullOrWhiteSpace(currentUser.Id))
+            throw new BusinessException(BusinessMessages.BusinessMessages.CompanyNotFound);
+
+        if (!Guid.TryParse(currentUser.Id, out var userId))
+            throw new BusinessException(BusinessMessages.BusinessMessages.InvalidCompanyId);
+
+        return userId;
+    }
 }

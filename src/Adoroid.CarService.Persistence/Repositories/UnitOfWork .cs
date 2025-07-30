@@ -1,5 +1,6 @@
 ﻿using Adoroid.CarService.Application.Common.Abstractions;
 using Adoroid.CarService.Application.Features.AccountTransactions.Abstracts;
+using Adoroid.CarService.Application.Features.Bookings.Abstracts;
 using Adoroid.CarService.Application.Features.Cities.Abstracts;
 using Adoroid.CarService.Application.Features.Companies.Abstracts;
 using Adoroid.CarService.Application.Features.CompanyMasterServices.Abstracts;
@@ -52,6 +53,8 @@ public class UnitOfWork : IUnitOfWork
 
     public IUserToCompanyRepository UserToCompanies { get; }
 
+    public IBookingRepository Bookings { get; }
+
     public UnitOfWork(CarServiceDbContext dbContext)
     {
         _dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
@@ -71,6 +74,7 @@ public class UnitOfWork : IUnitOfWork
         MasterServices = new MasterServiceRepository(_dbContext);
         Suppliers = new SupplierRepository(_dbContext);
         UserToCompanies = new UserToCompanyRepository(_dbContext);
+        Bookings = new BookingRepository(_dbContext);
     }
 
     public async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)

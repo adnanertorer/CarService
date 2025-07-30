@@ -13,6 +13,7 @@ public class Company : Entity<Guid>
         CompanyServices = new HashSet<CompanyService>();
         MainServices = new HashSet<MainService>();
         UserToCompanies = new HashSet<UserToCompany>();
+        Bookings = new HashSet<Booking>();
     }
 
     public string CompanyName { get; set; }
@@ -33,6 +34,7 @@ public class Company : Entity<Guid>
     public ICollection<CompanyService> CompanyServices { get; set; }
     public ICollection<MainService> MainServices { get; set; }
     public ICollection<UserToCompany>? UserToCompanies { get; set; }
+    public ICollection<Booking> Bookings { get; set; } 
 
     public City? City { get; set; }
     public District? District { get; set; }
