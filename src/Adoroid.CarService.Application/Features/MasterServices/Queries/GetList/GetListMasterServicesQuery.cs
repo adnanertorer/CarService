@@ -20,7 +20,7 @@ public class GetListMasterServicesQueryHandler(IUnitOfWork unitOfWork, ICacheSer
     const string redisKeyPrefix = "mainservice:list";
     public async Task<Response<Paginate<MasterServiceDto>>> Handle(GetListMasterServicesQuery request, CancellationToken cancellationToken)
     {
-        var list = await cacheService.GetOrSetPaginateAsync<List<MasterServiceDto>>(
+        var list = await cacheService.GetOrSetListAsync<List<MasterServiceDto>>(
             redisKeyPrefix,
             async () =>
             {
