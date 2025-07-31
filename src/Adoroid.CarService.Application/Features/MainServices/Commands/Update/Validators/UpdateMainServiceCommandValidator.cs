@@ -15,12 +15,6 @@ public class UpdateMainServiceCommandValidator : AbstractValidator<UpdateMainSer
            .NotNull()
            .WithMessage(string.Format(ValidationMessages.Required, "Araç bilgisi"));
 
-        RuleFor(x => x.ServiceDate)
-            .NotNull()
-            .WithMessage(string.Format(ValidationMessages.Required, "Servis tarihi"))
-            .GreaterThan(DateTime.UtcNow)
-            .WithMessage(string.Format(ValidationMessages.GreaterThanNow, "Servis tarihi"));
-
         RuleFor(x => x.Description)
            .MaximumLength(250)
            .WithMessage(string.Format(ValidationMessages.MaxLength, "Açıklama", "250"))
