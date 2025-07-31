@@ -1,4 +1,5 @@
 ﻿using Adoroid.CarService.Application.Common.Abstractions;
+using Adoroid.CarService.Application.Common.Abstractions.Auth;
 using Adoroid.CarService.Application.Common.Abstractions.Caching;
 using Adoroid.CarService.Application.Common.Extensions;
 using Adoroid.CarService.Application.Features.Bookings.Dtos;
@@ -10,17 +11,19 @@ using MinimalMediatR.Core;
 
 namespace Adoroid.CarService.Application.Features.Bookings.Qeries.GetByMobileUserIdQuery;
 
-public record GetByMobileUserIdAsyncQuery(PageRequest PageRequest, Guid MobileUserId) : IRequest<Response<Paginate<BookingDto>>>;
+public record GetByMobileUserIdAsyncQuery(PageRequest PageRequest) : IRequest<Response<Paginate<BookingDto>>>;
 
-public class GetByMobileUserIdAsyncQueryHandler(IUnitOfWork unitOfWork, ICacheService cacheService) :
+public class GetByMobileUserIdAsyncQueryHandler(IUnitOfWork unitOfWork, ICacheService cacheService, ICurrentUser currentUser) :
     IRequestHandler<GetByMobileUserIdAsyncQuery, Response<Paginate<BookingDto>>>
 {
     public async Task<Response<Paginate<BookingDto>>> Handle(GetByMobileUserIdAsyncQuery request, CancellationToken cancellationToken)
     {
-        var redisBookingKey = $"booking:forMobileUser:{request.MobileUserId}";
+        var validUserId = currentUser.ValidUserId();
+
+        var redisBookingKey = $"booking:forMobileUser:{validUserId}";
         var list = await cacheService.GetOrSetListAsync<List<BookingDto>>(redisBookingKey, async () =>
         {
-            var bookings = await unitOfWork.Bookings.GetByMobileUserIdAsync(request.MobileUserId, cancellationToken: cancellationToken);
+            var bookings = await unitOfWork.Bookings.GetByMobileUserIdAsync(validUserId, cancellationToken: cancellationToken);
             var bookingDtos = bookings.Select(b => b.FromEntity()).ToList();
             return bookingDtos;
 
