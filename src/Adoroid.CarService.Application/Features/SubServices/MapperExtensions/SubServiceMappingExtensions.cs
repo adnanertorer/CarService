@@ -22,7 +22,8 @@ public static class SubServiceMappingExtensions
             Description = mainService.Description,
             Id = mainService.Id,
             ServiceDate = mainService.ServiceDate,
-            VehicleId = mainService.VehicleId
+            VehicleId = mainService.VehicleId,
+            MainServiceStatus = mainService.ServiceStatus,
         };
     }
 
