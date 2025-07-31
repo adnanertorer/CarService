@@ -6,6 +6,7 @@ using Adoroid.CarService.Application.Features.Bookings.Dtos;
 using Adoroid.CarService.Application.Features.Bookings.Qeries.GetByCompanyId;
 using Adoroid.CarService.Application.Features.Bookings.Qeries.GetByMobileUserIdQuery;
 using Adoroid.Core.Application.Requests;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using MinimalMediatR.Core;
 using MinimalMediatR.Extensions;
 
@@ -16,7 +17,9 @@ public static class BookingEndpointsMap
     private const string apiPath = "/api/booking";
     public static IEndpointRouteBuilder MapBookingEndpoints(this IEndpointRouteBuilder builder)
     {
-        builder.MinimalMediatrMapCommand<CreateBookingCommand, BookingDto>(apiPath, "POST");
+        builder.MinimalMediatrMapCommand<CreateBookingCommand, BookingDto>(apiPath, "POST").RequireAuthorization(policy =>
+        policy.AddAuthenticationSchemes(["MobileUser"]).RequireAuthenticatedUser());
+
         builder.MinimalMediatrMapCommand<ApproveBookingCommand, BookingDto>(apiPath, "PUT").RequireAuthorization();
 
         builder.MapDelete(apiPath + "/{id}", async (string id, IMediator mediator, CancellationToken cancellationToken) =>
@@ -30,21 +33,15 @@ public static class BookingEndpointsMap
         }).RequireAuthorization(policy =>
         policy.AddAuthenticationSchemes(["MobileUser"]).RequireAuthenticatedUser());
 
-        builder.MapGet(apiPath + "/get-by-company", async ([AsParameters] PageRequest pageRequest, string companyId, IMediator mediator, CancellationToken cancellationToken) =>
+        builder.MapGet(apiPath + "/get-by-company", async ([AsParameters] PageRequest pageRequest, IMediator mediator, CancellationToken cancellationToken) =>
         {
-            if (!Guid.TryParse(companyId, out var guid))
-                return Results.BadRequest("Invalid company id.");
-
-            var result = await mediator.Send(new GetByCompanyIdAsyncQuery(pageRequest, guid), cancellationToken);
+            var result = await mediator.Send(new GetByCompanyIdAsyncQuery(pageRequest), cancellationToken);
             return result.ToResult();
         }).RequireAuthorization();
 
-        builder.MapGet(apiPath + "/get-by-mobileuser", async ([AsParameters] PageRequest pageRequest, string mobileUserId, IMediator mediator, CancellationToken cancellationToken) =>
+        builder.MapGet(apiPath + "/get-by-mobileuser", async ([AsParameters] PageRequest pageRequest, IMediator mediator, CancellationToken cancellationToken) =>
         {
-            if (!Guid.TryParse(mobileUserId, out var guid))
-                return Results.BadRequest("Invalid mobile user id.");
-
-            var result = await mediator.Send(new GetByMobileUserIdAsyncQuery(pageRequest, guid), cancellationToken);
+            var result = await mediator.Send(new GetByMobileUserIdAsyncQuery(pageRequest), cancellationToken);
             return result.ToResult();
         }).RequireAuthorization(policy =>
         policy.AddAuthenticationSchemes(["MobileUser"]).RequireAuthenticatedUser());

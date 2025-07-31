@@ -7,12 +7,6 @@ public class GetByMobileUserIdAsyncQueryValidator : AbstractValidator<GetByMobil
 {
     public GetByMobileUserIdAsyncQueryValidator()
     {
-        RuleFor(x => x.MobileUserId)
-            .NotEmpty()
-            .WithMessage(string.Format(ValidationMessages.Required, "User Id"))
-            .NotNull()
-            .WithMessage(string.Format(ValidationMessages.NotNull, "User Id"));
-
         RuleFor(i => i.PageRequest).NotNull()
            .WithMessage(ValidationMessages.PageRequestRequired);
 
