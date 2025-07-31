@@ -7,12 +7,6 @@ public class GetByCompanyIdAsyncQueryValidator : AbstractValidator<GetByCompanyI
 {
     public GetByCompanyIdAsyncQueryValidator()
     {
-        RuleFor(x => x.CompanyId)
-            .NotEmpty()
-            .WithMessage(string.Format(ValidationMessages.Required, "Firma Id"))
-            .NotNull()
-            .WithMessage(string.Format(ValidationMessages.NotNull, "Firma Id"));
-
         RuleFor(i => i.PageRequest).NotNull()
            .WithMessage(ValidationMessages.PageRequestRequired);
 
