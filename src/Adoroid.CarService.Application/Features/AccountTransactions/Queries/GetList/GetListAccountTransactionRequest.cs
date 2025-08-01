@@ -39,20 +39,16 @@ public class GetListAccountTransactionRequestHandler(IUnitOfWork unitOfWork, ICu
         }
 
 
-        var transactions = await transactionsQuery
-           .OrderBy(i => i.TransactionDate)
-           .ToPaginateAsync(
-               request.MainFilterRequest.PageRequest.PageIndex,
-               request.MainFilterRequest.PageRequest.PageSize,
-               cancellationToken);
+        var transactions = transactionsQuery
+           .OrderBy(i => i.TransactionDate);
 
-        var customerIds = transactions.Items
+        var customerIds = transactions
             .Where(t => t.AccountOwnerType == (int)AccountOwnerTypeEnum.Customer)
             .Select(t => t.AccountOwnerId)
             .Distinct()
             .ToList();
 
-        var mobileUserIds = transactions.Items
+        var mobileUserIds = transactions
             .Where(t => t.AccountOwnerType == (int)AccountOwnerTypeEnum.MobileUser)
             .Select(t => t.AccountOwnerId)
             .Distinct()
@@ -62,7 +58,7 @@ public class GetListAccountTransactionRequestHandler(IUnitOfWork unitOfWork, ICu
 
         var mobileUsers = await unitOfWork.MobileUsers.GetUserNames(mobileUserIds, cancellationToken);
 
-        var dtoItems = transactions.Items.Select(t => new AccountTransactionDto
+        var dtoItems = transactions.AsEnumerable().Select(t => new AccountTransactionDto
         {
             Id = t.Id,
             AccountOwnerId = t.AccountOwnerId,
