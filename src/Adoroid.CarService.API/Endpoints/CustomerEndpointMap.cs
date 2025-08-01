@@ -3,6 +3,7 @@ using Adoroid.CarService.Application.Features.Customers.Commands.Create;
 using Adoroid.CarService.Application.Features.Customers.Commands.Delete;
 using Adoroid.CarService.Application.Features.Customers.Commands.Update;
 using Adoroid.CarService.Application.Features.Customers.Dtos;
+using Adoroid.CarService.Application.Features.Customers.Queries.GetAllBasicInfos;
 using Adoroid.CarService.Application.Features.Customers.Queries.GetById;
 using Adoroid.CarService.Application.Features.Customers.Queries.GetList;
 using Adoroid.Core.Application.Requests;
@@ -42,6 +43,13 @@ public static class CustomerEndpointMap
             var result = await mediator.Send(new GetCustomerListQuery(pageRequest, search), cancellationToken);
             return result.ToResult();
         }).RequireAuthorization();
+
+        builder.MapGet(apiPath + "/basic-infos", async (IMediator mediator, CancellationToken cancellationToken) =>
+        {
+            var result = await mediator.Send(new GetAllBasicInfoCustomersQuery(), cancellationToken);
+            return result.ToResult();
+        }).RequireAuthorization();
+
         return builder;
     }
 }
