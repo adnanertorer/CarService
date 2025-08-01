@@ -5,6 +5,7 @@ using Adoroid.CarService.Application.Features.AccountTransactions.Commands.Updat
 using Adoroid.CarService.Application.Features.AccountTransactions.Dtos;
 using Adoroid.CarService.Application.Features.AccountTransactions.Queries.GetById;
 using Adoroid.CarService.Application.Features.AccountTransactions.Queries.GetList;
+using Adoroid.CarService.Application.Features.AccountTransactions.Queries.GetTransactionTotals;
 using Adoroid.Core.Application.Requests;
 using MinimalMediatR.Core;
 using MinimalMediatR.Extensions;
@@ -48,6 +49,20 @@ public static class AccountTransactionEndpointsMap
             var result = await mediator.Send(new GetListAccountTransactionRequest(new MainFilterRequestModel(pageRequest, search, startDate, endDate, cId)), cancellationToken);
             return result.ToResult();
         }).RequireAuthorization();
+
+        builder.MapGet(apiPath + "/get-totals", async (DateTime? startDate, DateTime? endDate, string? customerId, IMediator mediator, CancellationToken cancellationToken) =>
+        {
+            Guid? cId = null;
+            if (!string.IsNullOrEmpty(customerId))
+            {
+                if (!Guid.TryParse(customerId, out var id))
+                    return Results.BadRequest("Invalid customer id.");
+                cId = id;
+            }
+            var result = await mediator.Send(new GetTransactionTotalsQuery(cId, startDate, endDate), cancellationToken);
+            return result.ToResult();
+        }).RequireAuthorization();
+
         return builder;
     }
 }
