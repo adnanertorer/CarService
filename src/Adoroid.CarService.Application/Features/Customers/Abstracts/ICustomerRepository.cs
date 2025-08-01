@@ -1,4 +1,5 @@
-﻿using Adoroid.CarService.Domain.Entities;
+﻿using Adoroid.CarService.Application.Features.Customers.Dtos;
+using Adoroid.CarService.Domain.Entities;
 
 namespace Adoroid.CarService.Application.Features.Customers.Abstracts;
 
@@ -22,4 +23,5 @@ public interface ICustomerRepository
     IQueryable<Customer> GetByCompanyId(Guid companyId);
     Task<Dictionary<Guid, string>> GetCustomerNames(List<Guid> guids, CancellationToken cancellationToken);
     Task<Customer?> GetByIdWithIncludesAsync(Guid customerId, bool asNoTracking = true, CancellationToken cancellationToken = default);
+    IQueryable<CustomerBasicInfoDto> GetBasicInfoByCompanyId(Guid companyId);
 }

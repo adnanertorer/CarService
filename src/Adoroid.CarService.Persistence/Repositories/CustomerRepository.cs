@@ -1,4 +1,5 @@
 ﻿using Adoroid.CarService.Application.Features.Customers.Abstracts;
+using Adoroid.CarService.Application.Features.Customers.Dtos;
 using Adoroid.CarService.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 
@@ -26,6 +27,19 @@ public class CustomerRepository(CarServiceDbContext dbContext) : ICustomerReposi
         return dbContext.Customers
             .AsNoTracking()
             .Where(c => c.CompanyId == companyId && c.IsActive);
+    }
+
+    public IQueryable<CustomerBasicInfoDto> GetBasicInfoByCompanyId(Guid companyId)
+    {
+        return dbContext.Customers
+         .AsNoTracking()
+         .Where(c => c.CompanyId == companyId)
+         .OrderBy(c => c.Name).ThenBy(c => c.Surname)
+         .Select(i => new CustomerBasicInfoDto
+         {
+             Id = i.Id,
+             FullName = i.Name + " " + i.Surname
+         });
     }
 
     public async Task<Customer?> GetByIdAsync(Guid customerId, bool asNoTracking = true, CancellationToken cancellationToken = default)
