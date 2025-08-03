@@ -13,24 +13,35 @@ public class CompanyServiceRepository(CarServiceDbContext dbContext) : ICompanyS
 
     public async Task<CompanyService?> GetById(Guid id, bool asNoTracking, CancellationToken cancellationToken = default)
     {
-       var query = asNoTracking ?
-            dbContext.CompanyServices.AsNoTracking() :
-            dbContext.CompanyServices.AsQueryable();
+        if (asNoTracking)
+        {
+            return await dbContext.CompanyServices
+                .AsNoTracking()
+                .FirstOrDefaultAsync(i => i.Id == id, cancellationToken);
+        }
 
-       return await query.FirstOrDefaultAsync(i => i.Id == id, cancellationToken);
+        return await dbContext.CompanyServices
+                 .FirstOrDefaultAsync(i => i.Id == id, cancellationToken);
     }
 
     public async Task<CompanyService?> GetByIdWithSubTables(Guid id, bool asNoTracking, CancellationToken cancellationToken = default)
     {
-        var query = asNoTracking ?
-             dbContext.CompanyServices
+        IQueryable<CompanyService> query;
+
+        if (asNoTracking)
+        {
+            query = dbContext.CompanyServices
              .Include(i => i.MasterService)
              .Include(i => i.Company)
-             .AsNoTracking() :
-             dbContext.CompanyServices
+             .AsNoTracking()
+             .AsQueryable();
+        }
+        else {
+            query = dbContext.CompanyServices
              .Include(i => i.MasterService)
              .Include(i => i.Company)
              .AsQueryable();
+        }
 
         return await query.FirstOrDefaultAsync(i => i.Id == id, cancellationToken);
     }

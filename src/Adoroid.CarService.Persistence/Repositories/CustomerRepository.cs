@@ -44,25 +44,36 @@ public class CustomerRepository(CarServiceDbContext dbContext) : ICustomerReposi
 
     public async Task<Customer?> GetByIdAsync(Guid customerId, bool asNoTracking = true, CancellationToken cancellationToken = default)
     {
-        var query = asNoTracking ? 
-            dbContext.Customers.AsNoTracking() : 
-            dbContext.Customers.AsQueryable();
+        if (asNoTracking)
+        {
+            return await dbContext.Customers
+                .AsNoTracking()
+                .FirstOrDefaultAsync(predicate: c => c.Id == customerId, cancellationToken);
+        }
 
-        return await query
+        return await dbContext.Customers
             .FirstOrDefaultAsync(predicate: c => c.Id == customerId, cancellationToken);
     }
 
     public async Task<Customer?> GetByIdWithIncludesAsync(Guid customerId, bool asNoTracking = true, CancellationToken cancellationToken = default)
     {
-        var query = asNoTracking ?
-            dbContext.Customers
-            .Include(i => i.City)
-            .Include(i => i.District)
-            .AsNoTracking() :
-            dbContext.Customers
-            .Include(i => i.City)
-            .Include(i => i.District)
-            .AsQueryable();
+        IQueryable<Customer> query;
+
+        if (asNoTracking)
+        {
+            query = dbContext.Customers
+                .Include(i => i.City)
+                .Include(i => i.District)
+                .AsNoTracking()
+                .AsQueryable();
+        }
+        else
+        {
+            query = dbContext.Customers
+                .Include(i => i.City)
+                .Include(i => i.District)
+                .AsQueryable();
+        }
 
         return await query
             .FirstOrDefaultAsync(predicate: c => c.Id == customerId, cancellationToken);
@@ -70,11 +81,13 @@ public class CustomerRepository(CarServiceDbContext dbContext) : ICustomerReposi
 
     public async Task<Customer?> GetByMobileUserIdAsync(Guid mobileUserId, bool asNoTracking = true, CancellationToken cancellationToken = default)
     {
-        var query = asNoTracking ?
-           dbContext.Customers.AsNoTracking() :
-           dbContext.Customers.AsQueryable();
+        if (asNoTracking)
+        {
+            return await dbContext.Customers.AsNoTracking()
+                .FirstOrDefaultAsync(predicate: c => c.MobileUserId == mobileUserId, cancellationToken);
+        }
 
-        return await query
+        return await dbContext.Customers
             .FirstOrDefaultAsync(predicate: c => c.MobileUserId == mobileUserId, cancellationToken);
     }
 
