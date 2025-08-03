@@ -14,13 +14,21 @@ public class BookingRepository(CarServiceDbContext dbContext) : IBookingReposito
 
     public async Task<IEnumerable<Booking>> GetByCompanyIdAsync(Guid companyId, bool asNoTracking = true, CancellationToken cancellationToken = default)
     {
-        var query = asNoTracking 
-            ? dbContext.Bookings
-            .Include(i => i.MobileUser)
-            .AsNoTracking() 
-            : dbContext.Bookings
-            .Include(i => i.MobileUser)
-            .AsQueryable();
+        IQueryable<Booking> query;
+
+        if(asNoTracking)
+        {
+            query = dbContext.Bookings
+                .Include(i => i.MobileUser)
+                .AsNoTracking()
+                .AsQueryable();
+        }
+        else
+        {
+            query = dbContext.Bookings
+                .Include(i => i.MobileUser)
+                .AsQueryable();
+        }
 
         return await query.Where(b => b.CompanyId == companyId)
             .ToListAsync(cancellationToken);
@@ -28,9 +36,16 @@ public class BookingRepository(CarServiceDbContext dbContext) : IBookingReposito
 
     public async Task<Booking?> GetByIdAsync(Guid id, bool asNoTracking = true, CancellationToken cancellationToken = default)
     {
-        return await (asNoTracking 
-            ? dbContext.Bookings.AsNoTracking() 
-            : dbContext.Bookings.AsQueryable())
+        if (asNoTracking)
+        {
+            return await dbContext.Bookings
+                .AsNoTracking()
+                .Include(i => i.MobileUser)
+                .Include(i => i.Company)
+                .FirstOrDefaultAsync(b => b.Id == id, cancellationToken);
+        }
+
+        return await dbContext.Bookings
             .Include(i => i.MobileUser)
             .Include(i => i.Company)
             .FirstOrDefaultAsync(b => b.Id == id, cancellationToken);
@@ -38,13 +53,21 @@ public class BookingRepository(CarServiceDbContext dbContext) : IBookingReposito
 
     public async Task<IEnumerable<Booking>> GetByMobileUserIdAsync(Guid mobileUserId, bool asNoTracking = true, CancellationToken cancellationToken = default)
     {
-        var query = asNoTracking
-           ? dbContext.Bookings
-           .Include(i => i.Company)
-           .AsNoTracking()
-           : dbContext.Bookings
-           .Include(i => i.Company)
-           .AsQueryable();
+        IQueryable<Booking> query;
+
+        if (asNoTracking)
+        {
+            query = dbContext.Bookings
+                .Include(i => i.Company)
+                .AsNoTracking()
+                .AsQueryable();
+        }
+        else
+        {
+            query = dbContext.Bookings
+                .Include(i => i.Company)
+                .AsQueryable();
+        }
 
         return await query.Where(b => b.MobileUserId == mobileUserId)
             .ToListAsync(cancellationToken);
