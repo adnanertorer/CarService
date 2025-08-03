@@ -64,7 +64,7 @@ public static class AccountTransactionEndpointsMap
             return result.ToResult();
         }).RequireAuthorization();
 
-        builder.MapGet(apiPath + "/customer-balance", async ([AsParameters] string customerId, IMediator mediator, CancellationToken cancellationToken) =>
+        builder.MapGet(apiPath + "/customer-balance", async (string customerId, IMediator mediator, CancellationToken cancellationToken) =>
         {
             if (string.IsNullOrEmpty(customerId) || !Guid.TryParse(customerId, out var cId))
                 return Results.BadRequest("Invalid customer id.");
