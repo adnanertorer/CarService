@@ -9,4 +9,5 @@ public interface IAccountTransactionRepository
     Task<AccountingTransaction?> GetByIdAsync(Guid id, bool asNoTracking = true, CancellationToken cancellationToken = default);
     Task<decimal> GetBalanceWithAmounAsync(Guid customerId, Guid companyId, decimal amount, CancellationToken cancellationToken);
     IQueryable<AccountingTransaction> GetByCompanyId(Guid companyId, bool asNoTracking = true);
+    IQueryable<AccountingTransaction> GetByCustomerId(Guid companyId, Guid customerId, bool asNoTracking = true);
 }
