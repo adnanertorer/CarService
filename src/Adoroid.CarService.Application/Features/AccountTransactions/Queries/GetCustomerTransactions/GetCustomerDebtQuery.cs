@@ -24,18 +24,16 @@ public class GetCustomerDebtQueryHandler(ICurrentUser currentUser, IUnitOfWork u
 
         var balance = await unitOfWork.AccountTransactions.GetBalanceAsync(request.CustomerId, companyId, cancellationToken);
 
-        var transactions = unitOfWork.AccountTransactions.GetByCustomerId(companyId, request.CustomerId, true)
-            .OrderByDescending(i => i.TransactionDate)
-            .ToList();
+        var transactions = unitOfWork.AccountTransactions.GetByCustomerId(companyId, request.CustomerId, true);
 
         var customerIds = transactions
-            .Where(t => t.AccountOwnerType == (int)AccountOwnerTypeEnum.Customer)
+            .Where(t => t.AccountOwnerType == (int)AccountOwnerTypeEnum.Customer && t.AccountOwnerId == request.CustomerId)
             .Select(t => t.AccountOwnerId)
             .Distinct()
             .ToList();
 
         var mobileUserIds = transactions
-            .Where(t => t.AccountOwnerType == (int)AccountOwnerTypeEnum.MobileUser)
+            .Where(t => t.AccountOwnerType == (int)AccountOwnerTypeEnum.MobileUser && t.AccountOwnerId == request.CustomerId)
             .Select(t => t.AccountOwnerId)
             .Distinct()
             .ToList();
