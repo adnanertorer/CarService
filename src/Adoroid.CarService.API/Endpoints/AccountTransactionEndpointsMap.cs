@@ -4,6 +4,7 @@ using Adoroid.CarService.Application.Features.AccountTransactions.Commands.Creat
 using Adoroid.CarService.Application.Features.AccountTransactions.Commands.Update;
 using Adoroid.CarService.Application.Features.AccountTransactions.Dtos;
 using Adoroid.CarService.Application.Features.AccountTransactions.Queries.GetById;
+using Adoroid.CarService.Application.Features.AccountTransactions.Queries.GetCustomerTransactions;
 using Adoroid.CarService.Application.Features.AccountTransactions.Queries.GetList;
 using Adoroid.CarService.Application.Features.AccountTransactions.Queries.GetTransactionTotals;
 using Adoroid.Core.Application.Requests;
@@ -60,6 +61,15 @@ public static class AccountTransactionEndpointsMap
                 cId = id;
             }
             var result = await mediator.Send(new GetTransactionTotalsQuery(cId, startDate, endDate), cancellationToken);
+            return result.ToResult();
+        }).RequireAuthorization();
+
+        builder.MapGet(apiPath + "/customer-balance", async (string customerId, IMediator mediator, CancellationToken cancellationToken) =>
+        {
+            if (string.IsNullOrEmpty(customerId) || !Guid.TryParse(customerId, out var cId))
+                return Results.BadRequest("Invalid customer id.");
+
+            var result = await mediator.Send(new GetCustomerDebtQuery(cId), cancellationToken);
             return result.ToResult();
         }).RequireAuthorization();
 
