@@ -13,10 +13,14 @@ public class EmployeeRepository(CarServiceDbContext dbContext) : IEmployeeReposi
     }
     public async Task<Employee?> GetByIdAsync(Guid id, bool asNoTracking = true, CancellationToken cancellationToken = default)
     {
-        var query = asNoTracking ?
-            dbContext.Employees.AsNoTracking() :
-            dbContext.Employees.AsQueryable();
-        return await query.FirstOrDefaultAsync(i => i.Id == id, cancellationToken: cancellationToken);
+        if(asNoTracking)
+        {
+            return await dbContext.Employees
+                .AsNoTracking()
+                .FirstOrDefaultAsync(i => i.Id == id, cancellationToken: cancellationToken);
+        }
+
+        return await dbContext.Employees.FirstOrDefaultAsync(i => i.Id == id, cancellationToken: cancellationToken);
     }
     public async Task<bool> AnyAsync(string name, string surname, Guid companyId, CancellationToken cancellationToken = default)
     {
@@ -27,10 +31,13 @@ public class EmployeeRepository(CarServiceDbContext dbContext) : IEmployeeReposi
 
     public IQueryable<Employee> GetAll(Guid companyId, bool asNoTracking = true, CancellationToken cancellationToken = default)
     {
-        var query = asNoTracking ?
-             dbContext.Employees.AsNoTracking() :
-             dbContext.Employees.AsQueryable();
+        if (asNoTracking)
+        {
+            return dbContext.Employees
+                .AsNoTracking()
+                .Where(i => i.CompanyId == companyId).AsQueryable();
+        }
 
-        return query.Where(i => i.CompanyId == companyId);
+        return dbContext.Employees.Where(i => i.CompanyId == companyId).AsQueryable();
     }
 }

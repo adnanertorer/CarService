@@ -39,15 +39,27 @@ public class AccountTransactionRepository(CarServiceDbContext dbContext) : IAcco
 
     public IQueryable<AccountingTransaction> GetByCompanyId(Guid companyId, bool asNoTracking = true)
     {
-       return asNoTracking ? dbContext.AccountingTransactions
-            .AsNoTracking() : dbContext.AccountingTransactions
-            .Where(i => i.CompanyId == companyId);
+        if (asNoTracking)
+        {
+            return dbContext.AccountingTransactions
+                .AsNoTracking()
+                .Where(i => i.CompanyId == companyId);
+        }
+
+        return dbContext.AccountingTransactions
+             .Where(i => i.CompanyId == companyId);
     }
 
     public IQueryable<AccountingTransaction> GetByCustomerId(Guid companyId, Guid customerId, bool asNoTracking = true)
     {
-        return asNoTracking ? dbContext.AccountingTransactions
-             .AsNoTracking() : dbContext.AccountingTransactions
+        if (asNoTracking)
+        {
+            return dbContext.AccountingTransactions
+                .AsNoTracking()
+                .Where(i => i.CompanyId == companyId && i.AccountOwnerId == customerId);
+        }
+
+        return dbContext.AccountingTransactions
              .Where(i => i.CompanyId == companyId && i.AccountOwnerId == customerId);
     }
 
