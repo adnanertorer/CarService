@@ -63,6 +63,7 @@ public class GetCustomerDebtQueryHandler(ICurrentUser currentUser, IUnitOfWork u
         {
             CustomerId = request.CustomerId,
             CustomerName = customer.Name,
+            CustomerSurname = customer.Surname,
             Balance = balance,
             Transactions = dtoItems
         });
