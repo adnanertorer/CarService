@@ -44,6 +44,13 @@ public class AccountTransactionRepository(CarServiceDbContext dbContext) : IAcco
             .Where(i => i.CompanyId == companyId);
     }
 
+    public IQueryable<AccountingTransaction> GetByCustomerId(Guid companyId, Guid customerId, bool asNoTracking = true)
+    {
+        return asNoTracking ? dbContext.AccountingTransactions
+             .AsNoTracking() : dbContext.AccountingTransactions
+             .Where(i => i.CompanyId == companyId && i.AccountOwnerId == customerId);
+    }
+
     public async Task<AccountingTransaction?> GetByIdAsync(Guid id, bool asNoTracking = true, CancellationToken cancellationToken = default)
     {
         var query = dbContext.AccountingTransactions.AsQueryable();
