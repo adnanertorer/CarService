@@ -4,7 +4,7 @@ public static class BusinessExceptionMessages
 {
     public const string UserNotFound = "Kullanıcı bulunamadı.";
     public const string InvalidCredentials = "Geçersiz kimlik bilgileri.";
-    public const string UserAlreadyExists = "Bu e-posta adresiyle kayıtlı bir kullanıcı zaten var.";
+    public const string UserAlreadyExists = "Bu e-posta adresi ya da telefon numarasıyla kayıtlı bir kullanıcı zaten var.";
     public const string PasswordMismatch = "Parolalar eşleşmiyor.";
     public const string UnauthorizedAccess = "Yetkisiz erişim.";
     public const string AccountLocked = "Hesabınız kilitlenmiştir. Lütfen destek ile iletişime geçin.";
