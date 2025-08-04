@@ -11,7 +11,8 @@ namespace Adoroid.CarService.Application.Features.Users.Commands.Create;
 public record CreateUserCommand(string Name, string Surname, string Email, string Password, string PhoneNumber) :
     IRequest<Response<UserDto>>;
 
-public class CreateUserCommandHandler(IUnitOfWork unitOfWork, IAesEncryptionHelper aesEncryptionHelper) : IRequestHandler<CreateUserCommand, Response<UserDto>>
+public class CreateUserCommandHandler(IUnitOfWork unitOfWork, IAesEncryptionHelper aesEncryptionHelper) :
+    IRequestHandler<CreateUserCommand, Response<UserDto>>
 {
     public async Task<Response<UserDto>> Handle(CreateUserCommand request, CancellationToken cancellationToken)
     {
