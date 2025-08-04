@@ -18,15 +18,13 @@ public static class GeographicInformationEndpointsMap
         {
             var result = await mediator.Send(new GetListCityQuery(), cancellationToken);
             return result.ToResult();
-        }).RequireAuthorization(policy =>
-        policy.AddAuthenticationSchemes(schemes).RequireAuthenticatedUser());
+        });
 
         builder.MapGet(apiPath + "/districts", async (int cityId, string? search, IMediator mediator, CancellationToken cancellationToken) =>
         {
             var result = await mediator.Send(new GetDistrictListQuery(cityId, search), cancellationToken);
             return result.ToResult();
-        }).RequireAuthorization(policy =>
-        policy.AddAuthenticationSchemes(schemes).RequireAuthenticatedUser());
+        });
 
         return builder;
     }
