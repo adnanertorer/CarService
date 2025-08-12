@@ -17,6 +17,8 @@ public class BookingConfiguration : IEntityTypeConfiguration<Booking>
         builder.Property(b => b.VehicleBrand).IsRequired().HasMaxLength(50);
         builder.Property(b => b.VehicleModel).IsRequired().HasMaxLength(30);
         builder.Property(b => b.VehicleYear).IsRequired();
+        builder.Property(b => b.Status).IsRequired().HasDefaultValue(0);
+        builder.Property(b => b.CompanyMessage).HasMaxLength(500);
 
         builder.Property(i => i.CreatedDate).IsRequired();
         builder.Property(c => c.CreatedBy).IsRequired().HasMaxLength(64);

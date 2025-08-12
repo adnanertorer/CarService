@@ -12,7 +12,8 @@ public class Booking : Entity<Guid>
     public string VehicleBrand { get; set; }
     public string VehicleModel { get; set; }
     public int VehicleYear { get; set; }
-    public bool IsApproved { get; set; }
+    public int Status { get; set; }
+    public string? CompanyMessage { get; set; }
 
     public MobileUser MobileUser { get; set; }
     public Company Company { get; set; }

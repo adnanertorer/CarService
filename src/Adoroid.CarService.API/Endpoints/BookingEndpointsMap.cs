@@ -20,7 +20,8 @@ public static class BookingEndpointsMap
         builder.MinimalMediatrMapCommand<CreateBookingCommand, BookingDto>(apiPath, "POST").RequireAuthorization(policy =>
         policy.AddAuthenticationSchemes(["MobileUser"]).RequireAuthenticatedUser());
 
-        builder.MinimalMediatrMapCommand<ApproveBookingCommand, BookingDto>(apiPath, "PUT").RequireAuthorization();
+        builder.MinimalMediatrMapCommand<ApproveBookingCommand, BookingDto>(apiPath, "PUT")
+            .RequireAuthorization();
 
         builder.MapDelete(apiPath + "/{id}", async (string id, IMediator mediator, CancellationToken cancellationToken) =>
         {
