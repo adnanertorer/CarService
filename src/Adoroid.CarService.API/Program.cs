@@ -91,9 +91,10 @@ builder.Services.AddHttpContextAccessor();
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("CorsPolicy",
-        builder => builder.AllowAnyOrigin()
-                          .AllowAnyMethod()
-                          .AllowAnyHeader());
+        builder => builder.WithOrigins("https://app.fixybear.com")
+                          .AllowAnyHeader()
+        .AllowAnyMethod()
+        .AllowCredentials());
 });
 
 
