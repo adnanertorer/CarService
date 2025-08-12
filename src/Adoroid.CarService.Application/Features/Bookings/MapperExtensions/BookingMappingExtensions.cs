@@ -1,4 +1,5 @@
-﻿using Adoroid.CarService.Application.Features.Bookings.Dtos;
+﻿using Adoroid.CarService.Application.Common.Enums;
+using Adoroid.CarService.Application.Features.Bookings.Dtos;
 using Adoroid.CarService.Domain.Entities;
 
 namespace Adoroid.CarService.Application.Features.Bookings.MapperExtensions;
@@ -12,13 +13,14 @@ public static class BookingMappingExtensions
             BookingDate = booking.BookingDate,
             CompanyId = booking.CompanyId,
             Description = booking.Description,
-            IsApproved = booking.IsApproved,
+            Status = (BookingStatusEnum)booking.Status,
             Id = booking.Id,
             MobileUserId = booking.MobileUserId,
             Title = booking.Title,
             VehicleBrand = booking.VehicleBrand,
             VehicleModel = booking.VehicleModel,
             VehicleYear = booking.VehicleYear,
+            CompanyMessage = booking.CompanyMessage,
             Company = booking.Company != null ? new CompanyDto
             {
                 Id = booking.Company.Id,
