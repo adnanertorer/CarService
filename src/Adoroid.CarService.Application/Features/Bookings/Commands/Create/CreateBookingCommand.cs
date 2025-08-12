@@ -1,5 +1,6 @@
 ﻿using Adoroid.CarService.Application.Common.Abstractions;
 using Adoroid.CarService.Application.Common.Abstractions.Auth;
+using Adoroid.CarService.Application.Common.Enums;
 using Adoroid.CarService.Application.Features.Bookings.Dtos;
 using Adoroid.CarService.Application.Features.Bookings.ExceptionMessages;
 using Adoroid.CarService.Application.Features.Bookings.MapperExtensions;
@@ -28,7 +29,7 @@ public class CreateBookingCommandHandler(IUnitOfWork unitOfWork, ICurrentUser cu
             CreatedBy = Guid.Parse(currentUser.Id!),
             CreatedDate = DateTime.UtcNow,
             Description = request.Description,
-            IsApproved = false,
+            Status = (int)BookingStatusEnum.Pending,
             IsDeleted = false,
             MobileUserId = Guid.Parse(currentUser.Id!),
             Title = request.Title,
