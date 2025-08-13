@@ -2,6 +2,7 @@
 
 public class SubTotalModel
 {
+    public decimal? TotalMaterialCost { get; set; }
     public decimal TotalCost { get; set; }
     public decimal TotalDiscount { get; set; }
     public decimal TotalPrice { get; set; }
