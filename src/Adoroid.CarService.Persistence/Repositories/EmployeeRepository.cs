@@ -22,11 +22,13 @@ public class EmployeeRepository(CarServiceDbContext dbContext) : IEmployeeReposi
 
         return await dbContext.Employees.FirstOrDefaultAsync(i => i.Id == id, cancellationToken: cancellationToken);
     }
-    public async Task<bool> AnyAsync(string name, string surname, Guid companyId, CancellationToken cancellationToken = default)
+    public async Task<bool> AnyAsync(string name, string surname, string? email, string phone, Guid companyId, CancellationToken cancellationToken = default)
     {
         return await dbContext.Employees
             .AsNoTracking()
-            .AnyAsync(i => i.Name == name && i.Surname == surname && i.CompanyId == companyId, cancellationToken);
+            .Where(i => i.Name == name && i.Surname == surname && i.CompanyId == companyId)
+            .Where(c => c.PhoneNumber == phone || c.Email == email)
+            .AnyAsync(cancellationToken);
     }
 
     public IQueryable<Employee> GetAll(Guid companyId, bool asNoTracking = true, CancellationToken cancellationToken = default)
@@ -39,5 +41,15 @@ public class EmployeeRepository(CarServiceDbContext dbContext) : IEmployeeReposi
         }
 
         return dbContext.Employees.Where(i => i.CompanyId == companyId).AsQueryable();
+    }
+
+    public async Task<bool> IsExistingSameInfo(Guid companyId, string phone, string? email, Guid employeeId, CancellationToken cancellationToken = default)
+    {
+        return await dbContext.Employees
+            .AsNoTracking()
+            .Where(c => c.CompanyId == companyId && c.IsActive)
+            .Where(c => c.PhoneNumber == phone || c.Email == email)
+            .Where(c => c.Id != employeeId)
+            .AnyAsync(cancellationToken);
     }
 }
