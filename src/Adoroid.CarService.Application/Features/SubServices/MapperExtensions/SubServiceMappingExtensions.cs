@@ -53,7 +53,8 @@ public static class SubServiceMappingExtensions
             Operation = subService.Operation,
             OperationDate = subService.OperationDate,
             Supplier = subService.Supplier?.SupplierFromEntity(),
-            SupplierId = subService.SupplierId
+            SupplierId = subService.SupplierId,
+            MaterialCost = subService.MaterialCost
         };
     }
 

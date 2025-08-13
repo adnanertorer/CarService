@@ -11,6 +11,7 @@ public class SubService : Entity<Guid>
     public string? Description { get; set; }
     public string? Material { get; set; }
     public string? MaterialBrand { get; set; }
+    public decimal? MaterialCost { get; set; }
     public Guid? SupplierId { get; set; }
     public decimal? Discount { get; set; }
     public decimal Cost { get; set; }
