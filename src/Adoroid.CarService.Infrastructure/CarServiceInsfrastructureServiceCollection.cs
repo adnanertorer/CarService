@@ -4,6 +4,8 @@ using Adoroid.CarService.Application.Features.MainServices.Commands.Create;
 using Adoroid.CarService.Infrastructure.Auth;
 using Adoroid.CarService.Infrastructure.Auth.MobileUser;
 using Adoroid.CarService.Infrastructure.Caching;
+using Adoroid.CarService.Infrastructure.Mail;
+using Adoroid.CarService.Infrastructure.RabbitMqSettings;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using MinimalMediatR.Core;
@@ -18,6 +20,7 @@ public static class CarServiceInsfrastructureServiceCollection
         services.AddScoped<IAesEncryptionHelper, AesEncryptionHelper>();
         services.AddScoped<ITokenHandler, TokenHandler>();
         services.AddScoped<IMobileUserTokenHandler, MobileUserTokenHandler>();
+        services.Configure<MailConfig>(configuration.GetSection("MailConfig"));
 
         services.Scan(scan => scan.FromAssemblies(
             typeof(CreateMainServiceCommand).Assembly
