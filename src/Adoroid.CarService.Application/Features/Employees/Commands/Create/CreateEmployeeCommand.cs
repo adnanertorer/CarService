@@ -19,7 +19,7 @@ public class CreateEmployeeCommandHandler(IUnitOfWork unitOfWork, ICurrentUser c
     {
         var companyId = currentUser.ValidCompanyId();
 
-        var isExist = await unitOfWork.Employees.AnyAsync(request.Name, request.Surname, companyId, cancellationToken);
+        var isExist = await unitOfWork.Employees.AnyAsync(request.Name, request.Surname, request.Email, request.PhoneNumber, companyId, cancellationToken);
 
         if (isExist)
             return Response<EmployeeDto>.Fail(BusinessExceptionMessages.AlreadyExists);
