@@ -43,8 +43,9 @@ public class UpdateMainServiceCommandHandler(IUnitOfWork unitOfWork, ICurrentUse
         if(request.MainServiceStatus == (int)MainServiceStatusEnum.Done)
         {
             entity.Cost = await unitOfWork.SubServices.GetTotalPrice(request.Id, cancellationToken);
+            entity.MaterialCost = await unitOfWork.SubServices.GetTotalMaterialCost(request.Id, cancellationToken);
 
-            if(entity.Vehicle is null)
+            if (entity.Vehicle is null)
                 return Response<MainServiceDto>.Fail(BusinessExceptionMessages.VehicleNotFound);
 
             decimal balance = 0;

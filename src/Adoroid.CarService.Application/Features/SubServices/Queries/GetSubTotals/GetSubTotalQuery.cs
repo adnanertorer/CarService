@@ -16,9 +16,10 @@ public class GetSubTotalQueryHandler(IUnitOfWork unitOfWork) : IRequestHandler<G
 
         var subTotal = new SubTotalModel
         {
-            TotalCost = totalCost.Item1 ?? 0m,
-            TotalDiscount = totalCost.Item2 ?? 0m,
-            TotalPrice = totalCost.Item3 ?? 0m
+            TotalCost = totalCost.Item2 ?? 0m,
+            TotalDiscount = totalCost.Item3 ?? 0m,
+            TotalPrice = totalCost.Item4 ?? 0m,
+            TotalMaterialCost = totalCost.Item1 ?? 0m
         };
         return Response<SubTotalModel>.Success(subTotal);
     }

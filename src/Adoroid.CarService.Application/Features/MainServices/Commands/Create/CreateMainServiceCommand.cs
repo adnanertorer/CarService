@@ -32,6 +32,7 @@ public class CreateMainServiceCommandHandler(IUnitOfWork unitOfWork, ICurrentUse
         var entity = new MainService
         {
             Cost = 0,
+            MaterialCost = 0,
             CreatedBy = Guid.Parse(currentUser.Id!),
             Description = request.Description,
             CreatedDate = DateTime.UtcNow,
