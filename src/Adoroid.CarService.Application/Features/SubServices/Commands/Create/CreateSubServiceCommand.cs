@@ -13,7 +13,7 @@ using MinimalMediatR.Core;
 namespace Adoroid.CarService.Application.Features.SubServices.Commands.Create;
 
 public record CreateSubServiceCommand(Guid MainServiceId, string Operation, Guid EmployeeId, DateTime OperationDate, string? Description,
-    string? Material, string? MaterialBrand, Guid? SupplierId, decimal? Discount, decimal Cost) : IRequest<Response<SubServiceDto>>;
+    string? Material, string? MaterialBrand, decimal? MaterailCost, Guid? SupplierId, decimal? Discount, decimal Cost) : IRequest<Response<SubServiceDto>>;
 
 public class CreateSubServiceCommandHandler(IUnitOfWork unitOfWork, ICurrentUser currentUser, ICacheService cacheService, ILogger<CreateSubServiceCommandHandler> logger)
     : IRequestHandler<CreateSubServiceCommand, Response<SubServiceDto>>
@@ -49,7 +49,8 @@ public class CreateSubServiceCommandHandler(IUnitOfWork unitOfWork, ICurrentUser
             Operation = request.Operation,
             OperationDate = request.OperationDate,
             CreatedBy = Guid.Parse(currentUser.Id!),
-            CreatedDate = DateTime.UtcNow
+            CreatedDate = DateTime.UtcNow,
+            MaterialCost = request.MaterailCost
         };
 
         var result = await unitOfWork.SubServices.AddAsync(entity, cancellationToken);
