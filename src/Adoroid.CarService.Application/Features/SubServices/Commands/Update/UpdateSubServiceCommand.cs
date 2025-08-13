@@ -12,7 +12,7 @@ using MinimalMediatR.Core;
 namespace Adoroid.CarService.Application.Features.SubServices.Commands.Update;
 
 public record UpdateSubServiceCommand(Guid Id, string Operation, Guid EmployeeId, DateTime OperationDate, string? Description,
-    string? Material, string? MaterialBrand, Guid? SupplierId, decimal? Discount, decimal Cost) : IRequest<Response<SubServiceDto>>;
+    string? Material, string? MaterialBrand, decimal? MaterialCost, Guid? SupplierId, decimal? Discount, decimal Cost) : IRequest<Response<SubServiceDto>>;
 
 public class UpdateSubServiceCommandHandler(IUnitOfWork unitOfWork, ICurrentUser currentUser, ICacheService cacheService, ILogger<UpdateSubServiceCommandHandler> logger)
     : IRequestHandler<UpdateSubServiceCommand, Response<SubServiceDto>>
@@ -47,6 +47,7 @@ public class UpdateSubServiceCommandHandler(IUnitOfWork unitOfWork, ICurrentUser
         entity.EmployeeId = request.EmployeeId;
         entity.Operation = request.Operation;
         entity.OperationDate = request.OperationDate;
+        entity.MaterialCost = request.MaterialCost;
 
         entity.UpdatedBy = Guid.Parse(currentUser.Id!);
         entity.UpdatedDate = DateTime.UtcNow;
