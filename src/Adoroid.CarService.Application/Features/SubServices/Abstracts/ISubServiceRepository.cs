@@ -12,4 +12,5 @@ public interface ISubServiceRepository
     Task<IEnumerable<SubService>> GetListByMainServiceIdAsync(Guid mainServiceId, bool asNoTracking = true, CancellationToken cancellationToken = default);
     Task<decimal> GetTotalPrice(Guid mainServiceId, CancellationToken cancellationToken = default);
     Task<(decimal?, decimal?, decimal?)> GetTotalCost(Guid mainServiceId, CancellationToken cancellationToken = default);
+    Task<decimal> GetTotalMaterialCost(Guid mainServiceId, CancellationToken cancellationToken = default);
 }

@@ -11,6 +11,7 @@ public static class MainServiceMappingExtension
         return new MainServiceDto
         {
             Cost = mainService.Cost,
+            MaterialCost = mainService.MaterialCost,
             Description = mainService.Description,
             Id = mainService.Id,
             ServiceDate = mainService.ServiceDate,
