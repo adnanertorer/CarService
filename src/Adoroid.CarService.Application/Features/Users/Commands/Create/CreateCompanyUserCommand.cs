@@ -13,7 +13,8 @@ namespace Adoroid.CarService.Application.Features.Users.Commands.Create;
 
 public record CreateCompanyUserCommand(CreateUserDto CreateUserDto, CreateCompanyDto CreateCompanyDto) : IRequest<Response<UserDto>>;
 
-public class CreateCompanyUserCommandHandler(IUnitOfWork unitOfWork, IAesEncryptionHelper aesEncryptionHelper, ILogger<CreateCompanyUserCommandHandler> logger) : IRequestHandler<CreateCompanyUserCommand, Response<UserDto>>
+public class CreateCompanyUserCommandHandler(IUnitOfWork unitOfWork, IAesEncryptionHelper aesEncryptionHelper,
+    ILogger<CreateCompanyUserCommandHandler> logger, IMailSender mailSender) : IRequestHandler<CreateCompanyUserCommand, Response<UserDto>>
 {
     public async Task<Response<UserDto>> Handle(CreateCompanyUserCommand request, CancellationToken cancellationToken)
     {
@@ -24,6 +25,7 @@ public class CreateCompanyUserCommandHandler(IUnitOfWork unitOfWork, IAesEncrypt
             return Response<UserDto>.Fail(BusinessExceptionMessages.UserAlreadyExists);
 
         var encryptedPassword = aesEncryptionHelper.Encrypt(request.CreateUserDto.Password);
+        string otpCode = new Random().Next(100000, 999999).ToString();
         var user = new User
         {
             Name = request.CreateUserDto.Name,
@@ -33,7 +35,8 @@ public class CreateCompanyUserCommandHandler(IUnitOfWork unitOfWork, IAesEncrypt
             PhoneNumber = request.CreateUserDto.PhoneNumber,
             CreatedBy = new Guid(),
             CreatedDate = DateTime.UtcNow,
-            IsDeleted = false
+            IsDeleted = false,
+            OtpCode = otpCode,
         };
 
         await unitOfWork.Users.AddAsync(user, cancellationToken);
