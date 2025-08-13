@@ -24,4 +24,5 @@ public interface ICustomerRepository
     Task<Dictionary<Guid, string>> GetCustomerNames(List<Guid> guids, CancellationToken cancellationToken);
     Task<Customer?> GetByIdWithIncludesAsync(Guid customerId, bool asNoTracking = true, CancellationToken cancellationToken = default);
     IQueryable<CustomerBasicInfoDto> GetBasicInfoByCompanyId(Guid companyId);
+    Task<bool> IsExistingSameInfo(Guid companyId, string phone, string? email, Guid? customerId = null, CancellationToken cancellationToken = default);
 }

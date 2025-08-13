@@ -152,5 +152,14 @@ public class CustomerRepository(CarServiceDbContext dbContext) : ICustomerReposi
                .AnyAsync(i => i.CompanyId == companyId && i.Phone == phone, cancellationToken);
 
     }
-           
+
+    public async Task<bool> IsExistingSameInfo(Guid companyId, string phone, string? email, Guid? customerId = null, CancellationToken cancellationToken = default)
+    {
+        return await dbContext.Customers
+            .AsNoTracking()
+            .Where(c => c.CompanyId == companyId && c.IsActive)
+            .Where(c => c.Phone == phone || c.Email == email)
+            .Where(c => c.Id != customerId)
+            .AnyAsync(cancellationToken);
+    }
 }
