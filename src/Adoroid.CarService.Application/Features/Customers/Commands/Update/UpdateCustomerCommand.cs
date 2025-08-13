@@ -1,5 +1,6 @@
 ﻿using Adoroid.CarService.Application.Common.Abstractions;
 using Adoroid.CarService.Application.Common.Abstractions.Auth;
+using Adoroid.CarService.Application.Common.Extensions;
 using Adoroid.CarService.Application.Features.Customers.Dtos;
 using Adoroid.CarService.Application.Features.Customers.ExceptionMessages;
 using Adoroid.CarService.Application.Features.Customers.MapperExtensions;
@@ -16,6 +17,13 @@ public class UpdateCustomerCommandHandler(IUnitOfWork unitOfWork, ICurrentUser c
 {
     public async Task<Response<CustomerDto>> Handle(UpdateCustomerCommand request, CancellationToken cancellationToken)
     {
+        var validCompanyId = currentUser.ValidCompanyId();
+
+        var isExist = await unitOfWork.Customers.IsExistingSameInfo(validCompanyId, request.Phone, request.Email, request.Id, cancellationToken);
+
+        if(isExist)
+            return Response<CustomerDto>.Fail(BusinessExceptionMessages.CustomerAlready);
+
         var customer = await unitOfWork.Customers.GetWithVehicleUsersAsync(request.Id, cancellationToken);
 
         if (customer.Customer is null)
