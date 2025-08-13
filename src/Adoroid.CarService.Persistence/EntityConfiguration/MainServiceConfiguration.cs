@@ -13,7 +13,7 @@ public class MainServiceConfiguration : IEntityTypeConfiguration<MainService>
         builder.Property(b => b.ServiceStatus).IsRequired();
         builder.Property(b => b.ServiceDate).IsRequired();
         builder.Property(b => b.Description).HasMaxLength(250);
-        builder.Property(b => b.MaterialCost).HasPrecision(18, 2).HasDefaultValue(0);
+        builder.Property(b => b.MaterialCost).HasPrecision(18, 2).HasDefaultValue(0m);
         builder.Property(b => b.Cost).IsRequired().HasPrecision(18, 2);
 
         builder.Property(i => i.CreatedDate).IsRequired();
