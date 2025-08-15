@@ -18,6 +18,11 @@ using Serilog;
 
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Configuration.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+    .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true, reloadOnChange: true)
+    .AddEnvironmentVariables();
+
 builder.WebHost.ConfigureKestrel(options =>
 {
     options.ListenAnyIP(7290);
@@ -33,12 +38,14 @@ builder.Services.AddCarServiceInsfrastructure(builder.Configuration);
 
 builder.Services.AddMassTransit(x =>
 {
-    var rabbitMqConfig = builder.Configuration.GetSection("RabbitMqConfig").Get<RabbitMqConfig>();
+    var rabbitMqConfig = builder.Configuration.GetSection("RabbitMq").Get<RabbitMqConfig>();
+
     x.AddConsumer<MailSenderConsumer>();
+    x.SetKebabCaseEndpointNameFormatter();
 
     x.UsingRabbitMq((context, cfg) =>
     {
-        cfg.Host(rabbitMqConfig!.HostName, h =>
+        cfg.Host(rabbitMqConfig!.Host ?? "rabbitmq", rabbitMqConfig.VirtualHost ?? "/", h =>
         {
             h.Username(rabbitMqConfig.UserName);
             h.Password(rabbitMqConfig.Password);
