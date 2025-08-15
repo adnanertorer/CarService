@@ -13,13 +13,26 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ConnectionStrings__DefaultConnectionString=Host=postgres-db;Port=5432;Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD};Database=${POSTGRES_DB};
+      - ConnectionStrings__RedisConnectionString=redis:6379,user=${REDIS_USER},password=${REDIS_PASSWORD},abortConnect=false
       - Redis__Host=redis
       - Redis__Port=6379
       - Redis__Password=${REDIS_PASSWORD}
-      - Elastic__Url=http://elastic:carservice@elasticsearch:9200
-      - Rabbit__Host=rabbitmq
-      - Rabbit__User=${RABBIT_USER}
-      - Rabbit__Password=${RABBIT_PASSWORD}
+      - RedisConfig__Host=${REDIS_HOST}
+      - RedisConfig__Password=${REDIS_PASSWORD}
+      - Elastic__Url=${ELASTIC_URL}
+      - RabbitMq__Host=${RABBIT_HOST}
+      - RabbitMq__User=${RABBIT_USER}
+      - RabbitMq__Password=${RABBIT_PASSWORD}
+      - MailConfig__MailPassword=${MAIL_PASSWORD}
+      - MailConfig__MailSender=${MAIL_SENDER}
+      - MailConfig__MailUsername=${MAIL_USERNAME}
+      - ElasticConfig__Url=${ELASTIC_URL}
+      - ElasticConfig__UserName=${ELASTIC_USER}
+      - ElasticConfig__Password=${ELASTIC_PASSWORD}
+      - ElasticConfig__JaegerHost=${JEAGER_HOST}
+      - ElasticConfig__ResourceName=${RESOURCE_NAME}
+      - TokenOptions__SecurityKey=${SECURITY_KEY}
+      - MobileTokenOptions__SecurityKey=${MOBILE_TOKEN_SECURITY_KEY}
     networks:
       - backend
     depends_on:
