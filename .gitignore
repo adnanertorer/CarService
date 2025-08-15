@@ -365,3 +365,4 @@ FodyWeavers.xsd
 # local secrets
 appsettings.Development.json
 appsettings.Local.json
+.env
