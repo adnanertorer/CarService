@@ -21,7 +21,7 @@ services:
       - RedisConfig__Password=${REDIS_PASSWORD}
       - Elastic__Url=${ELASTIC_URL}
       - RabbitMq__Host=${RABBIT_HOST}
-      - RabbitMq__User=${RABBIT_USER}
+      - RabbitMq__Username=${RABBIT_USER}
       - RabbitMq__Password=${RABBIT_PASSWORD}
       - MailConfig__MailPassword=${MAIL_PASSWORD}
       - MailConfig__MailSender=${MAIL_SENDER}
