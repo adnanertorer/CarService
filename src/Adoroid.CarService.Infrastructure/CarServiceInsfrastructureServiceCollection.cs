@@ -1,4 +1,5 @@
-﻿using Adoroid.CarService.Application.Common.Abstractions.Auth;
+﻿using Adoroid.CarService.Application.Common.Abstractions;
+using Adoroid.CarService.Application.Common.Abstractions.Auth;
 using Adoroid.CarService.Application.Common.Abstractions.Caching;
 using Adoroid.CarService.Application.Features.MainServices.Commands.Create;
 using Adoroid.CarService.Infrastructure.Auth;
@@ -20,6 +21,7 @@ public static class CarServiceInsfrastructureServiceCollection
         services.AddScoped<IAesEncryptionHelper, AesEncryptionHelper>();
         services.AddScoped<ITokenHandler, TokenHandler>();
         services.AddScoped<IMobileUserTokenHandler, MobileUserTokenHandler>();
+        services.AddScoped<IMailSender, MailSender>();
         services.Configure<MailConfig>(configuration.GetSection("MailConfig"));
 
         services.Scan(scan => scan.FromAssemblies(
