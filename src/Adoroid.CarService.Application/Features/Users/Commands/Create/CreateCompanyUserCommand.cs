@@ -1,29 +1,32 @@
 ﻿using Adoroid.CarService.Application.Common.Abstractions;
 using Adoroid.CarService.Application.Common.Abstractions.Auth;
 using Adoroid.CarService.Application.Common.Enums;
+using Adoroid.CarService.Application.Common.Records;
 using Adoroid.CarService.Application.Features.Users.Dtos;
 using Adoroid.CarService.Application.Features.Users.ExceptionMessages;
+using Adoroid.CarService.Application.Features.Users.Templates;
 using Adoroid.CarService.Domain.Entities;
-using Adoroid.Core.Application.Wrappers;
+using MassTransit;
 using Microsoft.Extensions.Logging;
 using MinimalMediatR.Core;
 using UserDto = Adoroid.CarService.Application.Features.Users.Dtos.UserDto;
-
 namespace Adoroid.CarService.Application.Features.Users.Commands.Create;
 
-public record CreateCompanyUserCommand(CreateUserDto CreateUserDto, CreateCompanyDto CreateCompanyDto) : IRequest<Response<UserDto>>;
+public record CreateCompanyUserCommand(CreateUserDto CreateUserDto, CreateCompanyDto CreateCompanyDto) : IRequest<Core.Application.Wrappers.Response<UserDto>>;
 
-public class CreateCompanyUserCommandHandler(IUnitOfWork unitOfWork, IAesEncryptionHelper aesEncryptionHelper, ILogger<CreateCompanyUserCommandHandler> logger) : IRequestHandler<CreateCompanyUserCommand, Response<UserDto>>
+public class CreateCompanyUserCommandHandler(IUnitOfWork unitOfWork, IAesEncryptionHelper aesEncryptionHelper,
+    ILogger<CreateCompanyUserCommandHandler> logger, IPublishEndpoint publishEndpoint) : IRequestHandler<CreateCompanyUserCommand, Core.Application.Wrappers.Response<UserDto>>
 {
-    public async Task<Response<UserDto>> Handle(CreateCompanyUserCommand request, CancellationToken cancellationToken)
+    public async Task<Core.Application.Wrappers.Response<UserDto>> Handle(CreateCompanyUserCommand request, CancellationToken cancellationToken)
     {
         var userExist = await unitOfWork.Users.AnyUserWithEmailAndPhonenumber(request.CreateUserDto.Email,
             request.CreateUserDto.PhoneNumber, cancellationToken);
 
         if (userExist)
-            return Response<UserDto>.Fail(BusinessExceptionMessages.UserAlreadyExists);
+            return Core.Application.Wrappers.Response<UserDto>.Fail(BusinessExceptionMessages.UserAlreadyExists);
 
         var encryptedPassword = aesEncryptionHelper.Encrypt(request.CreateUserDto.Password);
+        string otpCode = new Random().Next(100000, 999999).ToString();
         var user = new User
         {
             Name = request.CreateUserDto.Name,
@@ -33,7 +36,8 @@ public class CreateCompanyUserCommandHandler(IUnitOfWork unitOfWork, IAesEncrypt
             PhoneNumber = request.CreateUserDto.PhoneNumber,
             CreatedBy = new Guid(),
             CreatedDate = DateTime.UtcNow,
-            IsDeleted = false
+            IsDeleted = false,
+            OtpCode = otpCode,
         };
 
         await unitOfWork.Users.AddAsync(user, cancellationToken);
@@ -45,7 +49,7 @@ public class CreateCompanyUserCommandHandler(IUnitOfWork unitOfWork, IAesEncrypt
             request.CreateCompanyDto.CompanyEmail, cancellationToken);
 
         if (isExist)
-            return Response<UserDto>.Fail(BusinessExceptionMessages.CompanyAlreadyExists);
+            return Core.Application.Wrappers.Response<UserDto>.Fail(BusinessExceptionMessages.CompanyAlreadyExists);
 
         var company = new Company
         {
@@ -72,7 +76,7 @@ public class CreateCompanyUserCommandHandler(IUnitOfWork unitOfWork, IAesEncrypt
         var isExistCompanyUser = await unitOfWork.UserToCompanies.IsExists(user.Id, company.Id, cancellationToken);
 
         if (isExistCompanyUser)
-            return Response<UserDto>.Fail(BusinessExceptionMessages.AlreadyExistsCompanyUser);
+            return Core.Application.Wrappers.Response<UserDto>.Fail(BusinessExceptionMessages.AlreadyExistsCompanyUser);
 
         var entity = new UserToCompany
         {
@@ -89,7 +93,25 @@ public class CreateCompanyUserCommandHandler(IUnitOfWork unitOfWork, IAesEncrypt
 
         logger.LogInformation("User to Company relation created with UserId: {UserId} and CompanyId: {CompanyId}", user.Id, company.Id);
 
-        return Response<UserDto>.Success(new UserDto
+        var mailBody = MailTemplates.GetVerificationEmailTemplate;
+        mailBody = mailBody.Replace("{{OTP_CODE}}", otpCode)
+            .Replace("{{ACTION_URL}}", $"https://fixybear.com/verify?code={otpCode}")
+            .Replace("{{SUPPORT_EMAIL}}", "info@fixybear.com")
+            .Replace("{{CURRENT_YEAR}}", DateTime.UtcNow.Year.ToString())
+            .Replace("{{PRIVACY_URL}}", "https://fixybear.com/privacy");
+
+        var emailText = new SendMailRequest(new Common.Dtos.MailModel
+        {
+            Body = mailBody,
+            IsBodyHtml = true,
+            Recipient = request.CreateUserDto.Email,
+            SenderDisplayName = "FixyBear",
+            Subject = "FixyBear Kayıt"
+        });
+
+        await publishEndpoint.Publish(emailText, cancellationToken);
+
+        return Core.Application.Wrappers.Response<UserDto>.Success(new UserDto
         {
             Id = user.Id,
             Name = user.Name,

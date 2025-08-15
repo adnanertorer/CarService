@@ -1,20 +1,28 @@
-using Adoroid.CarService.API;
 using Adoroid.CarService.API.Endpoints;
 using Adoroid.CarService.Application;
+using Adoroid.CarService.Application.Features.Users.Consumers;
 using Adoroid.CarService.Infrastructure;
 using Adoroid.CarService.Infrastructure.Auth;
 using Adoroid.CarService.Infrastructure.Auth.MobileUser;
 using Adoroid.CarService.Infrastructure.Logging;
+using Adoroid.CarService.Infrastructure.RabbitMqSettings;
 using Adoroid.CarService.Persistence;
 using Adoroid.Core.Application.Exceptions.Middlewares;
+using MassTransit;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Serilog;
 
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Configuration.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+    .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true, reloadOnChange: true)
+    .AddEnvironmentVariables();
+
 builder.WebHost.ConfigureKestrel(options =>
 {
     options.ListenAnyIP(7290);
@@ -22,7 +30,34 @@ builder.WebHost.ConfigureKestrel(options =>
 
 builder.Services.AddCarServicePersistence(builder.Configuration);
 builder.Services.AddCarServiceApplication(builder.Configuration);
+
+builder.Services.Configure<RabbitMqConfig>(builder.Configuration.GetSection("RabbitMqConfig"));
+builder.Services.AddSingleton(sp => sp.GetRequiredService<IOptions<RabbitMqConfig>>().Value);
+
 builder.Services.AddCarServiceInsfrastructure(builder.Configuration);
+
+builder.Services.AddMassTransit(x =>
+{
+    var rabbitMqConfig = builder.Configuration.GetSection("RabbitMq").Get<RabbitMqConfig>();
+
+    x.AddConsumer<MailSenderConsumer>();
+    x.SetKebabCaseEndpointNameFormatter();
+
+    x.UsingRabbitMq((context, cfg) =>
+    {
+        cfg.Host(rabbitMqConfig!.Host ?? "rabbitmq", rabbitMqConfig.VirtualHost ?? "/", h =>
+        {
+            h.Username(rabbitMqConfig.UserName);
+            h.Password(rabbitMqConfig.Password);
+        });
+
+        cfg.ReceiveEndpoint("send-mail-queue", e =>
+        {
+            e.ConfigureConsumer<MailSenderConsumer>(context);
+        });
+    });
+});
+
 #region token_options
 builder.Services.Configure<TokenOptions>(
     builder.Configuration.GetSection(nameof(TokenOptions)));
