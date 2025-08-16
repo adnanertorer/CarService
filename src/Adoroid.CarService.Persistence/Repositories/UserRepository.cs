@@ -55,4 +55,10 @@ public class UserRepository(CarServiceDbContext dbContext) : IUserRepository
     {
        await dbContext.Users.AddAsync(user, cancellationToken);
     }
+
+    public async Task<User?> GetUserById(Guid userId, CancellationToken cancellationToken = default)
+    {
+        return await dbContext.Users
+           .FirstOrDefaultAsync(i => i.Id == userId, cancellationToken);
+    }
 }

@@ -4,6 +4,7 @@ using Adoroid.CarService.Application.Features.Users.Commands.Create;
 using Adoroid.CarService.Application.Features.Users.Dtos;
 using Adoroid.CarService.Application.Features.Users.Queries.GetRefreshToken;
 using Adoroid.CarService.Application.Features.Users.Queries.Login;
+using Adoroid.CarService.Application.Features.Users.Queries.Logout;
 using MinimalMediatR.Core;
 using MinimalMediatR.Extensions;
 
@@ -24,6 +25,12 @@ public static class UserEndpointsMap
             return result.ToResult();
 
         });
+
+        builder.MapGet(apiPath + "/logout", async (IMediator mediator, CancellationToken cancellationToken) =>
+        {
+            var result = await mediator.Send(new UserLogoutQuery(), cancellationToken);
+            return result.ToResult();
+        }).RequireAuthorization();
 
         return builder;
     }

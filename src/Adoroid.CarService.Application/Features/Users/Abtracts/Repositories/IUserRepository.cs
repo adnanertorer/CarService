@@ -1,5 +1,4 @@
 ﻿using Adoroid.CarService.Application.Common.Dtos.Auth;
-using Adoroid.CarService.Application.Features.Users.Dtos;
 using Adoroid.CarService.Domain.Entities;
 
 namespace Adoroid.CarService.Application.Features.Users.Abtracts.Repositories;
@@ -15,4 +14,5 @@ public interface IUserRepository
     Task<UserToCompany?> GetUserToCompany(Guid userId, CancellationToken cancellationToken = default);
     void Update(User user, CancellationToken cancellationToken = default);
     Task AddAsync(User user, CancellationToken cancellationToken);
+    Task<User?> GetUserById(Guid userId, CancellationToken cancellationToken = default);
 }
