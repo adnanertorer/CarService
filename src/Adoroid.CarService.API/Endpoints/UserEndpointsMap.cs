@@ -52,6 +52,12 @@ public static class UserEndpointsMap
             return result.ToResult();
         });
 
+        builder.MapPost(apiPath + "/change-password", async (ChangePasswordCommand request, IMediator mediator, CancellationToken cancellationToken) =>
+        {
+            var result = await mediator.Send(request, cancellationToken);
+            return result.ToResult();
+        }).RequireAuthorization();
+
         return builder;
     }
 }
