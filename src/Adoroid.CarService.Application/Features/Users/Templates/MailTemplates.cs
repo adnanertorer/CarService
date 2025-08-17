@@ -171,7 +171,7 @@ public static class MailTemplates
                 <tr>
                   <td style=""padding:24px;"">
                     <h1 class=""text"" style=""margin:0 0 8px 0; font-size:20px; line-height:1.4; color:#111827;"">
-                      Paraolanızı sıfırlayın
+                      Parolanızı sıfırlayın
                     </h1>
                     <p class=""text"" style=""margin:0 0 16px 0; font-size:14px; color:#374151;"">
                       Aşağıdaki tek kullanımlık doğrulama kodunu uygulamaya girerek parolanızı yeniden oluşturabilirsiniz.
@@ -193,7 +193,7 @@ public static class MailTemplates
                       <tr>
                         <td align=""center"" bgcolor=""#4f46e5"" class=""btn"" style=""border-radius:10px;"">
                           <a href=""{{{{ACTION_URL}}}}"" target=""_blank"" style=""display:inline-block; padding:12px 18px; font-size:14px; font-weight:600; text-decoration:none; color:#ffffff;"">
-                            Hesabı Doğrula
+                            Parolanı sıfırla
                           </a>
                         </td>
                       </tr>

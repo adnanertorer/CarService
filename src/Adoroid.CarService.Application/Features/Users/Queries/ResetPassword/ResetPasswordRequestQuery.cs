@@ -30,7 +30,7 @@ public class ResetPasswordRequestQueryHandler(IUnitOfWork unitOfWork, IPublishEn
 
         var mailBody = MailTemplates.GetPasswordResetEmailTemplate;
         mailBody = mailBody.Replace("{{OTP_CODE}}", otpCode)
-            .Replace("{{ACTION_URL}}", "https://fixybear.com/reset-password")
+            .Replace("{{ACTION_URL}}", "https://app.fixybear.com/reset-password")
             .Replace("{{SUPPORT_EMAIL}}", "info@fixybear.com")
             .Replace("{{CURRENT_YEAR}}", DateTime.UtcNow.Year.ToString())
             .Replace("{{PRIVACY_URL}}", "https://fixybear.com/privacy");

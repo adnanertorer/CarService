@@ -96,7 +96,7 @@ public class CreateCompanyUserCommandHandler(IUnitOfWork unitOfWork, IAesEncrypt
 
         var mailBody = MailTemplates.GetVerificationEmailTemplate;
         mailBody = mailBody.Replace("{{OTP_CODE}}", otpCode)
-            .Replace("{{ACTION_URL}}", "https://fixybear.com/opt-approve")
+            .Replace("{{ACTION_URL}}", "https://app.fixybear.com/opt-approve")
             .Replace("{{SUPPORT_EMAIL}}", "info@fixybear.com")
             .Replace("{{CURRENT_YEAR}}", DateTime.UtcNow.Year.ToString())
             .Replace("{{PRIVACY_URL}}", "https://fixybear.com/privacy");
