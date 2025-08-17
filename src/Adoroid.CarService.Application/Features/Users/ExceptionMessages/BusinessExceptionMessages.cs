@@ -21,4 +21,5 @@ public static class BusinessExceptionMessages
     public const string CompanyAlreadyExists = "Bu vergi numarasıyla kayıtlı bir şirket zaten var.";
     public const string AlreadyExistsCompanyUser = "Bu kullanıcı zaten bu şirkette kayıtlı.";
     public const string UnexpectedError = "Beklenmeyen bir hata oluştu. Lütfen daha sonra tekrar deneyin.";
+    public const string OldPasswordIsIncorrect = "Eski şifre yanlış. Lütfen tekrar deneyin.";
 }
