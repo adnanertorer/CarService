@@ -6,6 +6,7 @@ using Adoroid.CarService.Application.Features.Users.Dtos;
 using Adoroid.CarService.Application.Features.Users.Queries.GetRefreshToken;
 using Adoroid.CarService.Application.Features.Users.Queries.Login;
 using Adoroid.CarService.Application.Features.Users.Queries.Logout;
+using Adoroid.CarService.Application.Features.Users.Queries.ResetPassword;
 using MinimalMediatR.Core;
 using MinimalMediatR.Extensions;
 
@@ -34,6 +35,18 @@ public static class UserEndpointsMap
         }).RequireAuthorization();
 
         builder.MapPost(apiPath + "/approve-otpcode", async(ApproveOtpCodeCommand request, IMediator mediator, CancellationToken cancellationToken) =>
+        {
+            var result = await mediator.Send(request, cancellationToken);
+            return result.ToResult();
+        });
+
+        builder.MapPost(apiPath + "/reset-password-request", async (ResetPasswordRequestQuery request, IMediator mediator, CancellationToken cancellationToken) =>
+        {
+            var result = await mediator.Send(request, cancellationToken);
+            return result.ToResult();
+        });
+
+        builder.MapPost(apiPath + "/approve-reset-password", async (ApproveResetPasswordCommand request, IMediator mediator, CancellationToken cancellationToken) =>
         {
             var result = await mediator.Send(request, cancellationToken);
             return result.ToResult();
