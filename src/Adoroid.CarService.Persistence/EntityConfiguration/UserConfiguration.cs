@@ -16,6 +16,7 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
         builder.Property(b => b.PhoneNumber).IsRequired().HasMaxLength(20);
         builder.Property(b => b.RefreshToken).HasMaxLength(150);
         builder.Property(b => b.OtpCode).HasMaxLength(6);
+        builder.Property(b => b.IsActive).HasDefaultValue(false);
 
         builder.Property(i => i.CreatedDate).IsRequired();
         builder.Property(c => c.CreatedBy).IsRequired().HasMaxLength(64);

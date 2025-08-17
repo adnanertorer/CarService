@@ -37,7 +37,7 @@ public class UserRepository(CarServiceDbContext dbContext) : IUserRepository
     {
         return await dbContext.Users
             .AsNoTracking()
-            .FirstOrDefaultAsync(i => i.Email == email && i.Password == password, cancellationToken);
+            .FirstOrDefaultAsync(i => i.Email == email && i.Password == password && i.IsActive == true, cancellationToken);
     }
 
     public async Task<bool> AnyUserWithEmailAndPhonenumber(string email, string phoneNumber, CancellationToken cancellationToken = default)
@@ -60,5 +60,11 @@ public class UserRepository(CarServiceDbContext dbContext) : IUserRepository
     {
         return await dbContext.Users
            .FirstOrDefaultAsync(i => i.Id == userId, cancellationToken);
+    }
+
+    public async Task<User?> GetUserByOtpCodeAsync(string otpCode, CancellationToken cancellationToken = default)
+    {
+        return await dbContext.Users
+            .FirstOrDefaultAsync(i => i.OtpCode == otpCode, cancellationToken);
     }
 }
