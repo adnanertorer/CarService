@@ -16,4 +16,5 @@ public interface IUserRepository
     Task AddAsync(User user, CancellationToken cancellationToken);
     Task<User?> GetUserById(Guid userId, CancellationToken cancellationToken = default);
     Task<User?> GetUserByOtpCodeAsync(string otpCode, CancellationToken cancellationToken = default);
+    Task<User?> GetUserWithEmailAddress(string email, CancellationToken cancellationToken = default);
 }

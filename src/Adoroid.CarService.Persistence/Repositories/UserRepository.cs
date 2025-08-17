@@ -67,4 +67,10 @@ public class UserRepository(CarServiceDbContext dbContext) : IUserRepository
         return await dbContext.Users
             .FirstOrDefaultAsync(i => i.OtpCode == otpCode, cancellationToken);
     }
+
+    public async Task<User?> GetUserWithEmailAddress(string email, CancellationToken cancellationToken = default)
+    {
+        return await dbContext.Users
+            .FirstOrDefaultAsync(i => i.Email == email, cancellationToken);
+    }
 }
