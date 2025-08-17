@@ -15,4 +15,5 @@ public interface IUserRepository
     void Update(User user, CancellationToken cancellationToken = default);
     Task AddAsync(User user, CancellationToken cancellationToken);
     Task<User?> GetUserById(Guid userId, CancellationToken cancellationToken = default);
+    Task<User?> GetUserByOtpCodeAsync(string otpCode, CancellationToken cancellationToken = default);
 }

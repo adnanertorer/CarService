@@ -38,6 +38,7 @@ public class CreateCompanyUserCommandHandler(IUnitOfWork unitOfWork, IAesEncrypt
             CreatedDate = DateTime.UtcNow,
             IsDeleted = false,
             OtpCode = otpCode,
+            IsActive = false
         };
 
         await unitOfWork.Users.AddAsync(user, cancellationToken);

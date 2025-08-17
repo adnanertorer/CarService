@@ -1,6 +1,7 @@
 ﻿using Adoroid.CarService.API.Extensions;
 using Adoroid.CarService.Application.Common.Dtos.Auth;
 using Adoroid.CarService.Application.Features.Users.Commands.Create;
+using Adoroid.CarService.Application.Features.Users.Commands.Update;
 using Adoroid.CarService.Application.Features.Users.Dtos;
 using Adoroid.CarService.Application.Features.Users.Queries.GetRefreshToken;
 using Adoroid.CarService.Application.Features.Users.Queries.Login;
@@ -31,6 +32,12 @@ public static class UserEndpointsMap
             var result = await mediator.Send(new UserLogoutQuery(), cancellationToken);
             return result.ToResult();
         }).RequireAuthorization();
+
+        builder.MapPost(apiPath + "/approve-otpcode", async(ApproveOtpCodeCommand request, IMediator mediator, CancellationToken cancellationToken) =>
+        {
+            var result = await mediator.Send(request, cancellationToken);
+            return result.ToResult();
+        });
 
         return builder;
     }
