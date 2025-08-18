@@ -126,7 +126,7 @@ builder.Services.AddHttpContextAccessor();
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("CorsPolicy",
-        builder => builder.WithOrigins("https://app.fixybear.com")
+        builder => builder.WithOrigins("https://app.fixybear.com", "http://localhost:5173")
                           .AllowAnyHeader()
         .AllowAnyMethod()
         .AllowCredentials());
@@ -191,6 +191,7 @@ app.MobileUserEndpoints();
 app.GeographicEndpoints();
 app.UserToCompanyEndpoints();
 app.MapBookingEndpoints();
+app.ReportEndpoints();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
