@@ -191,6 +191,7 @@ app.MobileUserEndpoints();
 app.GeographicEndpoints();
 app.UserToCompanyEndpoints();
 app.MapBookingEndpoints();
+app.ReportEndpoints();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
