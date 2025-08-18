@@ -1,6 +1,7 @@
 ﻿using Adoroid.CarService.API.Extensions;
 using Adoroid.CarService.Application.Features.Reports.Queries.GetHighestEarningCustomers;
 using Adoroid.CarService.Application.Features.Reports.Queries.GetServiceCountByEmployee;
+using Adoroid.CarService.Application.Features.Reports.Queries.GetServiceCountByVehicle;
 using Adoroid.CarService.Application.Features.Reports.Queries.GetTransactions;
 using MinimalMediatR.Core;
 using MinimalMediatR.Extensions;
@@ -27,6 +28,12 @@ public static class ReportEndpointsMap
         builder.MapGet(apiPath + "/employee-service-count", async (IMediator mediator, CancellationToken cancellationToken) =>
         {
             var result = await mediator.Send(new GetServiceCountByEmployeeQuery(), cancellationToken);
+            return result.ToResult();
+        }).RequireAuthorization();
+
+        builder.MapGet(apiPath + "/vehicle-service-count", async (IMediator mediator, CancellationToken cancellationToken) =>
+        {
+            var result = await mediator.Send(new GetServiceCountByVehicleQuery(), cancellationToken);
             return result.ToResult();
         }).RequireAuthorization();
 

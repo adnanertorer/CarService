@@ -25,4 +25,29 @@ public class SubServiceReportRepository(CarServiceDbContext dbContext) : ISubSer
             .ToListAsync(cancellationToken);
         return serviceCounts;
     }
+
+    public async Task<List<VehicleServiceCountDto>> GetServiceCountByVehicles(Guid companyId, CancellationToken cancellationToken = default)
+    {
+        var serviceCounts = await dbContext.MainServices
+            .AsNoTracking()
+            .Include(i => i.Vehicle)
+            .Where(s => s.Vehicle != null && s.CompanyId == companyId)
+            .Select(i => new {
+                i.VehicleId,
+                i.Vehicle!.Brand,
+                i.Vehicle.Model,
+                i.Vehicle.Plate,
+            })
+            .GroupBy(s => s.VehicleId)
+            .Select(g => new VehicleServiceCountDto
+            {
+                VehicleId = g.Key,
+                Brand = g.FirstOrDefault() != null ? g.FirstOrDefault().Brand : "Unknown",
+                Model = g.FirstOrDefault() != null ? g.FirstOrDefault().Model : "Unknown",
+                Plate = g.FirstOrDefault() != null ? g.FirstOrDefault().Plate : "Unknown",
+                ServiceCount = g.Count()
+            })
+            .ToListAsync(cancellationToken);
+        return serviceCounts;
+    }
 }
