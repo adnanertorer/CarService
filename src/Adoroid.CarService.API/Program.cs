@@ -126,7 +126,7 @@ builder.Services.AddHttpContextAccessor();
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("CorsPolicy",
-        builder => builder.WithOrigins("https://app.fixybear.com")
+        builder => builder.WithOrigins("https://app.fixybear.com", "http://localhost:5173")
                           .AllowAnyHeader()
         .AllowAnyMethod()
         .AllowCredentials());
