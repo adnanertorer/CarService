@@ -45,6 +45,7 @@ public class SubServiceReportRepository(CarServiceDbContext dbContext) : ISubSer
                 Brand = g.FirstOrDefault() != null ? g.FirstOrDefault().Brand : "Unknown",
                 Model = g.FirstOrDefault() != null ? g.FirstOrDefault().Model : "Unknown",
                 Plate = g.FirstOrDefault() != null ? g.FirstOrDefault().Plate : "Unknown",
+                Title = g.FirstOrDefault() != null ? $"{g.FirstOrDefault().Brand} {g.FirstOrDefault().Model} ({g.FirstOrDefault().Plate})" : "Unknown",
                 ServiceCount = g.Count()
             })
             .ToListAsync(cancellationToken);
