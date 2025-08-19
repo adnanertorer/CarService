@@ -32,6 +32,12 @@ public class UpdateMainServiceCommandHandler(IUnitOfWork unitOfWork, ICurrentUse
         if (entity is null)
             return Response<MainServiceDto>.Fail(BusinessExceptionMessages.NotFound);
 
+        var oldKm = entity.Kilometers;
+        var oldServiceDate = entity.ServiceDate;
+
+        if(request.ServiceDate < oldServiceDate)
+            return Response<MainServiceDto>.Fail(BusinessExceptionMessages.NewServiceDateBeforeOld);
+
         entity.ServiceDate = request.ServiceDate;
         entity.Description = request.Description;
         entity.VehicleId = request.VehicleId;
@@ -99,6 +105,8 @@ public class UpdateMainServiceCommandHandler(IUnitOfWork unitOfWork, ICurrentUse
         {
             await unitOfWork.SaveChangesAsync(cancellationToken);
             await unitOfWork.CommitAsync(cancellationToken);
+
+            logger.LogInformation("MainService güncelleme işlemi başarılı oldu. Eski km: {OldKm}, Eski tarih: {OldServiceDate}, MainServiceId: {MainServiceId}", oldKm, oldServiceDate, request.Id);
         }
         catch(Exception ex)
         {
