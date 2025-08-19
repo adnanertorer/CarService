@@ -27,7 +27,8 @@ public static class MainServiceMappingExtension
                 Year = mainService.Vehicle!.Year
             } : null,
             VehicleId = mainService.VehicleId,
-            MainServiceStatus = (MainServiceStatusEnum)mainService.ServiceStatus
+            MainServiceStatus = (MainServiceStatusEnum)mainService.ServiceStatus,
+            Kilometer = mainService.Kilometers ?? 0m
         };
     }
 }

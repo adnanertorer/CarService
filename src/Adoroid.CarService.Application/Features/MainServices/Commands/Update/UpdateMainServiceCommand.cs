@@ -13,7 +13,7 @@ using MinimalMediatR.Core;
 
 namespace Adoroid.CarService.Application.Features.MainServices.Commands.Update;
 
-public record UpdateMainServiceCommand(Guid Id, Guid VehicleId, DateTime ServiceDate, string? Description, int MainServiceStatus)
+public record UpdateMainServiceCommand(Guid Id, Guid VehicleId, decimal Kilometer, DateTime ServiceDate, string? Description, int MainServiceStatus)
     : IRequest<Response<MainServiceDto>>;
 
 public class UpdateMainServiceCommandHandler(IUnitOfWork unitOfWork, ICurrentUser currentUser, ICacheService cacheService,
@@ -36,6 +36,7 @@ public class UpdateMainServiceCommandHandler(IUnitOfWork unitOfWork, ICurrentUse
         entity.Description = request.Description;
         entity.VehicleId = request.VehicleId;
         entity.ServiceStatus = request.MainServiceStatus;
+        entity.Kilometers = request.Kilometer;
 
         entity.UpdatedBy = userId;
         entity.UpdatedDate = DateTime.UtcNow;

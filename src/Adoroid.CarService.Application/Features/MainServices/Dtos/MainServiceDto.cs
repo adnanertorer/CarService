@@ -11,6 +11,7 @@ public class MainServiceDto
     public decimal? MaterialCost { get; set; }
     public decimal Cost { get; set; }
     public MainServiceStatusEnum MainServiceStatus { get; set; }
+    public decimal? Kilometer { get; set; }
 
     public VehicleDto? Vehicle { get; set; }
 }

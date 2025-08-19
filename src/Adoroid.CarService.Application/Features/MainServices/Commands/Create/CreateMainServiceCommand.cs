@@ -13,7 +13,7 @@ using MinimalMediatR.Core;
 
 namespace Adoroid.CarService.Application.Features.MainServices.Commands.Create;
 
-public record CreateMainServiceCommand(Guid VehicleId, DateTime ServiceDate, string? Description) : IRequest<Response<MainServiceDto>>;
+public record CreateMainServiceCommand(Guid VehicleId, decimal Kilometer, DateTime ServiceDate, string? Description) : IRequest<Response<MainServiceDto>>;
 
 public class CreateMainServiceCommandHandler(IUnitOfWork unitOfWork, ICurrentUser currentUser, 
     ICacheService cacheService, ILogger<CreateMainServiceCommandHandler> logger) 
@@ -39,7 +39,8 @@ public class CreateMainServiceCommandHandler(IUnitOfWork unitOfWork, ICurrentUse
             ServiceDate = request.ServiceDate,
             VehicleId = request.VehicleId,
             ServiceStatus = (int)MainServiceStatusEnum.Opened,
-            CompanyId = companyId
+            CompanyId = companyId,
+            Kilometers = request.Kilometer
         };
 
         var result = await unitOfWork.MainServices.AddAsync(entity, cancellationToken);

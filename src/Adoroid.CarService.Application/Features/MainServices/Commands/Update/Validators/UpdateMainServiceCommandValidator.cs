@@ -19,5 +19,12 @@ public class UpdateMainServiceCommandValidator : AbstractValidator<UpdateMainSer
            .MaximumLength(250)
            .WithMessage(string.Format(ValidationMessages.MaxLength, "Açıklama", "250"))
            .When(x => !string.IsNullOrEmpty(x.Description));
+
+        RuleFor(x => x.Kilometer)
+            .NotNull()
+            .WithMessage(string.Format(ValidationMessages.Required, "Kilometre"))
+            .GreaterThan(0)
+            .WithMessage(string.Format(ValidationMessages.GreaterThanZero, "Kilometre"))
+            .When(x => x.Kilometer > 0);
     }
 }
