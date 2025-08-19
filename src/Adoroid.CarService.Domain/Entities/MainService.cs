@@ -15,6 +15,7 @@ public class MainService : Entity<Guid>
     public decimal Cost { get; set; }
     public int ServiceStatus { get; set; }
     public Guid CompanyId { get; set; }
+    public decimal? Kilometers { get; set; }
 
     public Vehicle? Vehicle { get; set; }
     public Company? Company { get; set; }
