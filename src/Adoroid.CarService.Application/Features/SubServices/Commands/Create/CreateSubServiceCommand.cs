@@ -1,6 +1,5 @@
 ﻿using Adoroid.CarService.Application.Common.Abstractions;
 using Adoroid.CarService.Application.Common.Abstractions.Auth;
-using Adoroid.CarService.Application.Common.Abstractions.Caching;
 using Adoroid.CarService.Application.Common.Extensions;
 using Adoroid.CarService.Application.Features.SubServices.Dtos;
 using Adoroid.CarService.Application.Features.SubServices.ExceptionMessages;
@@ -15,14 +14,12 @@ namespace Adoroid.CarService.Application.Features.SubServices.Commands.Create;
 public record CreateSubServiceCommand(Guid MainServiceId, string Operation, Guid EmployeeId, DateTime OperationDate, string? Description,
     string? Material, string? MaterialBrand, decimal? MaterialCost, Guid? SupplierId, decimal? Discount, decimal Cost) : IRequest<Response<SubServiceDto>>;
 
-public class CreateSubServiceCommandHandler(IUnitOfWork unitOfWork, ICurrentUser currentUser, ICacheService cacheService, ILogger<CreateSubServiceCommandHandler> logger)
+public class CreateSubServiceCommandHandler(IUnitOfWork unitOfWork, ICurrentUser currentUser, ILogger<CreateSubServiceCommandHandler> logger)
     : IRequestHandler<CreateSubServiceCommand, Response<SubServiceDto>>
 {
  
     public async Task<Response<SubServiceDto>> Handle(CreateSubServiceCommand request, CancellationToken cancellationToken)
     {
-        var redisKeyPrefix = $"subservice:list:{request.MainServiceId}";
-
         var companyId = currentUser.ValidCompanyId();
 
         var mainServiceEntity = await unitOfWork.MainServices.GetByIdAsync(request.MainServiceId, true, cancellationToken);
@@ -57,20 +54,13 @@ public class CreateSubServiceCommandHandler(IUnitOfWork unitOfWork, ICurrentUser
 
         await unitOfWork.SaveChangesAsync(cancellationToken);
 
+        logger.LogInformation("New sub service created with id {Id} for main service {MainServiceId} by user {UserId}", result.Id, mainServiceEntity.Id, currentUser.Id);
+
         var model = result;
         model.MainService = mainServiceEntity;
         model.Employee = employee;
 
         var resultDto = model.FromEntity();
-
-        try
-        {
-            await cacheService.AppendToListAsync($"{redisKeyPrefix}:{companyId}", resultDto, null);
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, "Error while appending to cache for sub service creation.");
-        }
 
         return Response<SubServiceDto>.Success(resultDto);
     }

@@ -1,6 +1,5 @@
 ﻿using Adoroid.CarService.Application.Common.Abstractions;
 using Adoroid.CarService.Application.Common.Abstractions.Auth;
-using Adoroid.CarService.Application.Common.Abstractions.Caching;
 using Adoroid.CarService.Application.Common.Extensions;
 using Adoroid.CarService.Application.Features.SubServices.ExceptionMessages;
 using Adoroid.Core.Application.Wrappers;
@@ -11,7 +10,7 @@ namespace Adoroid.CarService.Application.Features.SubServices.Commands.Delete;
 
 public record DeleteSubServiceCommand(Guid Id) : IRequest<Response<Guid>>;
 
-public class DeleteSubServiceCommandHandler(IUnitOfWork unitOfWork, ICurrentUser currentUser, ICacheService cacheService, ILogger<DeleteSubServiceCommandHandler> logger)
+public class DeleteSubServiceCommandHandler(IUnitOfWork unitOfWork, ICurrentUser currentUser, ILogger<DeleteSubServiceCommandHandler> logger)
     : IRequestHandler<DeleteSubServiceCommand, Response<Guid>>
 {
     public async Task<Response<Guid>> Handle(DeleteSubServiceCommand request, CancellationToken cancellationToken)
@@ -23,23 +22,13 @@ public class DeleteSubServiceCommandHandler(IUnitOfWork unitOfWork, ICurrentUser
         if (entity is null)
             return Response<Guid>.Fail(BusinessExceptionMessages.NotFound);
 
-        var redisKeyPrefix = $"subservice:list:{entity.MainServiceId}";
-
         entity.IsDeleted = true;
         entity.DeletedBy = Guid.Parse(currentUser.Id!);
         entity.DeletedDate = DateTime.UtcNow;
 
         await unitOfWork.SaveChangesAsync(cancellationToken);
 
-        try
-        {
-            var cacheListKey = $"{redisKeyPrefix}:{companyId}";
-            await cacheService.RemoveFromListAsync<dynamic>(cacheListKey, request.Id.ToString());
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, "Error while deleting to cache for sub service delete.");
-        }
+        logger.LogInformation("Sub service with id {Id} deleted by user {UserId}", entity.Id, currentUser.Id);
 
         return Response<Guid>.Success(entity.Id);
     }
