@@ -1,6 +1,5 @@
 ﻿using Adoroid.CarService.Application.Common.Abstractions;
 using Adoroid.CarService.Application.Common.Abstractions.Auth;
-using Adoroid.CarService.Application.Common.Abstractions.Caching;
 using Adoroid.CarService.Application.Common.Enums;
 using Adoroid.CarService.Application.Common.Extensions;
 using Adoroid.CarService.Application.Features.MainServices.Dtos;
@@ -15,11 +14,9 @@ namespace Adoroid.CarService.Application.Features.MainServices.Commands.Create;
 
 public record CreateMainServiceCommand(Guid VehicleId, decimal Kilometer, DateTime ServiceDate, string? Description) : IRequest<Response<MainServiceDto>>;
 
-public class CreateMainServiceCommandHandler(IUnitOfWork unitOfWork, ICurrentUser currentUser, 
-    ICacheService cacheService, ILogger<CreateMainServiceCommandHandler> logger) 
+public class CreateMainServiceCommandHandler(IUnitOfWork unitOfWork, ICurrentUser currentUser, ILogger<CreateMainServiceCommandHandler> logger) 
     : IRequestHandler<CreateMainServiceCommand, Response<MainServiceDto>>
 {
-    const string redisKeyPrefix = "mainservice:list";
     public async Task<Response<MainServiceDto>> Handle(CreateMainServiceCommand request, CancellationToken cancellationToken)
     {
         var companyId = currentUser.ValidCompanyId();
@@ -45,19 +42,12 @@ public class CreateMainServiceCommandHandler(IUnitOfWork unitOfWork, ICurrentUse
 
         var result = await unitOfWork.MainServices.AddAsync(entity, cancellationToken);
         await unitOfWork.SaveChangesAsync(cancellationToken);
-        
+
+        logger.LogInformation("New main service created with id {Id} for vehicle {VehicleId} by user {UserId}", result.Id, vehicle.Id, currentUser.Id);
+
         result.Vehicle = vehicle;
 
         var resultDto = result.FromEntity();
-
-        try
-        {
-            await cacheService.AppendToListAsync($"{redisKeyPrefix}:{companyId}", resultDto, null);
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, "Error while appending to cache for main service creation.");
-        }
 
         return Response<MainServiceDto>.Success(resultDto);
     }

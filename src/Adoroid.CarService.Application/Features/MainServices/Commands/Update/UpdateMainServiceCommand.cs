@@ -1,6 +1,5 @@
 ﻿using Adoroid.CarService.Application.Common.Abstractions;
 using Adoroid.CarService.Application.Common.Abstractions.Auth;
-using Adoroid.CarService.Application.Common.Abstractions.Caching;
 using Adoroid.CarService.Application.Common.Enums;
 using Adoroid.CarService.Application.Common.Extensions;
 using Adoroid.CarService.Application.Features.MainServices.Dtos;
@@ -16,11 +15,9 @@ namespace Adoroid.CarService.Application.Features.MainServices.Commands.Update;
 public record UpdateMainServiceCommand(Guid Id, Guid VehicleId, decimal Kilometer, DateTime ServiceDate, string? Description, int MainServiceStatus)
     : IRequest<Response<MainServiceDto>>;
 
-public class UpdateMainServiceCommandHandler(IUnitOfWork unitOfWork, ICurrentUser currentUser, ICacheService cacheService,
-    ILogger<UpdateMainServiceCommandHandler> logger)
+public class UpdateMainServiceCommandHandler(IUnitOfWork unitOfWork, ICurrentUser currentUser, ILogger<UpdateMainServiceCommandHandler> logger)
         : IRequestHandler<UpdateMainServiceCommand, Response<MainServiceDto>>
 {
-    const string redisKeyPrefix = "mainservice:list";
     public async Task<Response<MainServiceDto>> Handle(UpdateMainServiceCommand request, CancellationToken cancellationToken)
     {
         var companyId = currentUser.ValidCompanyId();
@@ -97,6 +94,8 @@ public class UpdateMainServiceCommandHandler(IUnitOfWork unitOfWork, ICurrentUse
             accountTransaction.MainServiceId = request.Id;
 
             await unitOfWork.AccountTransactions.AddAsync(accountTransaction, cancellationToken);
+
+            logger.LogInformation("Accounting transaction created for main service completion. MainServiceId: {MainServiceId}, AccountOwnerId: {AccountOwnerId}, Amount: {Amount}", request.Id, vehicleUserId, entity.Cost);
         }
 
         await unitOfWork.BeginTransactionAsync(cancellationToken); ;
@@ -117,15 +116,6 @@ public class UpdateMainServiceCommandHandler(IUnitOfWork unitOfWork, ICurrentUse
         }
 
         var resultDto = entity.FromEntity();
-
-        try
-        {
-            await cacheService.UpdateToListAsync($"{redisKeyPrefix}:{companyId}", request.Id.ToString(), resultDto, null);
-        }
-        catch (Exception ex) {
-            const string errorMessage = "Cache güncelleme işlemi başarısız oldu. MainServiceId: {MainServiceId}";
-            logger.LogError(ex, errorMessage, request.Id);
-        }
        
         return Response<MainServiceDto>.Success(resultDto);
     }
