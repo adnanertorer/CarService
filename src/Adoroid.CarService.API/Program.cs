@@ -23,10 +23,7 @@ builder.Configuration.AddJsonFile("appsettings.json", optional: false, reloadOnC
     .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true, reloadOnChange: true)
     .AddEnvironmentVariables();
 
-builder.WebHost.ConfigureKestrel(options =>
-{
-    options.ListenAnyIP(7290);
-});
+builder.WebHost.UseUrls("http://0.0.0.0:7290");
 
 builder.Services.AddCarServicePersistence(builder.Configuration);
 builder.Services.AddCarServiceApplication(builder.Configuration);
@@ -125,12 +122,14 @@ builder.Services.AddHttpContextAccessor();
 
 builder.Services.AddCors(options =>
 {
-options.AddPolicy("CorsPolicy", cors =>
-    cors.WithOrigins("https://app.fixybear.com")
-        .AllowAnyHeader()
-        .AllowAnyMethod()
+    options.AddPolicy("CorsPolicy", cors =>
+        cors.WithOrigins("https://app.fixybear.com")
+            .AllowAnyHeader()
+            .AllowAnyMethod()
+            .AllowCredentials() 
     );
 });
+
 
 builder.Services.AddSwaggerGen(setup =>
 {
@@ -182,16 +181,6 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi();
 }
 
-app.UseCors("CorsPolicy");
-
-app.UseHttpsRedirection();
-
-app.UseMiddleware<RequestTrackingMiddleware>();
-app.UseMiddleware<ExceptionMiddleware>();
-
-app.UseAuthentication();
-app.UseAuthorization();
-
 app.CompanyEndpoints();
 app.UserEndpoints();
 app.CustomerEndpoint();
@@ -208,5 +197,23 @@ app.GeographicEndpoints();
 app.UserToCompanyEndpoints();
 app.MapBookingEndpoints();
 app.ReportEndpoints();
+
+// Configure the HTTP request pipeline.
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
+    app.MapOpenApi();
+}
+
+app.UseCors("CorsPolicy");
+
+app.UseMiddleware<RequestTrackingMiddleware>();
+app.UseMiddleware<ExceptionMiddleware>();
+
+app.UseHttpsRedirection();
+
+app.UseAuthentication();
+app.UseAuthorization();
 
 app.Run();
