@@ -125,13 +125,13 @@ builder.Services.AddHttpContextAccessor();
 
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("CorsPolicy",
-        builder => builder.WithOrigins("https://app.fixybear.com")
-                          .AllowAnyHeader()
-        .AllowAnyMethod()
-        .AllowCredentials());
+    options.AddPolicy("CorsPolicy", cors =>
+        cors.WithOrigins("https://app.fixybear.com")
+            .AllowAnyHeader()
+            .AllowAnyMethod()
+            .AllowCredentials() 
+    );
 });
-
 
 builder.Services.AddSwaggerGen(setup =>
 {
@@ -176,6 +176,23 @@ using (var scope = app.Services.CreateScope())
     db.Database.Migrate();
 }
 
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
+    app.MapOpenApi();
+}
+
+app.UseCors("CorsPolicy");
+
+app.UseHttpsRedirection();
+
+app.UseMiddleware<RequestTrackingMiddleware>();
+app.UseMiddleware<ExceptionMiddleware>();
+
+app.UseAuthentication();
+app.UseAuthorization();
+
 app.CompanyEndpoints();
 app.UserEndpoints();
 app.CustomerEndpoint();
@@ -192,23 +209,5 @@ app.GeographicEndpoints();
 app.UserToCompanyEndpoints();
 app.MapBookingEndpoints();
 app.ReportEndpoints();
-
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-    app.MapOpenApi();
-}
-
-app.UseCors("CorsPolicy");
-
-app.UseMiddleware<RequestTrackingMiddleware>();
-app.UseMiddleware<ExceptionMiddleware>();
-
-app.UseHttpsRedirection();
-
-app.UseAuthentication();
-app.UseAuthorization();
 
 app.Run();
