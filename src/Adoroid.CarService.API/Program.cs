@@ -125,11 +125,10 @@ builder.Services.AddHttpContextAccessor();
 
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("CorsPolicy", cors =>
-        cors.WithOrigins("https://app.fixybear.com")
-            .AllowAnyHeader()
-            .AllowAnyMethod()
-            .AllowCredentials() 
+options.AddPolicy("CorsPolicy", cors =>
+    cors.WithOrigins("https://app.fixybear.com")
+        .AllowAnyHeader()
+        .AllowAnyMethod()
     );
 });
 
