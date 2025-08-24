@@ -1,6 +1,5 @@
 ﻿using Adoroid.CarService.Application.Common.Abstractions;
 using Adoroid.CarService.Application.Common.Abstractions.Auth;
-using Adoroid.CarService.Application.Common.Abstractions.Caching;
 using Adoroid.CarService.Application.Common.Extensions;
 using Adoroid.CarService.Application.Features.SubServices.Dtos;
 using Adoroid.CarService.Application.Features.SubServices.MapperExtensions;
@@ -17,26 +16,20 @@ public record GetListSubServiceQuery(PageRequest PageRequest, Guid MainServiceId
 public record GetListSubServiceQueryHandler(PageRequest PageRequest, string? Search)
     : IRequest<Response<Paginate<SubServiceDto>>>;
 
-public class GetEntityListQueryHandler(IUnitOfWork unitOfWork, ICacheService cacheService, ICurrentUser currentUser)
+public class GetEntityListQueryHandler(IUnitOfWork unitOfWork, ICurrentUser currentUser)
     : IRequestHandler<GetListSubServiceQuery, Response<Paginate<SubServiceDto>>>
 {
   
     public async Task<Response<Paginate<SubServiceDto>>> Handle(GetListSubServiceQuery request, CancellationToken cancellationToken)
     {
-        var redisKeyPrefix = $"subservice:list:{request.MainServiceId}";
 
         var companyId = currentUser.ValidCompanyId();
 
-        var cacheKey = $"{redisKeyPrefix}:{companyId}";
+        var query = unitOfWork.SubServices.GetListByMainServiceIdWithDetails(request.MainServiceId, true);
 
-        var list = await cacheService.GetOrSetListAsync<List<SubServiceDto>>(cacheKey, async () =>
-        {
-            var query = unitOfWork.SubServices.GetListByMainServiceIdWithDetails(request.MainServiceId, true);
-
-            return await query
-                .OrderByDescending(i => i.OperationDate)
-                .Select(i => i.FromEntity()).ToListAsync(cancellationToken);
-        }, TimeSpan.FromHours(2));
+        var list = await query
+            .OrderByDescending(i => i.OperationDate)
+            .Select(i => i.FromEntity()).ToListAsync(cancellationToken);
 
         return Response<Paginate<SubServiceDto>>.Success(list.AsQueryable().ToPaginate(request.PageRequest.PageIndex, request.PageRequest.PageSize));
     }

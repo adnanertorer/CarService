@@ -1,6 +1,5 @@
 ﻿using Adoroid.CarService.Application.Common.Abstractions;
 using Adoroid.CarService.Application.Common.Abstractions.Auth;
-using Adoroid.CarService.Application.Common.Abstractions.Caching;
 using Adoroid.CarService.Application.Common.Extensions;
 using Adoroid.CarService.Application.Features.SubServices.Dtos;
 using Adoroid.CarService.Application.Features.SubServices.ExceptionMessages;
@@ -14,7 +13,7 @@ namespace Adoroid.CarService.Application.Features.SubServices.Commands.Update;
 public record UpdateSubServiceCommand(Guid Id, string Operation, Guid EmployeeId, DateTime OperationDate, string? Description,
     string? Material, string? MaterialBrand, decimal? MaterialCost, Guid? SupplierId, decimal? Discount, decimal Cost) : IRequest<Response<SubServiceDto>>;
 
-public class UpdateSubServiceCommandHandler(IUnitOfWork unitOfWork, ICurrentUser currentUser, ICacheService cacheService, ILogger<UpdateSubServiceCommandHandler> logger)
+public class UpdateSubServiceCommandHandler(IUnitOfWork unitOfWork, ICurrentUser currentUser, ILogger<UpdateSubServiceCommandHandler> logger)
     : IRequestHandler<UpdateSubServiceCommand, Response<SubServiceDto>>
 {
     
@@ -26,8 +25,6 @@ public class UpdateSubServiceCommandHandler(IUnitOfWork unitOfWork, ICurrentUser
 
         if (entity is null)
             return Response<SubServiceDto>.Fail(BusinessExceptionMessages.NotFound);
-
-        var redisKeyPrefix = $"subservice:list:{entity.MainServiceId}";
 
         var mainServiceEntity = await unitOfWork.MainServices.GetByIdAsync(entity.MainServiceId, true, cancellationToken);
         if (mainServiceEntity == null)
@@ -54,19 +51,12 @@ public class UpdateSubServiceCommandHandler(IUnitOfWork unitOfWork, ICurrentUser
 
         await unitOfWork.SaveChangesAsync(cancellationToken);
 
+        logger.LogInformation("Sub service with id {Id} updated by user {UserId}", entity.Id, currentUser.Id);
+
         entity.MainService = mainServiceEntity;
         entity.Employee = employee;
 
         var resultDto = entity.FromEntity();
-
-        try
-        {
-            await cacheService.UpdateToListAsync($"{redisKeyPrefix}:{companyId}", request.Id.ToString(), resultDto, null);
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, "Error while updating to cache for sub service update.");
-        }
 
         return Response<SubServiceDto>.Success(entity.FromEntity());
     }
