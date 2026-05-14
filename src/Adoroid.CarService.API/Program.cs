@@ -122,12 +122,19 @@ builder.Services.AddHttpContextAccessor();
 
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("CorsPolicy", cors =>
-        cors.WithOrigins("https://app.fixybear.com")
+    options.AddPolicy("CorsPolicy", policy =>
+    {
+        policy
+            .WithOrigins(
+                "http://localhost:3000",
+                "http://localhost:5173",
+                "https://localhost:3000",
+                "https://localhost:5173"
+            )
             .AllowAnyHeader()
             .AllowAnyMethod()
-            .AllowCredentials() 
-    );
+            .AllowCredentials();
+    });
 });
 
 

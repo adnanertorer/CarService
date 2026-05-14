@@ -38,7 +38,7 @@ public class CreateCompanyUserCommandHandler(IUnitOfWork unitOfWork, IAesEncrypt
             CreatedDate = DateTime.UtcNow,
             IsDeleted = false,
             OtpCode = otpCode,
-            IsActive = false
+            IsActive = true
         };
 
         await unitOfWork.Users.AddAsync(user, cancellationToken);
@@ -94,7 +94,7 @@ public class CreateCompanyUserCommandHandler(IUnitOfWork unitOfWork, IAesEncrypt
 
         logger.LogInformation("User to Company relation created with UserId: {UserId} and CompanyId: {CompanyId}", user.Id, company.Id);
 
-        var mailBody = MailTemplates.GetVerificationEmailTemplate;
+       /* var mailBody = MailTemplates.GetVerificationEmailTemplate;
         mailBody = mailBody.Replace("{{OTP_CODE}}", otpCode)
             .Replace("{{ACTION_URL}}", "https://app.fixybear.com/opt-approve")
             .Replace("{{SUPPORT_EMAIL}}", "info@fixybear.com")
@@ -108,9 +108,9 @@ public class CreateCompanyUserCommandHandler(IUnitOfWork unitOfWork, IAesEncrypt
             Recipient = request.CreateUserDto.Email,
             SenderDisplayName = "FixyBear",
             Subject = "FixyBear Kayıt"
-        });
+        }); 
 
-        await publishEndpoint.Publish(emailText, cancellationToken);
+        await publishEndpoint.Publish(emailText, cancellationToken); */
 
         return Core.Application.Wrappers.Response<UserDto>.Success(new UserDto
         {
